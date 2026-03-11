@@ -215,11 +215,12 @@
       background: rgba(20,26,34,.6);
     }
     .train-detail-row {
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      display: grid; grid-template-columns: 100px 80px 1fr 1fr; align-items: center; gap: 12px;
       padding: 8px 0; border-bottom: 1px solid var(--line);
       font-size: 12px;
     }
     .train-detail-row:last-child { border-bottom: none; }
+    @media (max-width: 600px) { .train-detail-row { grid-template-columns: 1fr 1fr; } }
 
     /* ── CALENDAR ── */
     .cal-grid {
@@ -362,6 +363,7 @@
         </div>
         <div class="hdr-actions">
           <button class="btn-ghost btn-sm" id="overviewBtn">Hours Overview</button>
+          <button class="btn-ghost btn-sm" id="mgmtCalBtn">Mgmt Calendar</button>
           <button class="btn-ghost btn-sm" id="promoBtn">Promo / EOTM</button>
           <button class="btn-ghost btn-sm" id="importCsvBtn">Import CSV</button>
           <input type="file" id="csvFile" accept=".csv,text/csv" style="display:none">
@@ -385,6 +387,7 @@
           <option value="least_recent">Least Recent</option>
         </select>
         <button class="btn-ghost btn-sm" id="inactiveBtn">Inactive</button>
+        <button class="btn-ghost btn-sm" id="needsTrainBtn">Needs Training</button>
         <button class="btn-ghost btn-sm" id="pastBtn">Graveyard</button>
         <button class="btn-danger btn-sm" id="resetBtn">Reset</button>
       </div>
@@ -410,6 +413,24 @@
         </div>
         <div class="panel-body" id="overviewBody">
           <div class="chart-bar-wrap" id="hoursChart"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MANAGEMENT CALENDAR -->
+    <section id="mgmtCalView" style="display:none;">
+      <div class="panel">
+        <div class="panel-head">
+          <div class="h">Management Calendar</div>
+          <div class="row tight" style="gap:6px">
+            <button class="btn-ghost btn-sm" id="mcPrev">←</button>
+            <span class="pill" id="mcMonthLabel">Month</span>
+            <button class="btn-ghost btn-sm" id="mcNext">→</button>
+            <button class="btn-accent btn-sm" id="addMgmtEventBtn">+ Entry</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div id="mgmtCalendar"></div>
         </div>
       </div>
     </section>
@@ -508,7 +529,26 @@
 
   <div class="toast" id="toast">Copied</div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
 <script>
+// ═══════════════════════════════════════════
+// FIREBASE INIT
+// ═══════════════════════════════════════════
+const firebaseConfig = {
+  apiKey: "AIzaSyAqzUCHWGTCO7CIRiGldSnsfz5f0tzQ5V0",
+  authDomain: "diamond-casino-tracker.firebaseapp.com",
+  databaseURL: "https://diamond-casino-tracker-default-rtdb.firebaseio.com",
+  projectId: "diamond-casino-tracker",
+  storageBucket: "diamond-casino-tracker.firebasestorage.app",
+  messagingSenderId: "973952156488",
+  appId: "1:973952156488:web:a4729ae9f843ae941b297d"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const dbRef = db.ref('tracker');
+
 // ═══════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════
@@ -603,53 +643,127 @@ function normalizeType(t){ const x=(t||"").toUpperCase(); if(x.includes("IN")) r
 function seed(){
   return {
     version:8, monthCursor:new Date().toISOString(), profileMonthCursor:new Date().toISOString(),
-    overviewMonthCursor:new Date().toISOString(),
+    overviewMonthCursor:new Date().toISOString(), mgmtMonthCursor:new Date().toISOString(),
     selectedId:null,
     ui:{inactiveOnly:false,showArchived:false,view:"hub",reviewTab:"eotm"},
     people:[], clockEvents:[], loas:[], entries:[], notesEntries:[], eotmHistory:[],
-    calendarEvents:[], // {id, personId, dateISO, type:'training'|'interview'|'meeting'|'other', note}
-    trainingNotes:[] // {id, personId, dateISO, note}
+    calendarEvents:[],
+    trainingNotes:[],
+    mgmtEvents:[]
   };
 }
-function load(){
-  try{
-    const raw=localStorage.getItem(STORE_KEY);
-    if(!raw){
-      // try migrating from v7
-      const old=localStorage.getItem("casinoTracker.local.v7");
-      if(old){
-        const data=JSON.parse(old);
-        if(data && Array.isArray(data.people)){
-          data.version=8;
-          data.profileMonthCursor=data.monthCursor||new Date().toISOString();
-          data.overviewMonthCursor=data.monthCursor||new Date().toISOString();
-          data.calendarEvents=data.calendarEvents||[];
-          data.trainingNotes=data.trainingNotes||[];
-          data.ui=data.ui||{};
-          data.ui.view=data.ui.view||"hub";
-          data.ui.reviewTab=data.ui.reviewTab||"eotm";
-          return data;
-        }
-      }
-      return seed();
-    }
-    const data=JSON.parse(raw);
-    if(!data||!Array.isArray(data.people)) return seed();
-    data.clockEvents||=[];data.loas||=[];data.entries||=[];data.notesEntries||=[];data.eotmHistory||=[];
-    data.calendarEvents||=[];data.trainingNotes||=[];
-    data.ui||={inactiveOnly:false,showArchived:false};
-    data.ui.reviewTab||="eotm"; data.ui.view||="hub";
-    data.profileMonthCursor||=data.monthCursor||new Date().toISOString();
-    data.overviewMonthCursor||=data.monthCursor||new Date().toISOString();
-    return data;
-  }catch{ return seed(); }
-}
-let state = load();
 
+function ensureState(data){
+  if(!data||!Array.isArray(data.people)) return seed();
+  data.clockEvents||=[];data.loas||=[];data.entries||=[];data.notesEntries||=[];data.eotmHistory||=[];
+  data.calendarEvents||=[];data.trainingNotes||=[];data.mgmtEvents||=[];
+  data.ui||={inactiveOnly:false,showArchived:false};
+  data.ui.reviewTab||="eotm"; data.ui.view||="hub";
+  data.profileMonthCursor||=data.monthCursor||new Date().toISOString();
+  data.overviewMonthCursor||=data.monthCursor||new Date().toISOString();
+  data.mgmtMonthCursor||=data.monthCursor||new Date().toISOString();
+  return data;
+}
+
+let state = seed();
+let firebaseReady = false;
+let savePending = false;
+
+// Save to Firebase (debounced)
 function save(){
-  localStorage.setItem(STORE_KEY, JSON.stringify(state));
-  $("#saveState").textContent="saved";
-  clearTimeout(save._t); save._t=setTimeout(()=>$("#saveState").textContent="saved locally",600);
+  // Also keep localStorage as fallback
+  try{ localStorage.setItem("casinoTracker.local.v8", JSON.stringify(state)); }catch{}
+
+  $("#saveState").textContent="saving...";
+  clearTimeout(save._t);
+  save._t = setTimeout(()=>{
+    dbRef.set(state).then(()=>{
+      $("#saveState").textContent="saved to cloud";
+      clearTimeout(save._t2);
+      save._t2=setTimeout(()=>$("#saveState").textContent="synced",1500);
+    }).catch(err=>{
+      console.error("Firebase save error:",err);
+      $("#saveState").textContent="save failed!";
+    });
+  }, 300);
+}
+
+// Boot: load from Firebase, fall back to localStorage, then start
+function boot(){
+  $("#saveState").textContent="connecting...";
+  dbRef.once('value').then(snap=>{
+    const data=snap.val();
+    if(data && data.people){
+      state=ensureState(data);
+      firebaseReady=true;
+      $("#saveState").textContent="synced";
+    } else {
+      // Try localStorage migration
+      let migrated=false;
+      try{
+        const local=localStorage.getItem("casinoTracker.local.v8")||localStorage.getItem("casinoTracker.local.v7");
+        if(local){
+          const parsed=JSON.parse(local);
+          if(parsed&&Array.isArray(parsed.people)){
+            state=ensureState(parsed);
+            // Push local data to Firebase
+            dbRef.set(state);
+            migrated=true;
+            $("#saveState").textContent="migrated to cloud";
+          }
+        }
+      }catch{}
+      if(!migrated){
+        state=seed();
+        $("#saveState").textContent="new database";
+      }
+      firebaseReady=true;
+    }
+    startApp();
+  }).catch(err=>{
+    console.error("Firebase load error:",err);
+    // Fallback to localStorage
+    try{
+      const local=localStorage.getItem("casinoTracker.local.v8");
+      if(local) state=ensureState(JSON.parse(local));
+    }catch{}
+    firebaseReady=true;
+    $("#saveState").textContent="offline mode";
+    startApp();
+  });
+
+  // Listen for realtime changes from other users
+  dbRef.on('value', snap=>{
+    if(!firebaseReady) return;
+    const data=snap.val();
+    if(!data||!data.people) return;
+    // Only update if the data is different (avoid echo from our own saves)
+    const incoming=JSON.stringify(data);
+    const current=JSON.stringify(state);
+    if(incoming!==current){
+      const currentView=state.ui?.view||'hub';
+      const currentSelected=state.selectedId;
+      state=ensureState(data);
+      // Preserve local navigation state
+      state.ui.view=currentView;
+      state.selectedId=currentSelected;
+      // Re-render current view
+      if(currentView==='profile'&&currentSelected) renderProfile();
+      else if(currentView==='overview') renderOverview();
+      else if(currentView==='mgmtcal') renderMgmtCal();
+      else if(currentView==='review') renderReviewPage();
+      else renderHub();
+      toast("Synced from another user");
+    }
+  });
+}
+
+function startApp(){
+  if(state.ui?.view==="review") renderReviewPage();
+  else if(state.ui?.view==="overview") renderOverview();
+  else if(state.ui?.view==="mgmtcal") renderMgmtCal();
+  else if(state.selectedId) renderProfile();
+  else renderHub();
 }
 
 // ═══════════════════════════════════════════
@@ -743,9 +857,9 @@ function activityStatus(pid){
 function activityMsgTemplate(which, name){
   name = name || "there";
   if(which==='warning'){
-    return `Hey ${name}! Just checking in — you didn't hit the 4-hour minimum last month.\n\nWe require at least 4 hours of clock-in time per calendar month (30-minute shift minimum) to stay active on roster. If you need LOA, let me know and we'll get you covered.\n\nThis is your first miss — hit your hours this month and you're back to a clean slate. Two consecutive missed months means separation from the roster.\n\nThanks!`;
+    return `Hey ${name}! You didn't hit your 4 hours last month. Make sure you get them in this month — if you miss two months in a row we'll have to let you go. If you need time away, put in an LOA and we'll get you covered. Reach out if you have any questions!`;
   }
-  return `Hey ${name}. You've now missed the 4-hour minimum for two consecutive months.\n\nPer our activity policy, two consecutive missed months means separation from the casino roster. If there are circumstances we should know about, please reach out.\n\nYou're welcome to reapply in the future. Thank you for your time with us.`;
+  return `Hey ${name}. You've missed the 4-hour minimum two months in a row, so we're going to have to remove you from the roster. No hard feelings at all — you're always welcome to reapply down the line. Thanks for your time with us!`;
 }
 
 // ═══════════════════════════════════════════
@@ -874,11 +988,9 @@ function importBackup(file){
     try{
       const data=JSON.parse(reader.result);
       if(!data||!Array.isArray(data.people)) throw new Error("Invalid backup.");
-      data.clockEvents||=[];data.loas||=[];data.entries||=[];data.notesEntries||=[];data.eotmHistory||=[];
-      data.calendarEvents||=[];data.trainingNotes||=[];data.ui||={};
-      state=data; save();
+      state=ensureState(data); save();
       if(state.selectedId) renderProfile(); else renderHub();
-      alert("Backup imported.");
+      alert("Backup imported and synced to cloud.");
     }catch(e){ alert("Backup import failed: "+e.message); }
   };
   reader.readAsText(file);
@@ -921,6 +1033,7 @@ function renderHub(){
   $("#profileView").style.display="none";
   $("#overviewView").style.display="none";
   document.getElementById('reviewView').style.display="none";
+  document.getElementById('mgmtCalView').style.display="none";
   $("#backBtn").style.display="none";
   $("#searchBar").style.display="";
   state.ui.view="hub"; state.selectedId=null;
@@ -933,11 +1046,22 @@ function renderHub(){
   const monthDate=startOfMonth(new Date());
   const showArchived=!!(state.ui?.showArchived);
   const inactiveOnly=!!(state.ui?.inactiveOnly);
+  const needsTrainOnly=!!(state.ui?.needsTrainOnly);
 
   const ib=$("#inactiveBtn");
   if(ib){ ib.className=`btn-${inactiveOnly?'accent':'ghost'} btn-sm`; ib.textContent=inactiveOnly?'Inactive ✓':'Inactive'; }
+  const ntb=document.getElementById('needsTrainBtn');
+  if(ntb){ ntb.className=`btn-${needsTrainOnly?'accent':'ghost'} btn-sm`; ntb.textContent=needsTrainOnly?'Needs Training ✓':'Needs Training'; }
   const pb=$("#pastBtn");
   if(pb){ pb.className=`btn-${showArchived?'accent':'ghost'} btn-sm`; pb.textContent=showArchived?'Graveyard ✓':'Graveyard'; }
+
+  // Helper: person has zero completed trainings (SOP not done OR no role trainings at all)
+  function personNeedsTraining(p){
+    ensurePerson(p);
+    if(!p.training.sop?.done) return true;
+    const hasAnyRole=FIXED_ROLES.some(r=>!!(p.training.roles[r]?.date));
+    return !hasAnyRole;
+  }
 
   const items=state.people.filter(p=>showArchived?!!p.archived:!p.archived).map(p=>{
     ensurePerson(p);
@@ -948,9 +1072,11 @@ function renderHub(){
     const hay=`${p.character} ${p.steamName} ${p.callsign} ${p.steam}`.toLowerCase();
     const pass=!q||hay.includes(q);
     const strikes=strikesInMonth(p.id,monthDate);
-    return {p,monthly,total,lastIn,activity,strikes,pass};
+    const untrained=personNeedsTraining(p);
+    return {p,monthly,total,lastIn,activity,strikes,pass,untrained};
   }).filter(x=>x.pass)
-    .filter(x=>!inactiveOnly||(x.activity.state==='WARNING'||x.activity.state==='SEPARATION'));
+    .filter(x=>!inactiveOnly||(x.activity.state==='WARNING'||x.activity.state==='SEPARATION'))
+    .filter(x=>!needsTrainOnly||x.untrained);
 
   function byName(a,b){ return (a.p.character||"").localeCompare(b.p.character||"",undefined,{sensitivity:"base"}); }
   function byDc(a,b){ const an=dcNumberFromCallsign(a.p.callsign),bn=dcNumberFromCallsign(b.p.callsign); return an===bn?byName(a,b):an-bn; }
@@ -975,7 +1101,7 @@ function renderHub(){
     const p=it.p, a=it.activity;
     let badge="";
     if(a.state==='LOA') badge=`<span class="pill loa">LOA</span>`;
-    else if(a.state==='SEPARATION') badge=`<span class="pill bad">SEPARATION</span>`;
+    else if(a.state==='SEPARATION') badge=`<span class="pill bad">TERMINATE</span>`;
     else if(a.state==='WARNING') badge=`<span class="pill warn">WARNING</span>`;
     else if(a.state==='PENDING') badge=`<span class="pill accent">${it.monthly.countedMs>0?durLabel(it.monthly.countedMs)+' / 4h':'PENDING'}</span>`;
     else badge=`<span class="pill good">ACTIVE</span>`;
@@ -1024,6 +1150,7 @@ function renderOverview(){
   $("#profileView").style.display="none";
   $("#overviewView").style.display="";
   document.getElementById('reviewView').style.display="none";
+  document.getElementById('mgmtCalView').style.display="none";
   $("#backBtn").style.display="";
   $("#searchBar").style.display="none";
   state.ui.view="overview"; save();
@@ -1034,28 +1161,63 @@ function renderOverview(){
   const items=state.people.filter(p=>!p.archived).map(p=>{
     ensurePerson(p);
     const monthly=computeMonthly(p.id,md);
-    return {name:p.character||p.steamName||"Unknown", callsign:p.callsign||"", ms:monthly.countedMs, excluded:isMgmtCallsign(p.callsign)};
-  }).filter(x=>!x.excluded).sort((a,b)=>b.ms-a.ms);
+    const activity=activityStatus(p.id);
+    return {id:p.id, name:p.character||p.steamName||"Unknown", callsign:p.callsign||"",
+      discordId:p.discordId||"", ms:monthly.countedMs, activity, isMgmt:isMgmtCallsign(p.callsign)};
+  }).sort((a,b)=>b.ms-a.ms);
 
   const maxMs=Math.max(...items.map(x=>x.ms), MONTHLY_MIN_MS);
   const chart=$("#hoursChart");
+
+  const copyIcon=`<svg viewBox="0 0 24 24" fill="none" style="width:12px;height:12px"><path d="M9 9h9v10a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V11a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.8"/><path d="M7 13H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="1.8"/></svg>`;
 
   chart.innerHTML=items.map(it=>{
     const pct=maxMs>0?Math.round(it.ms/maxMs*100):0;
     const met=it.ms>=MONTHLY_MIN_MS;
     const color=met?'var(--good)':'var(--bad)';
-    const bg=met?'var(--good-dim)':'var(--bad-dim)';
+    const a=it.activity;
+
+    // One status pill only
+    let statusBadge='';
+    if(a.state==='LOA') statusBadge=`<span class="pill loa" style="font-size:9px">LOA</span>`;
+    else if(a.state==='SEPARATION') statusBadge=`<span class="pill bad" style="font-size:9px">TERMINATE</span>`;
+    else if(a.state==='WARNING') statusBadge=`<span class="pill warn" style="font-size:9px">WARNING</span>`;
+    else if(a.state==='PENDING') statusBadge=`<span class="pill accent" style="font-size:9px">PENDING</span>`;
+    else statusBadge=`<span class="pill good" style="font-size:9px">OK</span>`;
+
+    // Name is clickable to copy discord ID, pill is clickable to copy message
+    const nameColor=it.isMgmt?'color:var(--accent)':'';
+    const nameClickable=it.discordId?`cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px`:'';
+    const nameData=it.discordId?`data-ov-copy-dc="${escapeHtml(it.discordId)}"`:'';
+
+    const pillClickable=(a.state==='WARNING'||a.state==='SEPARATION')?`cursor:pointer`:'';
+    const pillData=(a.state==='WARNING')?`data-ov-copy-msg="${escapeHtml(activityMsgTemplate('warning',it.name))}"`:
+      (a.state==='SEPARATION')?`data-ov-copy-msg="${escapeHtml(activityMsgTemplate('separation',it.name))}"`:'';
+
     return `
-      <div class="chart-row">
-        <div class="chart-label" title="${escapeHtml(it.callsign)}">${escapeHtml(it.name)}</div>
+      <div class="chart-row" style="padding:4px 0">
+        <div class="chart-label" title="${it.discordId?'Click to copy Discord ID':escapeHtml(it.callsign)}" style="display:flex;align-items:center;gap:6px;${nameColor};${nameClickable}" ${nameData}>
+          ${escapeHtml(it.name)}
+        </div>
         <div class="chart-bar-bg">
           <div class="chart-bar-fill" style="width:${pct}%;background:${color};"></div>
           <div style="position:absolute;left:${Math.min(Math.round(MONTHLY_MIN_MS/maxMs*100),100)}%;top:0;bottom:0;width:1px;background:rgba(255,255,255,.2);"></div>
         </div>
-        <div class="chart-value">${escapeHtml(durLabel(it.ms))}</div>
+        <div style="display:flex;align-items:center;gap:6px;min-width:120px;justify-content:flex-end">
+          <span style="font-size:11px;color:var(--muted)">${escapeHtml(durLabel(it.ms))}</span>
+          <span style="${pillClickable}" ${pillData} ${pillData?'title="Click to copy message"':''}>${statusBadge}</span>
+        </div>
       </div>
     `;
   }).join('')||`<div class="muted">No active employees.</div>`;
+
+  // Wire copy buttons
+  document.querySelectorAll('[data-ov-copy-dc]').forEach(btn=>{
+    btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();copyText(btn.getAttribute('data-ov-copy-dc'));});
+  });
+  document.querySelectorAll('[data-ov-copy-msg]').forEach(btn=>{
+    btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();copyText(btn.getAttribute('data-ov-copy-msg'));});
+  });
 }
 
 // ═══════════════════════════════════════════
@@ -1070,6 +1232,7 @@ function renderProfile(){
   $("#profileView").style.display="";
   $("#overviewView").style.display="none";
   document.getElementById('reviewView').style.display="none";
+  document.getElementById('mgmtCalView').style.display="none";
   $("#backBtn").style.display="";
   $("#searchBar").style.display="none";
 
@@ -1082,7 +1245,7 @@ function renderProfile(){
   // Activity badge
   let aBadge="";
   if(activity.state==='LOA') aBadge=`<span class="pill loa">ON LOA</span>`;
-  else if(activity.state==='SEPARATION') aBadge=`<span class="pill bad">SEPARATION NEEDED</span>`;
+  else if(activity.state==='SEPARATION') aBadge=`<span class="pill bad">TERMINATION NEEDED</span>`;
   else if(activity.state==='WARNING') aBadge=`<span class="pill warn">WARNING — Missed Last Month</span>`;
   else if(activity.state==='PENDING') aBadge=`<span class="pill accent">Need ${escapeHtml(activity.hoursNeeded)} · ${activity.daysLeft}d left</span>`;
   else aBadge=`<span class="pill good">ACTIVE</span>`;
@@ -1198,11 +1361,17 @@ function renderTraining(pid){
 
   // SOP row
   detailHtml+=`<div class="train-detail">`;
+  detailHtml+=`<div class="train-detail-row" style="border-bottom:1px solid var(--line2);padding-bottom:6px;margin-bottom:2px">
+    <div class="muted" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Role</div>
+    <div class="muted" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Status</div>
+    <div class="muted" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Date</div>
+    <div class="muted" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Trainer</div>
+  </div>`;
   detailHtml+=`<div class="train-detail-row">
     <div><b>SOP</b></div>
     <div>${sopDone?`<span class="pill good" style="font-size:10px">Done</span>`:`<span class="pill warn" style="font-size:10px">Not Done</span>`}</div>
-    <div class="muted">${sopDone&&p.training.sop.date?escapeHtml(fmtMDY(new Date(p.training.sop.date))):''}</div>
-    <div class="muted">${sopDone?escapeHtml(trainerName(p.training.sop.trainerId)):''}</div>
+    <div class="muted">${sopDone&&p.training.sop.date?escapeHtml(fmtMDY(new Date(p.training.sop.date))):'—'}</div>
+    <div class="muted">${sopDone&&p.training.sop.trainerId?escapeHtml(trainerName(p.training.sop.trainerId)):'—'}</div>
   </div>`;
 
   // Role rows
@@ -1213,9 +1382,9 @@ function renderTraining(pid){
     detailHtml+=`<div class="train-detail-row">
       <div><b>${escapeHtml(role)}</b></div>
       <div>${locked?`<span class="pill" style="font-size:10px;opacity:.5">Locked</span>`:
-        trained?`<span class="pill good" style="font-size:10px">Trained</span>`:`<span class="pill" style="font-size:10px">Not trained</span>`}</div>
-      <div class="muted">${trained?escapeHtml(fmtMDY(new Date(r.date))):''}</div>
-      <div class="muted">${trained?escapeHtml(trainerName(r.trainerId)):''}</div>
+        trained?`<span class="pill good" style="font-size:10px">Trained</span>`:`<span class="pill" style="font-size:10px">—</span>`}</div>
+      <div class="muted">${trained?escapeHtml(fmtMDY(new Date(r.date))):'—'}</div>
+      <div class="muted">${trained&&r.trainerId?escapeHtml(trainerName(r.trainerId)):'—'}</div>
     </div>`;
   }
   detailHtml+=`</div>`;
@@ -1300,6 +1469,10 @@ function openTrainingModal(pid){
   openModal("Edit Training", html);
 
   document.getElementById('t_save').addEventListener('click',()=>{
+    const oldSopDate=p.training.sop?.date||'';
+    const oldRoleDates={};
+    for(const role of FIXED_ROLES) oldRoleDates[role]=p.training.roles[role]?.date||'';
+
     p.priorityRole=document.getElementById('t_pri').value||'';
     p.crossTrain=FIXED_ROLES.filter(r=>{const cb=document.querySelector(`input[data-cross="${CSS.escape(r)}"]`);return cb?.checked;});
     p.training.sop={done:document.getElementById('t_sop').value==='yes', trainerId:document.getElementById('t_sop_tr').value||'',
@@ -1309,6 +1482,39 @@ function openTrainingModal(pid){
       const dt=document.querySelector(`input[data-rd="${CSS.escape(role)}"]`);
       p.training.roles[role]={trainerId:tr?.value||'',date:(dt?.value||'').trim(),comment:p.training.roles[role]?.comment||''};
     }
+
+    // Auto-add calendar events for NEW training dates (personal + mgmt)
+    state.calendarEvents||=[];
+    state.mgmtEvents||=[];
+    const newSopDate=p.training.sop.date||'';
+    if(newSopDate&&newSopDate!==oldSopDate){
+      const iso=isoFromDateValue(newSopDate);
+      if(iso){
+        if(!state.calendarEvents.some(ce=>ce.personId===pid&&ce.type==='training'&&ce.note==='SOP Training'&&dateValueFromISO(ce.dateISO)===newSopDate)){
+          state.calendarEvents.push({id:uid(),personId:pid,dateISO:iso,type:'training',note:'SOP Training'});
+        }
+        // Mgmt calendar: auto-create if no matching training on that date
+        if(!state.mgmtEvents.some(me=>me.type==='training'&&me.role==='SOP'&&dateValueFromISO(me.dateISO)===newSopDate)){
+          state.mgmtEvents.push({id:uid(),dateISO:iso,type:'training',role:'SOP',ledBy:'',attendees:[],note:''});
+        }
+      }
+    }
+    for(const role of FIXED_ROLES){
+      const newDate=p.training.roles[role]?.date||'';
+      if(newDate&&newDate!==oldRoleDates[role]){
+        const iso=isoFromDateValue(newDate);
+        if(iso){
+          if(!state.calendarEvents.some(ce=>ce.personId===pid&&ce.type==='training'&&ce.note===`${role} Training`&&dateValueFromISO(ce.dateISO)===newDate)){
+            state.calendarEvents.push({id:uid(),personId:pid,dateISO:iso,type:'training',note:`${role} Training`});
+          }
+          // Mgmt calendar: group by role+date, no dupes
+          if(!state.mgmtEvents.some(me=>me.type==='training'&&me.role===role&&dateValueFromISO(me.dateISO)===newDate)){
+            state.mgmtEvents.push({id:uid(),dateISO:iso,type:'training',role,ledBy:'',attendees:[],note:''});
+          }
+        }
+      }
+    }
+
     save();closeModal();renderProfile();toast("Training saved");
   });
 }
@@ -1551,6 +1757,7 @@ function renderReviewPage(){
   $("#profileView").style.display="none";
   $("#overviewView").style.display="none";
   document.getElementById('reviewView').style.display="";
+  document.getElementById('mgmtCalView').style.display="none";
   $("#backBtn").style.display="";
   $("#searchBar").style.display="none";
 
@@ -1654,8 +1861,17 @@ function editBasics(){
 
 function deletePerson(){
   const p=getPerson(state.selectedId); if(!p) return;
-  if(!confirm(`Archive ${p.character||'this person'}?`)) return;
-  p.archived=true; state.selectedId=null; save(); renderHub();
+  const btn=document.getElementById('deletePersonBtn'); if(!btn) return;
+  if(btn.dataset.confirming==='true'){
+    p.archived=true; state.selectedId=null; save(); renderHub();
+  } else {
+    btn.dataset.confirming='true';
+    btn.textContent='Click again to confirm';
+    btn.className='btn-danger btn-sm';
+    setTimeout(()=>{
+      if(btn){btn.dataset.confirming='';btn.textContent='Archive';btn.className='btn-danger btn-sm';}
+    },3000);
+  }
 }
 
 function addEntry(existingId=null){
@@ -1746,8 +1962,208 @@ function openCalEventModal(){
 }
 
 function resetAll(){
-  if(!confirm("Reset EVERYTHING? This wipes your local tracker.")) return;
-  localStorage.removeItem(STORE_KEY); state=seed(); save(); renderHub();
+  if(!confirm("Reset EVERYTHING? This wipes the entire tracker for all users.")) return;
+  if(!confirm("Are you SURE? This cannot be undone.")) return;
+  state=seed();
+  dbRef.set(state);
+  try{localStorage.removeItem("casinoTracker.local.v8");}catch{}
+  save(); renderHub();
+}
+
+// ═══════════════════════════════════════════
+// RENDER: MANAGEMENT CALENDAR
+// ═══════════════════════════════════════════
+function hideAllViews(){
+  $("#hubView").style.display="none";
+  $("#profileView").style.display="none";
+  $("#overviewView").style.display="none";
+  document.getElementById('reviewView').style.display="none";
+  document.getElementById('mgmtCalView').style.display="none";
+}
+
+function renderMgmtCal(){
+  hideAllViews();
+  document.getElementById('mgmtCalView').style.display="";
+  $("#backBtn").style.display="";
+  $("#searchBar").style.display="none";
+  state.ui.view="mgmtcal"; save();
+
+  const md=startOfMonth(new Date(state.mgmtMonthCursor));
+  $("#mcMonthLabel").textContent=fmtMonthLabel(md);
+  const year=md.getFullYear(), mIdx=md.getMonth();
+
+  // Build day map for mgmt events
+  const mgmtByDay=new Map();
+  for(const me of (state.mgmtEvents||[])){
+    const dk=dateValueFromISO(me.dateISO);
+    if(!dk) continue;
+    const [cy,cm]=dk.split('-').map(Number);
+    if(cy===year&&cm===mIdx+1){
+      const arr=mgmtByDay.get(dk)||[];
+      arr.push(me);
+      mgmtByDay.set(dk,arr);
+    }
+  }
+
+  const firstDay=new Date(year,mIdx,1);
+  const startWeekday=firstDay.getDay();
+  const daysInMonth=new Date(year,mIdx+1,0).getDate();
+  const dayNames=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+  let html=`<div class="cal-grid">`;
+  for(const n of dayNames) html+=`<div class="cal-head">${n}</div>`;
+  for(let i=0;i<startWeekday;i++) html+=`<div></div>`;
+
+  for(let day=1;day<=daysInMonth;day++){
+    const key=`${year}-${String(mIdx+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+    const dayEvents=mgmtByDay.get(key)||[];
+    const hasTraining=dayEvents.some(e=>e.type==='training');
+    const hasInterview=dayEvents.some(e=>e.type==='interview');
+    const hasEvent=dayEvents.some(e=>e.type==='event');
+    const clickable=dayEvents.length>0;
+
+    let tags="";
+    if(hasTraining) tags+=`<span class="day-tag training"></span>`;
+    if(hasInterview) tags+=`<span class="day-tag interview"></span>`;
+    if(hasEvent) tags+=`<span class="day-tag event"></span>`;
+
+    let cls="cal-day";
+    if(dayEvents.length) cls+=" good";
+
+    html+=`<div class="${cls}" data-mday="${key}" style="cursor:${clickable?'pointer':'default'}">
+      <div class="day-num">${day}</div>
+      <div class="day-tags">${tags}</div>
+      <div><div class="day-label">${dayEvents.length?dayEvents.length+' entr'+(dayEvents.length===1?'y':'ies'):''}</div></div>
+    </div>`;
+  }
+  html+=`</div>`;
+  html+=`<div style="display:flex;gap:10px;margin-top:8px;font-size:10px;color:var(--muted);flex-wrap:wrap">
+    <span><span class="day-tag training" style="display:inline-block;vertical-align:middle"></span> Training</span>
+    <span><span class="day-tag interview" style="display:inline-block;vertical-align:middle"></span> Interview</span>
+    <span><span class="day-tag event" style="display:inline-block;vertical-align:middle"></span> Event</span>
+  </div>`;
+
+  document.getElementById('mgmtCalendar').innerHTML=html;
+
+  document.querySelectorAll('[data-mday]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const dk=el.getAttribute('data-mday');
+      const evts=mgmtByDay.get(dk)||[];
+      if(!evts.length) return;
+      openMgmtDayDetail(dk,evts);
+    });
+  });
+}
+
+function personLabel(pid){
+  const p=getPerson(pid);
+  if(!p) return '—';
+  return `${(p.callsign||'').toUpperCase()} ${p.character||p.steamName||'Unknown'}`.trim();
+}
+
+function openMgmtDayDetail(dayKey,evts){
+  const dateObj=new Date(dayKey+"T00:00:00");
+  const pretty=new Intl.DateTimeFormat("en-US",{month:"long",day:"numeric",year:"numeric"}).format(dateObj);
+  let html=`<div style="font-weight:900;font-size:16px;margin-bottom:12px">${escapeHtml(pretty)}</div>`;
+
+  for(const me of evts){
+    const typeColors={training:'var(--cyan)',interview:'var(--accent)',event:'var(--warn)'};
+    const typeLabel=me.type.charAt(0).toUpperCase()+me.type.slice(1);
+    const roleLabel=me.role?` — ${escapeHtml(me.role)}`:'';
+    const ledLabel=me.ledBy?personLabel(me.ledBy):'Not assigned';
+    const attendeeLabels=(me.attendees||[]).map(id=>escapeHtml(personLabel(id)));
+
+    html+=`<div style="padding:10px;border:1px solid var(--line);border-radius:var(--r);margin-bottom:8px;background:var(--surface)">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+        <div><span class="pill" style="font-size:10px;border-color:${typeColors[me.type]||'var(--muted)'}">${escapeHtml(typeLabel)}${roleLabel}</span></div>
+        <div style="display:flex;gap:4px">
+          <button class="btn-ghost btn-sm" data-edit-mgmt="${escapeHtml(me.id)}">Edit</button>
+          <button class="btn-ghost btn-sm" data-del-mgmt="${escapeHtml(me.id)}">Del</button>
+        </div>
+      </div>
+      <div style="margin-top:8px;font-size:12px">
+        <div><span class="muted">Led by:</span> <b>${escapeHtml(ledLabel)}</b></div>
+        ${attendeeLabels.length?`<div style="margin-top:6px"><span class="muted">Attended:</span><div style="display:flex;flex-direction:column;gap:3px;margin-top:4px">${attendeeLabels.map(a=>`<div style="padding:4px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);font-size:11px">${a}</div>`).join('')}</div></div>`:''}
+        ${me.note?`<div style="margin-top:4px;white-space:pre-wrap">${escapeHtml(me.note)}</div>`:''}
+      </div>
+    </div>`;
+  }
+
+  openModal("Day Details",html);
+
+  document.querySelectorAll('[data-edit-mgmt]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const me=(state.mgmtEvents||[]).find(x=>x.id===btn.getAttribute('data-edit-mgmt'));
+      if(me){closeModal();openMgmtEventModal(me);}
+    });
+  });
+  document.querySelectorAll('[data-del-mgmt]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      state.mgmtEvents=(state.mgmtEvents||[]).filter(x=>x.id!==btn.getAttribute('data-del-mgmt'));
+      save();closeModal();renderMgmtCal();
+    });
+  });
+}
+
+function openMgmtEventModal(existing){
+  const isEdit=!!existing;
+  const title=isEdit?"Edit Entry":"Add Entry";
+  const dateVal=isEdit?dateValueFromISO(existing.dateISO):dateValueFromISO(new Date().toISOString());
+  const typeVal=isEdit?existing.type:'training';
+  const roleVal=isEdit?existing.role||'':'';
+  const ledVal=isEdit?existing.ledBy||'':'';
+  const attendeesVal=isEdit?(existing.attendees||[]):[];
+  const noteVal=isEdit?existing.note||'':'';
+
+  // Build people options for led by (DC1-19 management)
+  const mgmtOpts=managementTrainerOptions();
+  const ledOpts=[`<option value="">— Select —</option>`].concat(mgmtOpts.map(t=>`<option value="${escapeHtml(t.id)}" ${t.id===ledVal?'selected':''}>${escapeHtml(t.label)}</option>`)).join('');
+
+  // Build people options for attendees (everyone active)
+  const allPeople=state.people.filter(p=>!p.archived).map(p=>{ensurePerson(p);return p;}).sort((a,b)=>(a.character||'').localeCompare(b.character||''));
+  const attendeeChecks=allPeople.map(p=>{
+    const checked=attendeesVal.includes(p.id);
+    const label=`${(p.callsign||'').toUpperCase()} ${p.character||p.steamName||'Unknown'}`.trim();
+    return `<label style="display:flex;gap:6px;align-items:center;font-size:12px;padding:3px 0"><input type="checkbox" data-att="${escapeHtml(p.id)}" ${checked?'checked':''}/>${escapeHtml(label)}</label>`;
+  }).join('');
+
+  const roleOpts=['','SOP',...FIXED_ROLES].map(r=>`<option value="${escapeHtml(r)}" ${r===roleVal?'selected':''}>${r||'— None —'}</option>`).join('');
+
+  openModal(title,`
+    <div class="row"><div><div class="muted small">Date</div><input type="date" id="me_date" value="${escapeHtml(dateVal)}"/></div>
+    <div><div class="muted small">Type</div><select id="me_type">
+      <option value="training" ${typeVal==='training'?'selected':''}>Training</option>
+      <option value="interview" ${typeVal==='interview'?'selected':''}>Interview</option>
+      <option value="event" ${typeVal==='event'?'selected':''}>Event</option>
+    </select></div></div>
+    <div class="row" style="margin-top:8px"><div><div class="muted small">Role (training only)</div><select id="me_role">${roleOpts}</select></div>
+    <div><div class="muted small">Led by</div><select id="me_led">${ledOpts}</select></div></div>
+    <div style="margin-top:8px"><div class="muted small">Attended by</div>
+      <div style="max-height:180px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--r);padding:8px;margin-top:4px;background:var(--surface)">${attendeeChecks}</div>
+    </div>
+    <div style="margin-top:8px"><div class="muted small">Note (optional)</div><textarea id="me_note" rows="2" placeholder="Additional details...">${escapeHtml(noteVal)}</textarea></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn-accent" id="me_save">Save</button></div>
+  `);
+
+  document.getElementById('me_save').addEventListener('click',()=>{
+    const ds=(document.getElementById('me_date').value||'').trim();
+    if(!ds) return alert('Pick a date.');
+    const iso=isoFromDateValue(ds);
+    const type=document.getElementById('me_type').value;
+    const role=document.getElementById('me_role').value;
+    const ledBy=document.getElementById('me_led').value;
+    const attendees=allPeople.filter(p=>{const cb=document.querySelector(`input[data-att="${CSS.escape(p.id)}"]`);return cb?.checked;}).map(p=>p.id);
+    const note=(document.getElementById('me_note').value||'').trim();
+
+    if(existing){
+      existing.dateISO=iso; existing.type=type; existing.role=role;
+      existing.ledBy=ledBy; existing.attendees=attendees; existing.note=note;
+    } else {
+      state.mgmtEvents||=[];
+      state.mgmtEvents.push({id:uid(),dateISO:iso,type,role,ledBy,attendees,note});
+    }
+    save();closeModal();renderMgmtCal();toast("Saved");
+  });
 }
 
 // ═══════════════════════════════════════════
@@ -1761,10 +2177,22 @@ $("#backupFile").addEventListener("change",e=>{const f=e.target.files?.[0];if(f)
 $("#addPersonBtn").addEventListener("click",addPerson);
 $("#promoBtn").addEventListener("click",()=>{state.ui.reviewTab='eotm';renderReviewPage();});
 $("#overviewBtn").addEventListener("click",renderOverview);
+$("#mgmtCalBtn").addEventListener("click",renderMgmtCal);
 $("#resetBtn").addEventListener("click",resetAll);
 
-$("#inactiveBtn").addEventListener("click",()=>{state.ui.inactiveOnly=!state.ui.inactiveOnly;if(state.ui.inactiveOnly)state.ui.showArchived=false;save();renderHub();});
-$("#pastBtn").addEventListener("click",()=>{state.ui.showArchived=!state.ui.showArchived;if(state.ui.showArchived)state.ui.inactiveOnly=false;save();renderHub();});
+document.getElementById('addMgmtEventBtn')?.addEventListener('click',()=>openMgmtEventModal(null));
+document.getElementById('mcPrev')?.addEventListener('click',()=>{
+  const d=startOfMonth(new Date(state.mgmtMonthCursor));
+  d.setMonth(d.getMonth()-1); state.mgmtMonthCursor=d.toISOString(); save(); renderMgmtCal();
+});
+document.getElementById('mcNext')?.addEventListener('click',()=>{
+  const d=startOfMonth(new Date(state.mgmtMonthCursor));
+  d.setMonth(d.getMonth()+1); state.mgmtMonthCursor=d.toISOString(); save(); renderMgmtCal();
+});
+
+$("#inactiveBtn").addEventListener("click",()=>{state.ui.inactiveOnly=!state.ui.inactiveOnly;if(state.ui.inactiveOnly){state.ui.showArchived=false;state.ui.needsTrainOnly=false;}save();renderHub();});
+document.getElementById('needsTrainBtn')?.addEventListener("click",()=>{state.ui.needsTrainOnly=!state.ui.needsTrainOnly;if(state.ui.needsTrainOnly){state.ui.showArchived=false;state.ui.inactiveOnly=false;}save();renderHub();});
+$("#pastBtn").addEventListener("click",()=>{state.ui.showArchived=!state.ui.showArchived;if(state.ui.showArchived){state.ui.inactiveOnly=false;state.ui.needsTrainOnly=false;}save();renderHub();});
 
 $("#backBtn").addEventListener("click",renderHub);
 $("#editPersonBtn").addEventListener("click",editBasics);
@@ -1803,10 +2231,7 @@ document.getElementById('reviewTabPromo')?.addEventListener('click',()=>{state.u
 // ═══════════════════════════════════════════
 // BOOT
 // ═══════════════════════════════════════════
-if(state.ui?.view==="review") renderReviewPage();
-else if(state.ui?.view==="overview") renderOverview();
-else if(state.selectedId) renderProfile();
-else renderHub();
+boot();
 </script>
 </body>
 </html>
