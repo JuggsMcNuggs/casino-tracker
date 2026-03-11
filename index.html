@@ -667,30 +667,24 @@ function ensureState(data){
 
 let state = seed();
 let firebaseReady = false;
-let justSaved = false; // cooldown flag to ignore our own echoes
 
 // Save to Firebase (debounced)
 function save(){
   // Also keep localStorage as fallback
   try{ localStorage.setItem("casinoTracker.local.v8", JSON.stringify(state)); }catch{}
 
-  justSaved = true;
   $("#saveState").textContent="saving...";
   clearTimeout(save._t);
   save._t = setTimeout(()=>{
     dbRef.set(state).then(()=>{
       $("#saveState").textContent="saved to cloud";
       clearTimeout(save._t2);
-      save._t2=setTimeout(()=>{
-        $("#saveState").textContent="synced";
-        justSaved = false;
-      },2000);
+      save._t2=setTimeout(()=>$("#saveState").textContent="synced",1500);
     }).catch(err=>{
       console.error("Firebase save error:",err);
       $("#saveState").textContent="save failed!";
-      justSaved = false;
     });
-  }, 300);
+  }, 400);
 }
 
 // Boot: load from Firebase, fall back to localStorage, then start
@@ -735,37 +729,6 @@ function boot(){
     firebaseReady=true;
     $("#saveState").textContent="offline mode";
     startApp();
-  });
-
-  // Listen for realtime changes from other users
-  dbRef.on('value', snap=>{
-    if(!firebaseReady) return;
-    if(justSaved) return; // ignore echoes from our own saves
-    const data=snap.val();
-    if(!data||!data.people) return;
-    const incoming=JSON.stringify(data);
-    const current=JSON.stringify(state);
-    if(incoming!==current){
-      const currentView=state.ui?.view||'hub';
-      const currentSelected=state.selectedId;
-      const profileMonth=state.profileMonthCursor;
-      const mgmtMonth=state.mgmtMonthCursor;
-      const ovMonth=state.overviewMonthCursor;
-      state=ensureState(data);
-      // Preserve local navigation state
-      state.ui.view=currentView;
-      state.selectedId=currentSelected;
-      state.profileMonthCursor=profileMonth;
-      state.mgmtMonthCursor=mgmtMonth;
-      state.overviewMonthCursor=ovMonth;
-      // Re-render current view
-      if(currentView==='profile'&&currentSelected) renderProfile();
-      else if(currentView==='overview') renderOverview();
-      else if(currentView==='mgmtcal') renderMgmtCal();
-      else if(currentView==='review') renderReviewPage();
-      else renderHub();
-      toast("Synced from another user");
-    }
   });
 }
 
