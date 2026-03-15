@@ -2630,12 +2630,30 @@ function renderCandidateCards(){
       :c.status==='denied'?`<span class="pill bad" style="font-size:10px">Denied</span>`
       :`<span class="pill warn" style="font-size:10px">Awaiting</span>`;
     const positions=(c.chosenPositions||[]).join(', ')||'—';
-    return `<div class="cand-card" data-cand-id="${escapeHtml(c.id)}">
+
+    // Grace period coloring (awaiting only)
+    let borderStyle='';
+    let graceLabel='';
+    if(c.status==='awaiting'&&c.acceptedDate){
+      const accepted=new Date(c.acceptedDate+'T00:00:00');
+      const days=Math.floor((Date.now()-accepted.getTime())/(1000*60*60*24));
+      if(days>=28){ borderStyle='border-color:var(--bad-border);background:var(--bad-dim)'; graceLabel=`<span class="pill bad" style="font-size:9px">EXPIRED — ${days}d</span>`; }
+      else if(days>=21){ borderStyle='border-color:var(--warn-border);background:var(--warn-dim)'; graceLabel=`<span class="pill warn" style="font-size:9px">${28-days}d left</span>`; }
+      else { graceLabel=`<span style="font-size:10px;color:var(--muted)">${28-days}d left</span>`; }
+    }
+
+    const dateLabel=c.acceptedDate?fmtMDY(new Date(c.acceptedDate+'T00:00:00')):'—';
+
+    return `<div class="cand-card" data-cand-id="${escapeHtml(c.id)}" style="${borderStyle}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
         <div class="cand-name">${escapeHtml(c.name||'(no name)')}</div>
         ${statusPill}
       </div>
       <div class="cand-meta">${escapeHtml(c.discord||'—')} · ${escapeHtml(positions)}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+        <div class="cand-meta">Accepted: ${escapeHtml(dateLabel)}</div>
+        ${graceLabel}
+      </div>
       <div class="cand-votes">
         <span class="yes">▲ ${yes}</span>
         <span class="no">▼ ${no}</span>
@@ -2662,11 +2680,15 @@ function openAddCandidateModal(){
     </div>
     <div class="row" style="margin-top:8px">
       <div><div class="muted small">Steam ID</div><input id="c_steam" placeholder="steam:..."/></div>
-      <div><div class="muted small">Age</div><input id="c_age" placeholder="Age"/></div>
+      <div><div class="muted small">Accepted Date</div><input type="date" id="c_accepted" value="${dateValueFromISO(new Date().toISOString())}"/></div>
     </div>
     <div class="row" style="margin-top:8px">
+      <div><div class="muted small">Age</div><input id="c_age" placeholder="Age"/></div>
       <div><div class="muted small">Timezone</div><input id="c_tz" placeholder="EST, CST, etc."/></div>
+    </div>
+    <div class="row" style="margin-top:8px">
       <div><div class="muted small">Bank ID</div><input id="c_bank" placeholder="Bank ID"/></div>
+      <div></div>
     </div>
     <div style="margin-top:8px"><div class="muted small">Chosen Positions</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">${roleChecks}</div>
@@ -2693,10 +2715,11 @@ function openAddCandidateModal(){
       chosenPositions:positions,
       firstChoice:document.getElementById('c_first').value||'',
       notes:(document.getElementById('c_notes').value||'').trim(),
+      acceptedDate:(document.getElementById('c_accepted').value||'').trim(),
       status:'awaiting',
       interviewDate:'',
-      qa:[], // {q, a} pairs baked from template at interview time
-      votes:[] // {voterId, voterName, vote:'yes'|'no', comment}
+      qa:[],
+      votes:[]
     };
     state.candidates||=[];
     state.candidates.push(cand);
@@ -2723,7 +2746,9 @@ function openCandidateDetail(c){
   `;
 
   // Basic info pills
+  const acceptedLabel=c.acceptedDate?fmtMDY(new Date(c.acceptedDate+'T00:00:00')):'—';
   html+=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;font-size:12px">
+    <span class="pill">Accepted: ${escapeHtml(acceptedLabel)}</span>
     <span class="pill">${escapeHtml(positions)}</span>
     ${c.firstChoice?`<span class="pill accent">1st: ${escapeHtml(c.firstChoice)}</span>`:''}
     ${c.age?`<span class="pill">Age: ${escapeHtml(c.age)}</span>`:''}
@@ -2793,6 +2818,7 @@ function openCandidateDetail(c){
       c.name||'',
       `Discord: ${c.discord||'—'}`,
       `Steam: ${c.steam||'—'}`,
+      `Accepted: ${c.acceptedDate?fmtMDY(new Date(c.acceptedDate+'T00:00:00')):'—'}`,
       `Positions: ${(c.chosenPositions||[]).join(', ')||'—'}`,
       `First Choice: ${c.firstChoice||'—'}`,
       `Age: ${c.age||'—'}`,
@@ -2846,11 +2872,15 @@ function openEditCandidateModal(c){
     </div>
     <div class="row" style="margin-top:8px">
       <div><div class="muted small">Steam ID</div><input id="ec_steam" value="${escapeHtml(c.steam||'')}"/></div>
-      <div><div class="muted small">Age</div><input id="ec_age" value="${escapeHtml(c.age||'')}"/></div>
+      <div><div class="muted small">Accepted Date</div><input type="date" id="ec_accepted" value="${escapeHtml(c.acceptedDate||'')}"/></div>
     </div>
     <div class="row" style="margin-top:8px">
+      <div><div class="muted small">Age</div><input id="ec_age" value="${escapeHtml(c.age||'')}"/></div>
       <div><div class="muted small">Timezone</div><input id="ec_tz" value="${escapeHtml(c.timezone||'')}"/></div>
+    </div>
+    <div class="row" style="margin-top:8px">
       <div><div class="muted small">Bank ID</div><input id="ec_bank" value="${escapeHtml(c.bankAccount||'')}"/></div>
+      <div></div>
     </div>
     <div style="margin-top:8px"><div class="muted small">Chosen Positions</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">${roleChecks}</div>
@@ -2866,6 +2896,7 @@ function openEditCandidateModal(c){
     c.name=(document.getElementById('ec_name').value||'').trim();
     c.discord=(document.getElementById('ec_discord').value||'').trim();
     c.steam=(document.getElementById('ec_steam').value||'').trim();
+    c.acceptedDate=(document.getElementById('ec_accepted').value||'').trim();
     c.age=(document.getElementById('ec_age').value||'').trim();
     c.timezone=(document.getElementById('ec_tz').value||'').trim();
     c.bankAccount=(document.getElementById('ec_bank').value||'').trim();
