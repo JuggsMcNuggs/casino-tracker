@@ -146,26 +146,28 @@
     /* ── HUB GRID ── */
     .hub-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
       gap: 10px;
     }
 
     .card {
-      height: 180px;
-      padding: 14px;
+      height: auto;
+      min-height: 110px;
+      padding: 12px;
       border: 1px solid var(--line);
       border-radius: var(--r2);
       background: var(--panel);
       cursor: pointer;
       transition: border-color .12s, transform .08s;
       display: flex; flex-direction: column; justify-content: space-between;
+      gap: 8px;
       overflow: hidden;
     }
     .card:hover { border-color: var(--accent-mid); transform: translateY(-1px); }
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .card-name { font-weight: 900; font-size: 14px; line-height: 1.2; }
     .card-meta { color: var(--muted); font-size: 11px; margin-top: 3px; line-height: 1.3; }
-    .card-hours { font-size: 22px; font-weight: 900; margin-top: auto; }
+    .card-hours { font-size: 18px; font-weight: 900; margin-top: auto; }
     .card-hours-sub { color: var(--muted); font-size: 11px; }
     .card-bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; }
     .card-total { color: var(--muted); font-size: 11px; }
@@ -307,6 +309,7 @@
       border-radius: var(--r2);
       box-shadow: var(--shadow);
     }
+    .modal.modal-wide { width: min(820px, 100%); }
     .modal-head {
       padding: 12px 16px;
       border-bottom: 1px solid var(--line);
@@ -343,11 +346,68 @@
     th, td { border-bottom: 1px solid var(--line); padding: 8px; font-size: 12px; vertical-align: top; }
     th { font-size: 10px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); font-weight: 700; }
 
+    /* ── TEMPLATE CARDS ── */
+    .tpl-card {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: rgba(20,26,34,.4);
+      margin-bottom: 8px;
+    }
+    .tpl-card .tpl-title { font-weight: 900; font-size: 13px; margin-bottom: 6px; }
+    .tpl-card .tpl-body {
+      font-size: 12px; white-space: pre-wrap; word-break: break-word;
+      color: var(--muted); max-height: 120px; overflow: hidden;
+      line-height: 1.5;
+    }
+    .tpl-card .tpl-actions { display: flex; gap: 4px; margin-top: 8px; justify-content: flex-end; }
+
+    /* ── INTERVIEW CANDIDATES ── */
+    .cand-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 10px;
+    }
+    .cand-card {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--r2);
+      background: var(--panel);
+      cursor: pointer;
+      transition: border-color .12s, transform .08s;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .cand-card:hover { border-color: var(--accent-mid); transform: translateY(-1px); }
+    .cand-card .cand-name { font-weight: 900; font-size: 14px; }
+    .cand-card .cand-meta { color: var(--muted); font-size: 11px; }
+    .cand-votes { display: flex; gap: 8px; margin-top: 4px; font-size: 11px; }
+    .cand-votes .yes { color: var(--good); font-weight: 700; }
+    .cand-votes .no { color: var(--bad); font-weight: 700; }
+
+    .iq-card {
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: rgba(20,26,34,.4);
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+    .iq-card .iq-q { font-weight: 700; margin-bottom: 4px; }
+    .iq-card .iq-a { color: var(--muted); white-space: pre-wrap; word-break: break-word; }
+
+    .vote-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 0; border-bottom: 1px solid var(--line);
+      font-size: 12px;
+    }
+    .vote-row:last-child { border-bottom: none; }
+
     .hidden { display: none !important; }
 
     @media (max-width: 600px) {
       .hub-grid { grid-template-columns: 1fr; }
-      .card { height: auto; min-height: 160px; }
+      .card { min-height: 90px; }
+      .cand-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -365,6 +425,8 @@
           <button class="btn-ghost btn-sm" id="overviewBtn">Hours Overview</button>
           <button class="btn-ghost btn-sm" id="mgmtCalBtn">Mgmt Calendar</button>
           <button class="btn-ghost btn-sm" id="promoBtn">Promo / EOTM</button>
+          <button class="btn-ghost btn-sm" id="interviewBtn">Interviews</button>
+          <button class="btn-ghost btn-sm" id="templatesBtn">Templates</button>
           <button class="btn-ghost btn-sm" id="importCsvBtn">Import CSV</button>
           <input type="file" id="csvFile" accept=".csv,text/csv" style="display:none">
           <button class="btn-ghost btn-sm" id="exportBtn">Export</button>
@@ -385,6 +447,15 @@
           <option value="total_asc">Total: Low → High</option>
           <option value="recent">Most Recent</option>
           <option value="least_recent">Least Recent</option>
+        </select>
+        <select id="rankFilter">
+          <option value="">All Ranks</option>
+          <option value="Trainee">Trainee</option>
+          <option value="Employee">Employee</option>
+          <option value="Senior Employee">Senior Employee</option>
+          <option value="Supervisor">Supervisor</option>
+          <option value="Manager">Manager</option>
+          <option value="Director">Director</option>
         </select>
         <button class="btn-ghost btn-sm" id="inactiveBtn">Inactive</button>
         <button class="btn-ghost btn-sm" id="needsTrainBtn">Needs Training</button>
@@ -431,6 +502,47 @@
         </div>
         <div class="panel-body">
           <div id="mgmtCalendar"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TEMPLATES -->
+    <section id="templatesView" style="display:none;">
+      <div class="panel">
+        <div class="panel-head">
+          <div class="h">Discord Templates</div>
+          <button class="btn-accent btn-sm" id="addTemplateBtn">+ Template</button>
+        </div>
+        <div class="panel-body" id="templatesBody"></div>
+      </div>
+    </section>
+
+    <!-- INTERVIEWS -->
+    <section id="interviewView" style="display:none;">
+      <!-- Question Template Editor -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="h">Interview Questions (Template)</div>
+          <button class="btn-ghost btn-sm" id="editQuestionsBtn">Edit Questions</button>
+        </div>
+        <div class="panel-body" id="questionsBody"></div>
+      </div>
+
+      <!-- Candidates -->
+      <div class="panel" style="margin-top:12px">
+        <div class="panel-head">
+          <div class="h">Candidates</div>
+          <div class="row tight" style="gap:6px">
+            <button class="btn-ghost btn-sm" id="ivFilterAwait" data-iv-filter="awaiting">Awaiting</button>
+            <button class="btn-ghost btn-sm" id="ivFilterDone" data-iv-filter="interviewed">Interviewed</button>
+            <button class="btn-ghost btn-sm" id="ivFilterHired" data-iv-filter="hired">Hired</button>
+            <button class="btn-ghost btn-sm" id="ivFilterDenied" data-iv-filter="denied">Denied</button>
+            <button class="btn-ghost btn-sm" id="ivFilterAll" data-iv-filter="all">All</button>
+            <button class="btn-accent btn-sm" id="addCandidateBtn">+ Candidate</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="cand-grid" id="candidateCards"></div>
         </div>
       </div>
     </section>
@@ -567,6 +679,26 @@ function isMgmtCallsign(cs){
   const m = c.match(/^DC-?0?(1[0-9]|[1-9])$/);
   return !!m;
 }
+const MGMT_RANKS = ["Supervisor","Manager","Director"];
+function isMgmtRank(p){ return MGMT_RANKS.includes(p?.rank||''); }
+function isPromoEligible(p){ return !["Manager","Director",""].includes(p?.rank||'') && !p?.archived; }
+function nextRank(current){
+  const idx=RANKS.indexOf(current||'');
+  if(idx<0||idx>=RANKS.length-1) return null;
+  const next=RANKS[idx+1];
+  if(next==='Director') return null; // Can't auto-promo to Director
+  return next;
+}
+function promotePerson(pid){
+  const p=getPerson(pid);if(!p) return;
+  const nr=nextRank(p.rank);
+  if(!nr){toast("Already at max rank");return;}
+  if(!confirm(`Promote ${p.character||'this person'} from ${p.rank||'(none)'} to ${nr}?`)) return;
+  p.rank=nr;
+  save();toast(`Promoted to ${nr}`);
+  if(state.ui?.view==='hub') renderHub();
+  if(state.selectedId===pid) renderProfile();
+}
 function dcNumberFromCallsign(cs){
   const c = (cs||"").toUpperCase().replace(/\s+/g,"");
   const m = c.match(/^DC-?0?(\d{1,2})$/);
@@ -645,11 +777,20 @@ function seed(){
     version:8, monthCursor:new Date().toISOString(), profileMonthCursor:new Date().toISOString(),
     overviewMonthCursor:new Date().toISOString(), mgmtMonthCursor:new Date().toISOString(),
     selectedId:null,
-    ui:{inactiveOnly:false,showArchived:false,view:"hub",reviewTab:"eotm"},
+    ui:{inactiveOnly:false,showArchived:false,view:"hub",reviewTab:"eotm",ivFilter:"all"},
     people:[], clockEvents:[], loas:[], entries:[], notesEntries:[], eotmHistory:[],
     calendarEvents:[],
     trainingNotes:[],
-    mgmtEvents:[]
+    mgmtEvents:[],
+    templates:[],
+    interviewQuestions:[
+      "Tell me about one of your favorite moments here in the city.",
+      "Which three words would you use to describe The Diamond Casino & Resort?",
+      "Could you tell me a little bit about any previous employment you've had here in the city and how it will help with working at the casino?",
+      "How do you typically handle conflict between you and another person?",
+      "Scenario Question"
+    ],
+    candidates:[]
   };
 }
 
@@ -657,8 +798,16 @@ function ensureState(data){
   if(!data||!Array.isArray(data.people)) return seed();
   data.clockEvents||=[];data.loas||=[];data.entries||=[];data.notesEntries||=[];data.eotmHistory||=[];
   data.calendarEvents||=[];data.trainingNotes||=[];data.mgmtEvents||=[];
+  data.templates||=[];data.candidates||=[];
+  data.interviewQuestions||=[
+    "Tell me about one of your favorite moments here in the city.",
+    "Which three words would you use to describe The Diamond Casino & Resort?",
+    "Could you tell me a little bit about any previous employment you've had here in the city and how it will help with working at the casino?",
+    "How do you typically handle conflict between you and another person?",
+    "Scenario Question"
+  ];
   data.ui||={inactiveOnly:false,showArchived:false};
-  data.ui.reviewTab||="eotm"; data.ui.view||="hub";
+  data.ui.reviewTab||="eotm"; data.ui.view||="hub"; data.ui.ivFilter||="all";
   data.profileMonthCursor||=data.monthCursor||new Date().toISOString();
   data.overviewMonthCursor||=data.monthCursor||new Date().toISOString();
   data.mgmtMonthCursor||=data.monthCursor||new Date().toISOString();
@@ -736,6 +885,8 @@ function startApp(){
   if(state.ui?.view==="review") renderReviewPage();
   else if(state.ui?.view==="overview") renderOverview();
   else if(state.ui?.view==="mgmtcal") renderMgmtCal();
+  else if(state.ui?.view==="templates") renderTemplates();
+  else if(state.ui?.view==="interviews") renderInterviews();
   else if(state.selectedId) renderProfile();
   else renderHub();
 }
@@ -743,7 +894,9 @@ function startApp(){
 // ═══════════════════════════════════════════
 // MODAL
 // ═══════════════════════════════════════════
-function openModal(title,html){
+function openModal(title,html,opts={}){
+  const modal=document.querySelector('.modal');
+  if(opts.wide) modal.classList.add('modal-wide'); else modal.classList.remove('modal-wide');
   $("#modalTitle").textContent=title; $("#modalBody").innerHTML=html; $("#modalBackdrop").style.display="flex";
 }
 function closeModal(){ $("#modalBackdrop").style.display="none"; }
@@ -993,8 +1146,7 @@ function markEotm(pid,md){
 // MANAGEMENT TRAINER OPTIONS
 // ═══════════════════════════════════════════
 function managementTrainerOptions(){
-  return state.people.filter(p=>isMgmtCallsign(p.callsign)).map(p=>{
-    ensurePerson(p);
+  return state.people.filter(p=>{ensurePerson(p);return isMgmtRank(p)&&!p.archived;}).map(p=>{
     return {id:p.id, label:`${(p.callsign||"").toUpperCase()} — ${p.character||p.steamName||"Unknown"}`};
   }).sort((a,b)=>a.label.localeCompare(b.label,undefined,{sensitivity:"base"}));
 }
@@ -1008,6 +1160,8 @@ function renderHub(){
   $("#overviewView").style.display="none";
   document.getElementById('reviewView').style.display="none";
   document.getElementById('mgmtCalView').style.display="none";
+  document.getElementById('templatesView').style.display="none";
+  document.getElementById('interviewView').style.display="none";
   $("#backBtn").style.display="none";
   $("#searchBar").style.display="";
   state.ui.view="hub"; state.selectedId=null;
@@ -1017,6 +1171,7 @@ function renderHub(){
 
   const q=($("#search").value||"").trim().toLowerCase();
   const sort=$("#sort").value;
+  const rankFilter=(document.getElementById('rankFilter')?.value||"");
   const monthDate=startOfMonth(new Date());
   const showArchived=!!(state.ui?.showArchived);
   const inactiveOnly=!!(state.ui?.inactiveOnly);
@@ -1049,6 +1204,7 @@ function renderHub(){
     const untrained=personNeedsTraining(p);
     return {p,monthly,total,lastIn,activity,strikes,pass,untrained};
   }).filter(x=>x.pass)
+    .filter(x=>!rankFilter||(x.p.rank||'')=== rankFilter)
     .filter(x=>!inactiveOnly||(x.activity.state==='WARNING'||x.activity.state==='SEPARATION'))
     .filter(x=>!needsTrainOnly||x.untrained);
 
@@ -1082,11 +1238,12 @@ function renderHub(){
     if(it.strikes>=3) badge+=` <span class="pill bad">3 STRIKES</span>`;
 
     const el=document.createElement("div"); el.className="card";
+    const rankLabel=p.rank||'No rank';
     el.innerHTML=`
       <div class="card-top">
         <div>
           <div class="card-name">${escapeHtml(p.character||"(no name)")}</div>
-          <div class="card-meta">${escapeHtml(p.callsign||"—")} · ${escapeHtml(p.steamName||"—")}</div>
+          <div class="card-meta">${escapeHtml(p.callsign||"—")} · ${escapeHtml(rankLabel)} · ${escapeHtml(p.steamName||"—")}</div>
         </div>
         ${badge}
       </div>
@@ -1125,6 +1282,8 @@ function renderOverview(){
   $("#overviewView").style.display="";
   document.getElementById('reviewView').style.display="none";
   document.getElementById('mgmtCalView').style.display="none";
+  document.getElementById('templatesView').style.display="none";
+  document.getElementById('interviewView').style.display="none";
   $("#backBtn").style.display="";
   $("#searchBar").style.display="none";
   state.ui.view="overview"; save();
@@ -1137,7 +1296,7 @@ function renderOverview(){
     const monthly=computeMonthly(p.id,md);
     const activity=activityStatus(p.id);
     return {id:p.id, name:p.character||p.steamName||"Unknown", callsign:p.callsign||"",
-      discordId:p.discordId||"", ms:monthly.countedMs, activity, isMgmt:isMgmtCallsign(p.callsign)};
+      discordId:p.discordId||"", ms:monthly.countedMs, activity, isMgmt:isMgmtRank(p)};
   }).sort((a,b)=>b.ms-a.ms);
 
   const maxMs=Math.max(...items.map(x=>x.ms), MONTHLY_MIN_MS);
@@ -1169,7 +1328,7 @@ function renderOverview(){
       (a.state==='SEPARATION')?`data-ov-copy-msg="${escapeHtml(activityMsgTemplate('separation',it.name))}"`:'';
 
     return `
-      <div class="chart-row" style="padding:4px 0">
+      <div class="chart-row" style="padding:4px 0;cursor:pointer" data-ov-profile="${escapeHtml(it.id)}">
         <div class="chart-label" title="${it.discordId?'Click to copy Discord ID':escapeHtml(it.callsign)}" style="display:flex;align-items:center;gap:6px;${nameColor};${nameClickable}" ${nameData}>
           ${escapeHtml(it.name)}
         </div>
@@ -1192,6 +1351,15 @@ function renderOverview(){
   document.querySelectorAll('[data-ov-copy-msg]').forEach(btn=>{
     btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();copyText(btn.getAttribute('data-ov-copy-msg'));});
   });
+  // Click row to go to profile
+  document.querySelectorAll('[data-ov-profile]').forEach(row=>{
+    row.addEventListener('click',e=>{
+      // Don't navigate if they clicked a copy target
+      if(e.target.closest('[data-ov-copy-dc]')||e.target.closest('[data-ov-copy-msg]')) return;
+      const pid=row.getAttribute('data-ov-profile');
+      if(pid){state.selectedId=pid;state.profileMonthCursor=new Date().toISOString();state.ui.view='profile';save();renderProfile();}
+    });
+  });
 }
 
 // ═══════════════════════════════════════════
@@ -1207,6 +1375,8 @@ function renderProfile(){
   $("#overviewView").style.display="none";
   document.getElementById('reviewView').style.display="none";
   document.getElementById('mgmtCalView').style.display="none";
+  document.getElementById('templatesView').style.display="none";
+  document.getElementById('interviewView').style.display="none";
   $("#backBtn").style.display="";
   $("#searchBar").style.display="none";
 
@@ -1732,6 +1902,8 @@ function renderReviewPage(){
   $("#overviewView").style.display="none";
   document.getElementById('reviewView').style.display="";
   document.getElementById('mgmtCalView').style.display="none";
+  document.getElementById('templatesView').style.display="none";
+  document.getElementById('interviewView').style.display="none";
   $("#backBtn").style.display="";
   $("#searchBar").style.display="none";
 
@@ -1740,7 +1912,7 @@ function renderReviewPage(){
   if(sub) sub.textContent=`Reviewing ${fmtMonthLabel(monthDate)}`;
 
   const base=state.people.map(p=>{ensurePerson(p);const m=computeMonthly(p.id,monthDate);const c=monthContextCounts(p.id,monthDate);
-    return {p,monthly:m,excluded:isMgmtCallsign(p.callsign),counts:c,loaNow:isOnLOA(p.id,monthDate)};}).filter(x=>!x.excluded&&!x.p.archived);
+    return {p,monthly:m,excluded:isMgmtRank(p),counts:c,loaNow:isOnLOA(p.id,monthDate)};}).filter(x=>!x.excluded&&!x.p.archived);
 
   const tab=state.ui.reviewTab||"eotm";
   const tabE=document.getElementById('reviewTabEotm'),tabP=document.getElementById('reviewTabPromo');
@@ -1750,8 +1922,10 @@ function renderReviewPage(){
   const eotm=base.slice().sort((a,b)=>b.monthly.countedMs-a.monthly.countedMs).slice(0,3);
   const promos=base.filter(x=>x.monthly.countedMs>=MONTHLY_MIN_MS).sort((a,b)=>(a.p.rank||'').localeCompare(b.p.rank||'')||(b.monthly.countedMs-a.monthly.countedMs));
 
-  function card(x,showMark=false){
+  function card(x,opts={}){
     const lastE=lastEotmLabel(x.p.id);
+    const canPromo=isPromoEligible(x.p);
+    const nr=nextRank(x.p.rank);
     return `<div style="padding:12px;border:1px solid var(--line);border-radius:var(--r);margin-bottom:8px;background:var(--panel)">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap">
         <div><div style="font-weight:900">${escapeHtml(x.p.character||'')}</div>
@@ -1769,23 +1943,25 @@ function renderReviewPage(){
       </div>
       <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:8px">
         <button class="btn-ghost btn-sm" data-review-profile="${escapeHtml(x.p.id)}">View Profile</button>
-        ${showMark?`<button class="btn-accent btn-sm" data-mark-eotm="${escapeHtml(x.p.id)}">Mark EOTM</button>`:''}
+        ${opts.showMark?`<button class="btn-accent btn-sm" data-mark-eotm="${escapeHtml(x.p.id)}">Mark EOTM</button>`:''}
+        ${opts.showPromo&&canPromo&&nr?`<button class="btn-accent btn-sm" data-promo="${escapeHtml(x.p.id)}">▲ Promote to ${escapeHtml(nr)}</button>`:''}
       </div>
     </div>`;
   }
 
   let html='';
   if(tab==='eotm'){
-    html+=`<div class="hint" style="margin-bottom:10px"><b>Top 3</b> by monthly hours for EOTM consideration. DC1–DC19 excluded.</div>`;
-    html+=eotm.length?eotm.map(x=>card(x,true)).join(''):`<div class="muted">No candidates yet.</div>`;
+    html+=`<div class="hint" style="margin-bottom:10px"><b>Top 3</b> by monthly hours for EOTM consideration. Supervisors, Managers & Directors excluded.</div>`;
+    html+=eotm.length?eotm.map(x=>card(x,{showMark:true})).join(''):`<div class="muted">No candidates yet.</div>`;
   } else {
-    html+=`<div class="hint" style="margin-bottom:10px"><b>Eligible</b> for promotion — met ${MONTHLY_MIN_HOURS}hr minimum. DC1–DC19 excluded.</div>`;
-    html+=promos.length?promos.map(x=>card(x,false)).join(''):`<div class="muted">No one meets the baseline yet.</div>`;
+    html+=`<div class="hint" style="margin-bottom:10px"><b>Eligible</b> for promotion — met ${MONTHLY_MIN_HOURS}hr minimum. Supervisors, Managers & Directors excluded.</div>`;
+    html+=promos.length?promos.map(x=>card(x,{showPromo:true})).join(''):`<div class="muted">No one meets the baseline yet.</div>`;
   }
 
   $("#reviewBody").innerHTML=html;
   document.querySelectorAll('[data-review-profile]').forEach(btn=>{btn.addEventListener('click',()=>{state.selectedId=btn.getAttribute('data-review-profile');state.profileMonthCursor=new Date().toISOString();state.ui.view='profile';save();renderProfile();});});
   document.querySelectorAll('[data-mark-eotm]').forEach(btn=>{btn.addEventListener('click',()=>markEotm(btn.getAttribute('data-mark-eotm'),monthDate));});
+  document.querySelectorAll('[data-promo]').forEach(btn=>{btn.addEventListener('click',()=>{promotePerson(btn.getAttribute('data-promo'));renderReviewPage();});});
 }
 
 // ═══════════════════════════════════════════
@@ -1953,6 +2129,8 @@ function hideAllViews(){
   $("#overviewView").style.display="none";
   document.getElementById('reviewView').style.display="none";
   document.getElementById('mgmtCalView').style.display="none";
+  document.getElementById('templatesView').style.display="none";
+  document.getElementById('interviewView').style.display="none";
 }
 
 function renderMgmtCal(){
@@ -2141,6 +2319,630 @@ function openMgmtEventModal(existing){
 }
 
 // ═══════════════════════════════════════════
+// RENDER: TEMPLATES
+// ═══════════════════════════════════════════
+const DEFAULT_TEMPLATES = [
+  {
+    title: "Training Announcement",
+    body: `@diamondcasinotrainee
+There will be a (role) training session on <hammer time>. (Note: this is your time zone.)
+If you would like to attend, please react with :white_check_mark:. Join the Casino Radio five minutes prior to the training. Please try to be there on time. If you signed up to attend but something gets in the way or you are running late, please let me know ASAP.
+
+**If this is your first training session and you still need to do your SOP training, please message me and we'll meet up 30 min beforehand.**
+
+More sessions will be posted in the future if you cannot make this one.
+
+(Name)
+(Position)`
+  },
+  {
+    title: "Training (Training Server)",
+    body: `**This session will take place in the Training Server.**
+
+**How to Connect:**
+
+A moderator will unlock the training server shortly before the training begins.
+Open FiveM and wait at the main menu screen. A supervisor or higher will let you know when to connect.
+Press F8, then paste and enter the following command:
+connect training.playhigh.life`
+  },
+  {
+    title: "Interview — Advance Notice",
+    body: `@DiamondCasinoRecruitment
+ANNOUNCEMENT
+
+Next interview session will <date time> (this is your time zone)
+
+Looking forward to seeing you. Have an extraordinary day and take care!
+
+If the posted time doesn't work for you, more sessions will be posted. You have four weeks from approval to attend, so there's no need to DM management the moment a session goes up if the current one doesn't work for you.`
+  },
+  {
+    title: "Interview — Day Of",
+    body: `@DiamondCasinoRecruitment
+
+Hello everyone! Hope you are all doing well and are excited for your interview.
+
+**Interview Day!**
+
+Interviews will be conducted in the **Training Server** on <hammertime> (this is your time zone). All interviews must be conducted in character. We operate on a first come, first serve basis. Please meet at the front desk and join the Casino Waiting room.
+
+**How to Connect:**
+
+A moderator will unlock the training server shortly before interviews begin.
+Open FiveM and wait at the main menu screen. A supervisor or higher will let you know when to connect.
+Press F8, then paste and enter the following command:
+connect training.playhigh.life
+
+Please react with :white_check_mark: if you will be attending the interview session.
+
+**Reminder: You have a 4-week grace period to attend an interview. If you do not show up within that time, your application will be denied.**`
+  },
+  {
+    title: "Promotions",
+    body: `:casino: __**Promotions**__ :casino:
+
+@diamondcasino
+
+**Promos!**
+
+Hello team, we hope everyone has had a great month! It's time to get this next month started with some promotions. Congrats to all the ones getting a promotion!
+Also, if you are a Senior Employee and you wish to advance in your Diamond Casino career please reach out to management!
+
+*If you are in city currently, you will have to take a flight for the changes to take effect*
+
+**Senior Employee > Supervisor**
+-
+-
+
+**Employee > Senior Employee**
+-
+-
+
+**Trainee > Employee**
+-
+-
+
+__**Employee of the Month:**__
+
+**This months EOTM is: (NAME)**
+
+(write something about them and why they were picked)
+As always, our EOTM receives a $50,000 prize for their hard work. It will be transferred to your bank account. Congratulations to everyone!
+
+(Name)
+(Title)`
+  },
+  {
+    title: "Happy Hour",
+    body: `@diamondcasino
+
+It's time for **Happy Hour!** It will be on, <hammertime> (this is your time zone)
+
+For newer employees who don't know what happy hour is, it's where players will gain a 1.5x bonus payout on **certain** hands. (Natural blackjacks, straight flush on poker, three of a kind on slots, single inside bets in roulette have recently been added!)
+
+It has been a popular event in the past, and it can get fairly busy. This is a great chance for people to clock in as a team instead of the lonely shifts we find ourselves in a lot of the time. The more the merrier!
+
+Please react with :white_check_mark: if you will be attending!`
+  },
+  {
+    title: "New Hire Welcome",
+    body: `Welcome to the team!
+
+We're glad to have you, have a look at https://discord.com/channels/366897352012988418/813643496526577674
+
+Everything you need is in there. Your guides, training info, and how to get in touch with the team.
+
+Training sessions are posted regularly throughout the week at a variety of times. Keep an eye out for one that works for you, something will come up that fits your schedule!`
+  },
+  {
+    title: "4 Hour Warning (First Miss)",
+    body: `Hello.
+
+Just wanted to let you know that you didn't hit your 4 hours last month. Make sure you get them in this month. If you miss them again we'll have to part ways. Please put in an LOA if needed. Reach out if you have any questions!
+
+[Name]
+[Title]`
+  }
+];
+
+function renderTemplates(){
+  hideAllViews();
+  document.getElementById('templatesView').style.display="";
+  $("#backBtn").style.display="";
+  $("#searchBar").style.display="none";
+  state.ui.view="templates"; save();
+
+  // Auto-populate defaults on first visit
+  if(!state.templates.length){
+    state.templates=DEFAULT_TEMPLATES.map(t=>({id:uid(),title:t.title,body:t.body}));
+    save();
+  }
+
+  const host=document.getElementById('templatesBody');
+  if(!state.templates.length){
+    host.innerHTML=`<div class="muted small">No templates yet. Click + Template to add one.</div>`;
+    return;
+  }
+
+  host.innerHTML=state.templates.map(t=>{
+    const preview=(t.body||'').length>200?(t.body||'').slice(0,200)+'…':(t.body||'');
+    return `<div class="tpl-card">
+      <div class="tpl-title">${escapeHtml(t.title||'Untitled')}</div>
+      <div class="tpl-body">${escapeHtml(preview)}</div>
+      <div class="tpl-actions">
+        <button class="btn-ghost btn-sm" data-tpl-copy="${escapeHtml(t.id)}">Copy</button>
+        <button class="btn-ghost btn-sm" data-tpl-edit="${escapeHtml(t.id)}">Edit</button>
+        <button class="btn-ghost btn-sm" data-tpl-del="${escapeHtml(t.id)}">Del</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  host.querySelectorAll('[data-tpl-copy]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const t=state.templates.find(x=>x.id===btn.getAttribute('data-tpl-copy'));
+      if(t) copyText(t.body||'');
+    });
+  });
+  host.querySelectorAll('[data-tpl-edit]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const t=state.templates.find(x=>x.id===btn.getAttribute('data-tpl-edit'));
+      if(t) openTemplateModal(t);
+    });
+  });
+  host.querySelectorAll('[data-tpl-del]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      if(!confirm('Delete this template?')) return;
+      state.templates=state.templates.filter(x=>x.id!==btn.getAttribute('data-tpl-del'));
+      save();renderTemplates();
+    });
+  });
+}
+
+function openTemplateModal(existing){
+  const isEdit=!!existing;
+  openModal(isEdit?"Edit Template":"Add Template",`
+    <div><div class="muted small">Title</div><input id="tpl_title" value="${escapeHtml(existing?.title||'')}" placeholder="Template name"/></div>
+    <div style="margin-top:8px"><div class="muted small">Body</div><textarea id="tpl_body" rows="14" style="min-height:200px" placeholder="Template content...">${escapeHtml(existing?.body||'')}</textarea></div>
+    <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:10px">
+      <button class="btn-accent" id="tpl_save">Save</button>
+    </div>
+  `);
+  document.getElementById('tpl_save').addEventListener('click',()=>{
+    const title=(document.getElementById('tpl_title').value||'').trim();
+    const body=(document.getElementById('tpl_body').value||'').trim();
+    if(!title) return alert('Give it a title.');
+    if(existing){ existing.title=title; existing.body=body; }
+    else { state.templates.push({id:uid(),title,body}); }
+    save();closeModal();renderTemplates();toast("Saved");
+  });
+}
+
+// ═══════════════════════════════════════════
+// RENDER: INTERVIEWS
+// ═══════════════════════════════════════════
+function renderInterviews(){
+  hideAllViews();
+  document.getElementById('interviewView').style.display="";
+  $("#backBtn").style.display="";
+  $("#searchBar").style.display="none";
+  state.ui.view="interviews"; save();
+
+  // Render question template
+  renderInterviewQuestions();
+  // Render candidate cards
+  renderCandidateCards();
+}
+
+function renderInterviewQuestions(){
+  const host=document.getElementById('questionsBody');
+  const qs=state.interviewQuestions||[];
+  if(!qs.length){
+    host.innerHTML=`<div class="muted small">No questions set. Click Edit Questions to add them.</div>`;
+    return;
+  }
+  host.innerHTML=qs.map((q,i)=>`
+    <div class="iq-card">
+      <div class="iq-q">Q${i+1}: ${escapeHtml(q)}</div>
+    </div>
+  `).join('');
+}
+
+function openEditQuestionsModal(){
+  const qs=state.interviewQuestions||[];
+  let html=`<div class="muted small" style="margin-bottom:10px">One question per box. These get copied into each candidate's record when you fill in their interview.</div>`;
+  html+=`<div id="iq_list">`;
+  qs.forEach((q,i)=>{
+    html+=`<div style="display:flex;gap:6px;align-items:flex-start;margin-bottom:6px">
+      <div style="min-width:28px;font-weight:900;font-size:12px;padding-top:10px;color:var(--muted)">Q${i+1}</div>
+      <textarea class="iq-input" rows="2" style="flex:1;min-height:40px">${escapeHtml(q)}</textarea>
+      <button class="btn-ghost btn-sm" data-iq-del="${i}" style="margin-top:6px">✕</button>
+    </div>`;
+  });
+  html+=`</div>`;
+  html+=`<div style="display:flex;justify-content:space-between;margin-top:10px">
+    <button class="btn-ghost btn-sm" id="iq_add">+ Question</button>
+    <button class="btn-accent" id="iq_save">Save</button>
+  </div>`;
+
+  openModal("Edit Interview Questions",html);
+
+  function collectQs(){
+    return Array.from(document.querySelectorAll('.iq-input')).map(ta=>ta.value.trim()).filter(Boolean);
+  }
+
+  document.querySelectorAll('[data-iq-del]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      btn.closest('div').remove();
+      // Renumber
+      document.querySelectorAll('#iq_list > div').forEach((row,i)=>{
+        const label=row.querySelector('div');
+        if(label) label.textContent=`Q${i+1}`;
+      });
+    });
+  });
+
+  document.getElementById('iq_add').addEventListener('click',()=>{
+    const list=document.getElementById('iq_list');
+    const idx=list.children.length;
+    const div=document.createElement('div');
+    div.style.cssText='display:flex;gap:6px;align-items:flex-start;margin-bottom:6px';
+    div.innerHTML=`<div style="min-width:28px;font-weight:900;font-size:12px;padding-top:10px;color:var(--muted)">Q${idx+1}</div>
+      <textarea class="iq-input" rows="2" style="flex:1;min-height:40px" placeholder="New question..."></textarea>
+      <button class="btn-ghost btn-sm" style="margin-top:6px" onclick="this.closest('div').remove()">✕</button>`;
+    list.appendChild(div);
+  });
+
+  document.getElementById('iq_save').addEventListener('click',()=>{
+    state.interviewQuestions=collectQs();
+    save();closeModal();renderInterviews();toast("Questions saved");
+  });
+}
+
+function renderCandidateCards(){
+  const filter=state.ui.ivFilter||'all';
+  const fA=document.getElementById('ivFilterAwait'),fD=document.getElementById('ivFilterDone'),fH=document.getElementById('ivFilterHired'),fDn=document.getElementById('ivFilterDenied'),fAll=document.getElementById('ivFilterAll');
+  if(fA) fA.className=`btn-${filter==='awaiting'?'accent':'ghost'} btn-sm`;
+  if(fD) fD.className=`btn-${filter==='interviewed'?'accent':'ghost'} btn-sm`;
+  if(fH) fH.className=`btn-${filter==='hired'?'accent':'ghost'} btn-sm`;
+  if(fDn) fDn.className=`btn-${filter==='denied'?'accent':'ghost'} btn-sm`;
+  if(fAll) fAll.className=`btn-${filter==='all'?'accent':'ghost'} btn-sm`;
+
+  let list=(state.candidates||[]).slice();
+  if(filter==='awaiting') list=list.filter(c=>c.status==='awaiting');
+  else if(filter==='interviewed') list=list.filter(c=>c.status==='interviewed');
+  else if(filter==='hired') list=list.filter(c=>c.status==='hired');
+  else if(filter==='denied') list=list.filter(c=>c.status==='denied');
+  list.sort((a,b)=>(a.name||'').localeCompare(b.name||'',undefined,{sensitivity:'base'}));
+
+  const host=document.getElementById('candidateCards');
+  if(!list.length){
+    host.innerHTML=`<div class="muted small" style="grid-column:1/-1">No candidates. Click + Candidate to add one.</div>`;
+    return;
+  }
+
+  host.innerHTML=list.map(c=>{
+    const votes=c.votes||[];
+    const yes=votes.filter(v=>v.vote==='yes').length;
+    const no=votes.filter(v=>v.vote==='no').length;
+    const statusPill=c.status==='interviewed'?`<span class="pill good" style="font-size:10px">Interviewed</span>`
+      :c.status==='hired'?`<span class="pill accent" style="font-size:10px">Hired</span>`
+      :c.status==='denied'?`<span class="pill bad" style="font-size:10px">Denied</span>`
+      :`<span class="pill warn" style="font-size:10px">Awaiting</span>`;
+    const positions=(c.chosenPositions||[]).join(', ')||'—';
+    return `<div class="cand-card" data-cand-id="${escapeHtml(c.id)}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
+        <div class="cand-name">${escapeHtml(c.name||'(no name)')}</div>
+        ${statusPill}
+      </div>
+      <div class="cand-meta">${escapeHtml(c.discord||'—')} · ${escapeHtml(positions)}</div>
+      <div class="cand-votes">
+        <span class="yes">▲ ${yes}</span>
+        <span class="no">▼ ${no}</span>
+        <span style="color:var(--muted)">${votes.length} vote${votes.length!==1?'s':''}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  host.querySelectorAll('[data-cand-id]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const c=(state.candidates||[]).find(x=>x.id===el.getAttribute('data-cand-id'));
+      if(c) openCandidateDetail(c);
+    });
+  });
+}
+
+function openAddCandidateModal(){
+  const roleChecks=FIXED_ROLES.map(r=>`<label style="display:flex;gap:6px;align-items:center;font-size:12px"><input type="checkbox" data-cpos="${escapeHtml(r)}"/>${escapeHtml(r)}</label>`).join('');
+
+  openModal("Add Candidate",`
+    <div class="row">
+      <div><div class="muted small">Name</div><input id="c_name" placeholder="Character name"/></div>
+      <div><div class="muted small">Discord</div><input id="c_discord" placeholder="Discord name"/></div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <div><div class="muted small">Steam ID</div><input id="c_steam" placeholder="steam:..."/></div>
+      <div><div class="muted small">Age</div><input id="c_age" placeholder="Age"/></div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <div><div class="muted small">Timezone</div><input id="c_tz" placeholder="EST, CST, etc."/></div>
+      <div><div class="muted small">Bank ID</div><input id="c_bank" placeholder="Bank ID"/></div>
+    </div>
+    <div style="margin-top:8px"><div class="muted small">Chosen Positions</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">${roleChecks}</div>
+    </div>
+    <div style="margin-top:8px"><div class="muted small">First Choice</div>
+      <select id="c_first"><option value="">—</option>${FIXED_ROLES.map(r=>`<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`).join('')}</select>
+    </div>
+    <div style="margin-top:8px"><div class="muted small">Notes</div><textarea id="c_notes" rows="2" placeholder="Optional..."></textarea></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn-accent" id="c_save">Add</button></div>
+  `);
+
+  document.getElementById('c_save').addEventListener('click',()=>{
+    const name=(document.getElementById('c_name').value||'').trim();
+    if(!name) return alert('Name is required.');
+    const positions=FIXED_ROLES.filter(r=>{const cb=document.querySelector(`input[data-cpos="${CSS.escape(r)}"]`);return cb?.checked;});
+    const cand={
+      id:uid(),
+      name,
+      discord:(document.getElementById('c_discord').value||'').trim(),
+      steam:(document.getElementById('c_steam').value||'').trim(),
+      age:(document.getElementById('c_age').value||'').trim(),
+      timezone:(document.getElementById('c_tz').value||'').trim(),
+      bankAccount:(document.getElementById('c_bank').value||'').trim(),
+      chosenPositions:positions,
+      firstChoice:document.getElementById('c_first').value||'',
+      notes:(document.getElementById('c_notes').value||'').trim(),
+      status:'awaiting',
+      interviewDate:'',
+      qa:[], // {q, a} pairs baked from template at interview time
+      votes:[] // {voterId, voterName, vote:'yes'|'no', comment}
+    };
+    state.candidates||=[];
+    state.candidates.push(cand);
+    save();closeModal();renderCandidateCards();toast("Added");
+  });
+}
+
+function openCandidateDetail(c){
+  const positions=(c.chosenPositions||[]).join(', ')||'—';
+  const statusOpts=['awaiting','interviewed','hired','denied'].map(s=>`<option value="${s}" ${c.status===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('');
+
+  let html=`
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+      <div>
+        <div style="font-weight:900;font-size:18px">${escapeHtml(c.name||'(no name)')}</div>
+        <div class="muted small" style="margin-top:2px">${escapeHtml(c.discord||'—')} · ${escapeHtml(c.steam||'—')}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn-accent btn-sm" data-cd-copyinfo>Copy Info</button>
+        <button class="btn-ghost btn-sm" data-cd-edit>Edit Info</button>
+        <button class="btn-danger btn-sm" data-cd-del>Delete</button>
+      </div>
+    </div>
+  `;
+
+  // Basic info pills
+  html+=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;font-size:12px">
+    <span class="pill">${escapeHtml(positions)}</span>
+    ${c.firstChoice?`<span class="pill accent">1st: ${escapeHtml(c.firstChoice)}</span>`:''}
+    ${c.age?`<span class="pill">Age: ${escapeHtml(c.age)}</span>`:''}
+    ${c.timezone?`<span class="pill">${escapeHtml(c.timezone)}</span>`:''}
+    ${c.bankAccount?`<span class="pill">Bank: ${escapeHtml(c.bankAccount)}</span>`:''}
+  </div>`;
+
+  // Status
+  html+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+    <span class="muted small" style="font-weight:700">STATUS:</span>
+    <select id="cd_status" style="padding:4px 8px;font-size:12px">${statusOpts}</select>
+  </div>`;
+
+  if(c.notes) html+=`<div style="font-size:12px;color:var(--muted);margin-bottom:12px;white-space:pre-wrap">${escapeHtml(c.notes)}</div>`;
+
+  html+=`<div class="divider"></div>`;
+
+  // Interview Q&A
+  html+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <div class="muted small" style="font-weight:700;text-transform:uppercase;letter-spacing:.5px">Interview Q&A</div>
+    <button class="btn-ghost btn-sm" data-cd-interview>${c.qa&&c.qa.length?'Edit Answers':'Record Interview'}</button>
+  </div>`;
+
+  if(c.qa&&c.qa.length){
+    html+=c.qa.map((pair,i)=>`<div class="iq-card">
+      <div class="iq-q">Q${i+1}: ${escapeHtml(pair.q)}</div>
+      <div class="iq-a">${escapeHtml(pair.a||'(no answer recorded)')}</div>
+    </div>`).join('');
+  } else {
+    html+=`<div class="muted small">No interview recorded yet.</div>`;
+  }
+
+  html+=`<div class="divider"></div>`;
+
+  // Votes
+  const votes=c.votes||[];
+  html+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <div class="muted small" style="font-weight:700;text-transform:uppercase;letter-spacing:.5px">Votes (${votes.length})</div>
+    <button class="btn-ghost btn-sm" data-cd-vote>+ Vote</button>
+  </div>`;
+
+  if(votes.length){
+    html+=votes.map(v=>{
+      const icon=v.vote==='yes'?`<span style="color:var(--good);font-weight:900">YES</span>`:`<span style="color:var(--bad);font-weight:900">NO</span>`;
+      return `<div class="vote-row">
+        <div style="min-width:120px;font-weight:700">${escapeHtml(v.voterName||'Unknown')}</div>
+        ${icon}
+        <div style="flex:1;color:var(--muted)">${escapeHtml(v.comment||'')}</div>
+        <button class="btn-ghost btn-sm" data-cd-delvote="${escapeHtml(v.id||'')}">✕</button>
+      </div>`;
+    }).join('');
+  } else {
+    html+=`<div class="muted small">No votes yet.</div>`;
+  }
+
+  openModal(c.name||'Candidate',html,{wide:true});
+
+  // Status change
+  document.getElementById('cd_status')?.addEventListener('change',e=>{
+    c.status=e.target.value;
+    save();renderCandidateCards();
+  });
+
+  // Copy Info — formatted for easy pasting when creating employee card
+  document.querySelector('[data-cd-copyinfo]')?.addEventListener('click',()=>{
+    const lines=[
+      c.name||'',
+      `Discord: ${c.discord||'—'}`,
+      `Steam: ${c.steam||'—'}`,
+      `Positions: ${(c.chosenPositions||[]).join(', ')||'—'}`,
+      `First Choice: ${c.firstChoice||'—'}`,
+      `Age: ${c.age||'—'}`,
+      `Timezone: ${c.timezone||'—'}`,
+      `Bank ID: ${c.bankAccount||'—'}`,
+    ].filter(Boolean).join('\n');
+    copyText(lines);
+  });
+
+  // Edit info
+  document.querySelector('[data-cd-edit]')?.addEventListener('click',()=>{
+    closeModal();openEditCandidateModal(c);
+  });
+
+  // Delete
+  document.querySelector('[data-cd-del]')?.addEventListener('click',()=>{
+    if(!confirm(`Delete ${c.name}?`)) return;
+    state.candidates=(state.candidates||[]).filter(x=>x.id!==c.id);
+    save();closeModal();renderCandidateCards();toast("Deleted");
+  });
+
+  // Record / Edit interview
+  document.querySelector('[data-cd-interview]')?.addEventListener('click',()=>{
+    closeModal();openInterviewRecordModal(c);
+  });
+
+  // Add vote
+  document.querySelector('[data-cd-vote]')?.addEventListener('click',()=>{
+    closeModal();openVoteModal(c);
+  });
+
+  // Delete vote
+  document.querySelectorAll('[data-cd-delvote]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      c.votes=(c.votes||[]).filter(v=>(v.id||'')!==btn.getAttribute('data-cd-delvote'));
+      save();closeModal();openCandidateDetail(c);
+    });
+  });
+}
+
+function openEditCandidateModal(c){
+  const roleChecks=FIXED_ROLES.map(r=>{
+    const checked=(c.chosenPositions||[]).includes(r);
+    return `<label style="display:flex;gap:6px;align-items:center;font-size:12px"><input type="checkbox" data-ecpos="${escapeHtml(r)}" ${checked?'checked':''}/>${escapeHtml(r)}</label>`;
+  }).join('');
+
+  openModal("Edit Candidate",`
+    <div class="row">
+      <div><div class="muted small">Name</div><input id="ec_name" value="${escapeHtml(c.name||'')}"/></div>
+      <div><div class="muted small">Discord</div><input id="ec_discord" value="${escapeHtml(c.discord||'')}"/></div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <div><div class="muted small">Steam ID</div><input id="ec_steam" value="${escapeHtml(c.steam||'')}"/></div>
+      <div><div class="muted small">Age</div><input id="ec_age" value="${escapeHtml(c.age||'')}"/></div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <div><div class="muted small">Timezone</div><input id="ec_tz" value="${escapeHtml(c.timezone||'')}"/></div>
+      <div><div class="muted small">Bank ID</div><input id="ec_bank" value="${escapeHtml(c.bankAccount||'')}"/></div>
+    </div>
+    <div style="margin-top:8px"><div class="muted small">Chosen Positions</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">${roleChecks}</div>
+    </div>
+    <div style="margin-top:8px"><div class="muted small">First Choice</div>
+      <select id="ec_first"><option value="">—</option>${FIXED_ROLES.map(r=>`<option value="${escapeHtml(r)}" ${c.firstChoice===r?'selected':''}>${escapeHtml(r)}</option>`).join('')}</select>
+    </div>
+    <div style="margin-top:8px"><div class="muted small">Notes</div><textarea id="ec_notes" rows="2">${escapeHtml(c.notes||'')}</textarea></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn-accent" id="ec_save">Save</button></div>
+  `);
+
+  document.getElementById('ec_save').addEventListener('click',()=>{
+    c.name=(document.getElementById('ec_name').value||'').trim();
+    c.discord=(document.getElementById('ec_discord').value||'').trim();
+    c.steam=(document.getElementById('ec_steam').value||'').trim();
+    c.age=(document.getElementById('ec_age').value||'').trim();
+    c.timezone=(document.getElementById('ec_tz').value||'').trim();
+    c.bankAccount=(document.getElementById('ec_bank').value||'').trim();
+    c.chosenPositions=FIXED_ROLES.filter(r=>{const cb=document.querySelector(`input[data-ecpos="${CSS.escape(r)}"]`);return cb?.checked;});
+    c.firstChoice=document.getElementById('ec_first').value||'';
+    c.notes=(document.getElementById('ec_notes').value||'').trim();
+    save();closeModal();openCandidateDetail(c);renderCandidateCards();toast("Saved");
+  });
+}
+
+function openInterviewRecordModal(c){
+  // If they already have Q&A, use those questions. Otherwise copy from template.
+  const qs=(c.qa&&c.qa.length)?c.qa.map(p=>p.q):(state.interviewQuestions||[]).slice();
+  const answers=(c.qa&&c.qa.length)?c.qa.map(p=>p.a||''):qs.map(()=>'');
+
+  let html=`<div class="muted small" style="margin-bottom:10px">Record answers for <b>${escapeHtml(c.name)}</b>. Questions are from your template.</div>`;
+  html+=`<div style="margin-bottom:10px"><div class="muted small">Interview Date</div><input type="date" id="ir_date" value="${escapeHtml(c.interviewDate?dateValueFromStored(c.interviewDate):dateValueFromISO(new Date().toISOString()))}"/></div>`;
+
+  qs.forEach((q,i)=>{
+    html+=`<div style="margin-bottom:10px">
+      <div style="font-weight:700;font-size:12px;margin-bottom:4px">Q${i+1}: ${escapeHtml(q)}</div>
+      <textarea class="ir-answer" rows="3" placeholder="Their answer...">${escapeHtml(answers[i]||'')}</textarea>
+    </div>`;
+  });
+
+  html+=`<div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn-accent" id="ir_save">Save</button></div>`;
+
+  openModal("Record Interview — "+c.name,html,{wide:true});
+
+  document.getElementById('ir_save').addEventListener('click',()=>{
+    const ansEls=document.querySelectorAll('.ir-answer');
+    c.qa=qs.map((q,i)=>({q, a:(ansEls[i]?.value||'').trim()}));
+    c.interviewDate=(document.getElementById('ir_date').value||'').trim();
+    if(c.status==='awaiting') c.status='interviewed';
+    save();closeModal();openCandidateDetail(c);renderCandidateCards();toast("Interview saved");
+  });
+}
+
+function openVoteModal(c){
+  // Build voter dropdown from DC1-19 management
+  const mgmt=managementTrainerOptions();
+  const voterOpts=[`<option value="">— Select Voter —</option>`].concat(
+    mgmt.map(m=>`<option value="${escapeHtml(m.id)}">${escapeHtml(m.label)}</option>`)
+  ).join('');
+
+  openModal("Add Vote — "+c.name,`
+    <div><div class="muted small">Voter</div><select id="v_voter">${voterOpts}</select></div>
+    <div style="margin-top:8px"><div class="muted small">Vote</div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <label style="display:flex;gap:4px;align-items:center;font-size:13px"><input type="radio" name="v_vote" value="yes"/> Yes</label>
+        <label style="display:flex;gap:4px;align-items:center;font-size:13px"><input type="radio" name="v_vote" value="no"/> No</label>
+      </div>
+    </div>
+    <div style="margin-top:8px"><div class="muted small">Comment (optional)</div><textarea id="v_comment" rows="2" placeholder="Reasoning..."></textarea></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn-accent" id="v_save">Submit Vote</button></div>
+  `);
+
+  document.getElementById('v_save').addEventListener('click',()=>{
+    const voterId=document.getElementById('v_voter').value;
+    if(!voterId) return alert('Pick a voter.');
+    const voteEl=document.querySelector('input[name="v_vote"]:checked');
+    if(!voteEl) return alert('Pick yes or no.');
+    const voter=mgmt.find(m=>m.id===voterId);
+    // Check for duplicate vote
+    const existing=(c.votes||[]).find(v=>v.voterId===voterId);
+    if(existing){
+      existing.vote=voteEl.value;
+      existing.comment=(document.getElementById('v_comment').value||'').trim();
+    } else {
+      c.votes||=[];
+      c.votes.push({id:uid(),voterId,voterName:voter?.label||'Unknown',vote:voteEl.value,comment:(document.getElementById('v_comment').value||'').trim()});
+    }
+    save();closeModal();openCandidateDetail(c);renderCandidateCards();toast("Vote recorded");
+  });
+}
+
+// ═══════════════════════════════════════════
 // WIRES
 // ═══════════════════════════════════════════
 $("#importCsvBtn").addEventListener("click",()=>$("#csvFile").click());
@@ -2152,6 +2954,16 @@ $("#addPersonBtn").addEventListener("click",addPerson);
 $("#promoBtn").addEventListener("click",()=>{state.ui.reviewTab='eotm';renderReviewPage();});
 $("#overviewBtn").addEventListener("click",renderOverview);
 $("#mgmtCalBtn").addEventListener("click",renderMgmtCal);
+$("#templatesBtn").addEventListener("click",renderTemplates);
+$("#interviewBtn").addEventListener("click",renderInterviews);
+document.getElementById('addTemplateBtn')?.addEventListener('click',()=>openTemplateModal(null));
+document.getElementById('editQuestionsBtn')?.addEventListener('click',openEditQuestionsModal);
+document.getElementById('addCandidateBtn')?.addEventListener('click',openAddCandidateModal);
+document.getElementById('ivFilterAwait')?.addEventListener('click',()=>{state.ui.ivFilter='awaiting';save();renderCandidateCards();});
+document.getElementById('ivFilterDone')?.addEventListener('click',()=>{state.ui.ivFilter='interviewed';save();renderCandidateCards();});
+document.getElementById('ivFilterHired')?.addEventListener('click',()=>{state.ui.ivFilter='hired';save();renderCandidateCards();});
+document.getElementById('ivFilterDenied')?.addEventListener('click',()=>{state.ui.ivFilter='denied';save();renderCandidateCards();});
+document.getElementById('ivFilterAll')?.addEventListener('click',()=>{state.ui.ivFilter='all';save();renderCandidateCards();});
 $("#resetBtn").addEventListener("click",resetAll);
 
 document.getElementById('addMgmtEventBtn')?.addEventListener('click',()=>openMgmtEventModal(null));
@@ -2198,6 +3010,7 @@ if(ovN) ovN.addEventListener('click',()=>{
 
 $("#search").addEventListener("input",()=>{if(state.ui?.view==='hub') renderHub();});
 $("#sort").addEventListener("change",()=>{if(state.ui?.view==='hub') renderHub();});
+document.getElementById('rankFilter')?.addEventListener("change",()=>{if(state.ui?.view==='hub') renderHub();});
 
 document.getElementById('reviewTabEotm')?.addEventListener('click',()=>{state.ui.reviewTab='eotm';save();renderReviewPage();});
 document.getElementById('reviewTabPromo')?.addEventListener('click',()=>{state.ui.reviewTab='promo';save();renderReviewPage();});
