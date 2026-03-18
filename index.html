@@ -54,32 +54,101 @@
       min-height: 100vh;
     }
 
-    /* ── HEADER ── */
-    header {
-      position: sticky; top: 0; z-index: 20;
-      backdrop-filter: blur(20px);
-      background: rgba(7,11,18,.9);
-      border-bottom: 1px solid var(--line);
+    /* ── SIDEBAR ── */
+    .sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: 220px; background: var(--panel);
+      border-right: 1px solid var(--line);
+      display: flex; flex-direction: column;
+      z-index: 30; transition: width .2s ease, transform .2s ease;
+      overflow: hidden;
     }
-    header::after {
-      content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--accent), var(--cyan), transparent);
-      opacity: .4;
+    .sidebar::after {
+      content: ''; position: absolute; top: 0; right: -1px; bottom: 0; width: 1px;
+      background: linear-gradient(180deg, transparent 10%, var(--accent) 40%, var(--cyan) 60%, transparent 90%);
+      opacity: .35;
     }
-    .wrap { max-width: 1200px; margin: 0 auto; padding: 14px 20px; }
-    .hdr-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-    .brand { display: flex; align-items: center; gap: 10px; }
+    .sidebar.collapsed { width: 56px; }
+    .sidebar-logo {
+      padding: 14px 12px; display: flex; align-items: center; gap: 10px;
+      cursor: pointer; border-bottom: 1px solid var(--line); flex-shrink: 0; min-height: 52px; transition: padding .2s;
+    }
+    .sidebar.collapsed .sidebar-logo { padding: 14px 8px; justify-content: center; }
+    .sidebar-logo:hover { background: rgba(139,108,255,.04); }
+    .logo-img { width: 32px; height: 32px; border-radius: 8px; object-fit: contain; flex-shrink: 0; background: #000; padding: 2px; }
+    .logo-text { display: flex; flex-direction: column; overflow: hidden; white-space: nowrap; transition: opacity .15s; }
+    .sidebar.collapsed .logo-text { opacity: 0; width: 0; }
+    .logo-title { font-weight: 900; font-size: 13px; letter-spacing: .2px; line-height: 1.2; }
+    .logo-sub { font-size: 10px; color: var(--muted); letter-spacing: .3px; }
+    .collapse-btn {
+      position: absolute; top: 12px; right: -12px; width: 24px; height: 24px; border-radius: 50%;
+      background: var(--panel2); border: 1px solid var(--line2);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 31; transition: background .15s; color: var(--muted);
+    }
+    .collapse-btn:hover { background: var(--accent-dim); border-color: var(--accent-mid); color: var(--text); }
+    .collapse-btn svg { width: 12px; height: 12px; transition: transform .2s; }
+    .sidebar.collapsed .collapse-btn svg { transform: rotate(180deg); }
+    .nav-section { padding: 8px; flex: 1; overflow-y: auto; overflow-x: hidden; }
+    .nav-label {
+      font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted);
+      padding: 8px 8px 4px; font-weight: 700; white-space: nowrap; overflow: hidden; transition: opacity .15s;
+    }
+    .sidebar.collapsed .nav-label { opacity: 0; height: 0; padding: 0; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px;
+      font-size: 12px; font-weight: 500; cursor: pointer; transition: background .1s, color .1s;
+      white-space: nowrap; overflow: hidden; color: var(--muted); position: relative;
+      border: 1px solid transparent;
+    }
+    .nav-item:hover { background: rgba(139,108,255,.06); color: var(--text); }
+    .nav-item.active { background: var(--accent-dim); color: #c4b5fd; border-color: var(--accent-mid); }
+    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; opacity: .7; }
+    .nav-item.active svg { opacity: 1; }
+    .nav-item-text { transition: opacity .15s; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar.collapsed .nav-item-text { opacity: 0; width: 0; }
+    .sidebar.collapsed .nav-item { justify-content: center; padding: 8px; }
+    .nav-badge {
+      background: var(--accent); color: #fff; font-size: 9px; font-weight: 900;
+      padding: 1px 5px; border-radius: 999px; margin-left: auto; flex-shrink: 0; line-height: 1.4;
+    }
+    .sidebar.collapsed .nav-badge { position: absolute; top: 2px; right: 2px; margin: 0; width: 8px; height: 8px; padding: 0; font-size: 0; }
+    .nav-divider { height: 1px; background: var(--line); margin: 6px 8px; }
+    .sidebar-user {
+      padding: 10px 12px; border-top: 1px solid var(--line);
+      display: flex; align-items: center; gap: 8px; flex-shrink: 0; min-height: 48px; overflow: hidden;
+    }
+    .user-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--cyan));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 900; flex-shrink: 0; color: #fff;
+    }
+    .user-info { overflow: hidden; transition: opacity .15s; }
+    .sidebar.collapsed .user-info { opacity: 0; width: 0; }
+    .user-name { font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-rank { font-size: 10px; color: var(--accent); font-weight: 700; }
+    .user-signout {
+      margin-left: auto; font-size: 10px; color: var(--muted); cursor: pointer; flex-shrink: 0;
+      padding: 2px 6px; border-radius: 4px; transition: color .1s, background .1s; border: none; background: none;
+    }
+    .user-signout:hover { color: var(--bad); background: rgba(251,113,133,.08); }
+    .sidebar.collapsed .user-signout { display: none; }
+    .hamburger {
+      display: none; position: fixed; top: 12px; left: 12px; z-index: 40;
+      width: 36px; height: 36px; border-radius: 8px; background: var(--panel2);
+      border: 1px solid var(--line2); align-items: center; justify-content: center; cursor: pointer; color: var(--text);
+    }
+    .hamburger svg { width: 18px; height: 18px; }
+    .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 25; }
+    .mobile-overlay.show { display: block; }
+    @keyframes pulse { 0%,100%{opacity:.8;} 50%{opacity:1;} }
     .gem {
       width: 8px; height: 8px; border-radius: 50%;
       background: linear-gradient(135deg, var(--accent), var(--cyan));
       box-shadow: 0 0 12px rgba(139,108,255,.6), 0 0 24px rgba(56,189,248,.2);
       animation: pulse 3s ease-in-out infinite;
     }
-    @keyframes pulse { 0%,100%{opacity:.8;} 50%{opacity:1;} }
-    .brand-name { font-weight: 900; font-size: 15px; letter-spacing: .3px; }
-    .brand-sub { font-size: 11px; color: var(--muted); margin-left: 2px; }
-
-    .hdr-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 
     /* ── BUTTONS & INPUTS ── */
     input, select, button, textarea {
@@ -138,7 +207,8 @@
     .search-bar select { min-width: 180px; }
 
     /* ── MAIN ── */
-    main { max-width: 1200px; margin: 0 auto; padding: 16px 20px; }
+    main { max-width: 1200px; margin: 0 auto; padding: 16px 20px; margin-left: 220px; transition: margin-left .2s ease; }
+    .sidebar.collapsed ~ main { margin-left: 56px; }
 
     /* ── PANELS ── */
     .panel {
@@ -201,9 +271,12 @@
     /* Basic Info rows */
     .info-row {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 0; border-bottom: 1px solid var(--line);
-      font-size: 13px;
+      padding: 10px 12px; margin: 0 -12px;
+      font-size: 13px; border-radius: 8px;
+      transition: background .1s;
     }
+    .info-row.copyable { cursor: pointer; }
+    .info-row.copyable:hover { background: rgba(139,108,255,.05); }
     .info-row:last-child { border-bottom: none; }
     .info-key { color: var(--muted); min-width: 120px; font-size: 12px; }
     .info-val { display: flex; align-items: center; gap: 8px; text-align: right; }
@@ -461,7 +534,13 @@
 
     .hidden { display: none !important; }
 
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
+      .hamburger { display: flex; }
+      .collapse-btn { display: none; }
+      .sidebar { transform: translateX(-100%); width: 220px; }
+      .sidebar.collapsed { width: 220px; }
+      .sidebar.mobile-open { transform: translateX(0); }
+      main { margin-left: 0 !important; padding-top: 56px; max-width: 100%; }
       .hub-grid { grid-template-columns: 1fr; }
       .card { min-height: 90px; }
       .cand-grid { grid-template-columns: 1fr; }
@@ -470,61 +549,131 @@
 </head>
 <body>
 
-  <header>
-    <div class="wrap">
-      <div class="hdr-top">
-        <div class="brand">
-          <div class="gem"></div>
-          <span class="brand-name">Diamond Casino</span>
-          <span class="brand-sub" id="saveState">saved locally</span>
-        </div>
-        <div class="hdr-actions">
-          <button class="btn-ghost btn-sm" id="overviewBtn">Hours Overview</button>
-          <button class="btn-ghost btn-sm" id="mgmtCalBtn">Mgmt Calendar</button>
-          <button class="btn-ghost btn-sm" id="promoBtn">Promo / EOTM</button>
-          <button class="btn-ghost btn-sm" id="interviewBtn">Interviews</button>
-          <button class="btn-ghost btn-sm" id="leadershipBtn">Leadership</button>
-          <button class="btn-ghost btn-sm" id="auditLogBtn">Audit Log</button>
-          <button class="btn-ghost btn-sm" id="templatesBtn">Templates</button>
-          <button class="btn-ghost btn-sm" id="importCsvBtn">Import CSV</button>
-          <input type="file" id="csvFile" accept=".csv,text/csv" style="display:none">
-          <button class="btn-ghost btn-sm" id="exportBtn">Export</button>
-          <button class="btn-ghost btn-sm" id="importBackupBtn">Import</button>
-          <input type="file" id="backupFile" accept="application/json" style="display:none">
-          <button class="btn-accent btn-sm" id="addPersonBtn">+ Person</button>
-          <button class="btn-ghost btn-sm" id="backBtn" style="display:none;">← Back</button>
-        </div>
-      </div>
-      <div class="search-bar" id="searchBar">
-        <input id="search" placeholder="Search name, callsign, steam..." />
-        <select id="sort">
-          <option value="az">A → Z</option>
-          <option value="dc">DC Number</option>
-          <option value="month_desc">Hours: High → Low</option>
-          <option value="month_asc">Hours: Low → High</option>
-          <option value="total_desc">Total: High → Low</option>
-          <option value="total_asc">Total: Low → High</option>
-          <option value="recent">Most Recent</option>
-          <option value="least_recent">Least Recent</option>
-        </select>
-        <select id="rankFilter">
-          <option value="">All Ranks</option>
-          <option value="Trainee">Trainee</option>
-          <option value="Employee">Employee</option>
-          <option value="Senior Employee">Senior Employee</option>
-          <option value="Supervisor">Supervisor</option>
-          <option value="Manager">Manager</option>
-          <option value="Director">Director</option>
-        </select>
-        <button class="btn-ghost btn-sm" id="inactiveBtn">Inactive</button>
-        <button class="btn-ghost btn-sm" id="needsTrainBtn">Needs Training</button>
-        <button class="btn-ghost btn-sm" id="pastBtn">Graveyard</button>
-        <button class="btn-danger btn-sm" id="resetBtn">Reset</button>
+  <!-- HAMBURGER (mobile) -->
+  <div class="hamburger" id="hamburger">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </div>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="collapse-btn" id="collapseBtn" title="Collapse sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </div>
+
+    <div class="sidebar-logo" id="sidebarHome" title="Home">
+      <img class="logo-img" src="logo_white.png" alt="DC" onerror="this.outerHTML='<div class=\'gem\' style=\'width:12px;height:12px;flex-shrink:0\'></div>'"/>
+      <div class="logo-text">
+        <span class="logo-title">Diamond Casino</span>
+        <span class="logo-sub" id="sidebarCount">Staff Tracker</span>
       </div>
     </div>
-  </header>
+
+    <div class="nav-section">
+      <div class="nav-label">Pages</div>
+
+      <div class="nav-item active" id="navHub" title="Staff Hub">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span class="nav-item-text">Staff Hub</span>
+      </div>
+      <div class="nav-item" id="overviewBtn" title="Hours Overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+        <span class="nav-item-text">Hours Overview</span>
+      </div>
+      <div class="nav-item" id="mgmtCalBtn" title="Mgmt Calendar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span class="nav-item-text">Mgmt Calendar</span>
+      </div>
+      <div class="nav-item" id="promoBtn" title="Promo / EOTM">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span class="nav-item-text">Promo / EOTM</span>
+        <span class="nav-badge" id="promoBadge" style="display:none"></span>
+      </div>
+      <div class="nav-item" id="interviewBtn" title="Interviews">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="nav-item-text">Interviews</span>
+      </div>
+      <div class="nav-item" id="leadershipBtn" title="Leadership">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        <span class="nav-item-text">Leadership</span>
+      </div>
+      <div class="nav-item" id="auditLogBtn" title="Audit Log">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span class="nav-item-text">Audit Log</span>
+      </div>
+      <div class="nav-item" id="templatesBtn" title="Templates">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+        <span class="nav-item-text">Templates</span>
+      </div>
+
+      <div class="nav-divider"></div>
+      <div class="nav-label">Tools</div>
+
+      <div class="nav-item" id="addPersonBtn" title="Add Person">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        <span class="nav-item-text">+ Person</span>
+      </div>
+      <div class="nav-item" id="importCsvBtn" title="Import CSV">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span class="nav-item-text">Import CSV</span>
+      </div>
+      <input type="file" id="csvFile" accept=".csv,text/csv" style="display:none">
+      <div class="nav-item" id="exportBtn" title="Export Backup">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span class="nav-item-text">Export Backup</span>
+      </div>
+      <div class="nav-item" id="importBackupBtn" title="Import Backup">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 15v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span class="nav-item-text">Import Backup</span>
+      </div>
+      <input type="file" id="backupFile" accept="application/json" style="display:none">
+      <div class="nav-item" id="resetBtn" title="Reset" style="color:var(--bad)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        <span class="nav-item-text">Reset</span>
+      </div>
+    </div>
+
+    <div class="sidebar-user" id="sidebarUser" style="display:none">
+      <div class="user-avatar" id="userAvatar">?</div>
+      <div class="user-info">
+        <div class="user-name" id="userName">—</div>
+        <div class="user-rank" id="userRank">—</div>
+      </div>
+      <span class="user-signout" id="signOutBtn" title="Sign out">Sign out</span>
+    </div>
+  </nav>
 
   <main>
+    <!-- Save state indicator -->
+    <span id="saveState" style="display:none">saved locally</span>
+
+    <!-- SEARCH BAR (hub only) -->
+    <div class="search-bar" id="searchBar">
+      <input id="search" placeholder="Search name, callsign, steam..." />
+      <select id="sort">
+        <option value="az">A → Z</option>
+        <option value="dc">DC Number</option>
+        <option value="month_desc">Hours: High → Low</option>
+        <option value="month_asc">Hours: Low → High</option>
+        <option value="total_desc">Total: High → Low</option>
+        <option value="total_asc">Total: Low → High</option>
+        <option value="recent">Most Recent</option>
+        <option value="least_recent">Least Recent</option>
+      </select>
+      <select id="rankFilter">
+        <option value="">All Ranks</option>
+        <option value="Trainee">Trainee</option>
+        <option value="Employee">Employee</option>
+        <option value="Senior Employee">Senior Employee</option>
+        <option value="Supervisor">Supervisor</option>
+        <option value="Manager">Manager</option>
+        <option value="Director">Director</option>
+      </select>
+      <button class="btn-ghost btn-sm" id="inactiveBtn">Inactive</button>
+      <button class="btn-ghost btn-sm" id="needsTrainBtn">Needs Training</button>
+      <button class="btn-ghost btn-sm" id="pastBtn">Graveyard</button>
+    </div>
+
     <!-- HUB -->
     <section id="hubView">
       <div class="hub-grid" id="cards"></div>
@@ -864,12 +1013,13 @@ function showSetupFlow(user){
 
 function showLoginOverlay(){
   document.getElementById('loginOverlay').style.display='flex';
-  document.querySelector('header').style.display='none';
+  document.getElementById('sidebar').style.display='none';
   document.querySelector('main').style.display='none';
+  document.getElementById('hamburger').style.display='none';
 }
 function hideLoginOverlay(){
   document.getElementById('loginOverlay').style.display='none';
-  document.querySelector('header').style.display='';
+  document.getElementById('sidebar').style.display='';
   document.querySelector('main').style.display='';
 }
 
@@ -1127,6 +1277,7 @@ function save(){
       clearTimeout(save._t2);
       save._t2=setTimeout(()=>$("#saveState").textContent="synced",1500);
       updatePromoBadge();
+      updateEmployeeCount();
     }).catch(err=>{
       console.error("Firebase save error:",err);
       $("#saveState").textContent="save failed!";
@@ -1231,15 +1382,22 @@ function initAuth(){
 }
 
 function updateHeaderUser(){
-  const existing=document.getElementById('userInfoSpan');
-  if(existing) existing.remove();
-  if(!currentUser) return;
-  const span=document.createElement('span');
-  span.id='userInfoSpan';
-  span.style.cssText='font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px';
-  span.innerHTML=escapeHtml(currentUser.character||currentAuth?.email||'')+' <span style="color:var(--accent);font-weight:700;font-size:10px">'+escapeHtml(currentUser.rank||'')+'</span> <button class="btn-ghost btn-sm" id="signOutBtn" style="font-size:10px;padding:3px 8px">Sign Out</button>';
-  document.querySelector('.brand')?.appendChild(span);
-  document.getElementById('signOutBtn')?.addEventListener('click',()=>{ auth.signOut(); });
+  const userEl=document.getElementById('sidebarUser');
+  if(!currentUser){ if(userEl) userEl.style.display='none'; return; }
+  if(userEl) userEl.style.display='';
+  const avatar=document.getElementById('userAvatar');
+  const name=document.getElementById('userName');
+  const rank=document.getElementById('userRank');
+  const charName=currentUser.character||currentAuth?.email||'';
+  if(avatar){ const initials=(charName||'?').split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase(); avatar.textContent=initials; }
+  if(name) name.textContent=charName;
+  if(rank) rank.textContent=currentUser.rank||'';
+}
+function updateEmployeeCount(){
+  const el=document.getElementById('sidebarCount');
+  if(!el) return;
+  const count=state.people.filter(p=>!p.archived).length;
+  el.textContent=`Staff Tracker · ${count}`;
 }
 
 function applyPermissions(){
@@ -1273,11 +1431,8 @@ function startApp(){
   else if(state.selectedId) renderProfile();
   else renderHub();
   updatePromoBadge();
+  updateEmployeeCount();
 }
-
-
-// ═══════════════════════════════════════════
-// MODAL
 // ═══════════════════════════════════════════
 function openModal(title,html,opts={}){
   const modal=document.querySelector('.modal');
@@ -1312,7 +1467,7 @@ function notesForPerson(pid){ return (state.notesEntries||[]).filter(n=>n.person
 function trainingNotesForPerson(pid){ return (state.trainingNotes||[]).filter(n=>n.personId===pid).slice().sort((a,b)=>new Date(b.dateISO)-new Date(a.dateISO)); }
 function calEventsForPerson(pid){ return (state.calendarEvents||[]).filter(e=>e.personId===pid).slice().sort((a,b)=>new Date(a.dateISO)-new Date(b.dateISO)); }
 
-function normalizeKind(k){ const v=(k||'').trim(); if(!v) return 'Commendation'; if(v==='Correction') return 'Correction'; if(v==='Comment') return 'Commendation'; if(v==='Discipline') return 'Strike'; return v; }
+function normalizeKind(k){ const v=(k||'').trim(); if(!v) return 'Commendation'; if(v==='Correction') return 'Correction'; if(v==='Comment') return 'Commendation'; if(v==='Discipline') return 'Strike'; if(v==='Fired'||v==='Resigned'||v==='Hired') return v; return v; }
 function isStrike(e){ return normalizeKind(e.kind)==="Strike"; }
 function strikesInMonth(pid,md){ const f=startOfMonth(md),t=endOfMonth(md); return entriesForPerson(pid).filter(e=>isStrike(e)).filter(e=>{const d=new Date(e.dateISO);return d>=f&&d<t;}).length; }
 
@@ -1582,11 +1737,11 @@ function countReadyTrainees(){
   }).length;
 }
 function updatePromoBadge(){
-  const btn=document.getElementById('promoBtn');
-  if(!btn) return;
+  const badge=document.getElementById('promoBadge');
+  if(!badge) return;
   const count=countReadyTrainees();
-  btn.textContent=count>0?`Promo / EOTM (${count})`:'Promo / EOTM';
-  btn.className=count>0?'btn-accent btn-sm':'btn-ghost btn-sm';
+  if(count>0){ badge.style.display=''; badge.textContent=count; }
+  else { badge.style.display='none'; }
 }
 function countWarningsSent(pid){
   return (state.entries||[]).filter(e=>e.personId===pid&&e.kind==='Warning Sent').length;
@@ -1605,12 +1760,13 @@ function renderHub(){
   document.getElementById('interviewView').style.display="none";
   document.getElementById('leadershipView').style.display="none";
   document.getElementById('auditLogView').style.display="none";
-  $("#backBtn").style.display="none";
   $("#searchBar").style.display="";
+  updateSidebarActive('hub');
   state.ui.view="hub"; state.selectedId=null;
   // Reset hub to current month always
   state.monthCursor=new Date().toISOString();
   save();
+  updateEmployeeCount();
 
   const q=($("#search").value||"").trim().toLowerCase();
   const sort=$("#sort").value;
@@ -1735,10 +1891,10 @@ function renderOverview(){
   document.getElementById('mgmtCalView').style.display="none";
   document.getElementById('templatesView').style.display="none";
   document.getElementById('interviewView').style.display="none";
-  $("#backBtn").style.display="";
   document.getElementById('auditLogView').style.display="none";
   document.getElementById('leadershipView').style.display="none";
   $("#searchBar").style.display="none";
+  updateSidebarActive('overview');
   state.ui.view="overview"; save();
 
   const md=startOfMonth(new Date(state.overviewMonthCursor));
@@ -1923,9 +2079,9 @@ function renderProfile(){
   document.getElementById('templatesView').style.display="none";
   document.getElementById('interviewView').style.display="none";
   document.getElementById('auditLogView').style.display="none";
-  $("#backBtn").style.display="";
   document.getElementById('leadershipView').style.display="none";
   $("#searchBar").style.display="none";
+  updateSidebarActive('');
 
   const monthDate=startOfMonth(new Date(state.profileMonthCursor));
   const monthly=computeMonthly(p.id,monthDate);
@@ -1981,21 +2137,22 @@ function renderProfile(){
   });
 
   // Basic Info
-  const copyIcon=`<svg viewBox="0 0 24 24" fill="none"><path d="M9 9h9v10a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V11a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.8"/><path d="M7 13H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="1.8"/></svg>`;
   const basicRows=[
-    {k:'Rank',v:p.rank||'—'},{k:'Discord',v:p.discord||'—'},
-    {k:'Discord ID',v:p.discordId||'—',copy:p.discordId},{k:'Steam ID',v:p.steam||'—',copy:p.steam},
-    {k:'Timezone',v:p.timeZone||'—'},{k:'Bank ID',v:p.bankAccount||'—',copy:p.bankAccount},
+    {k:'Rank',v:p.rank||'—'},
+    {k:'Steam Name',v:p.steamName||'—',copy:p.steamName},
+    {k:'Discord',v:p.discord||'—',copy:p.discord},
+    {k:'Discord ID',v:p.discordId||'—',copy:p.discordId?`<@${p.discordId}>`:null},
+    {k:'Steam ID',v:p.steam||'—',copy:p.steam},
+    {k:'Timezone',v:p.timeZone||'—',copy:p.timeZone},
+    {k:'Bank ID',v:p.bankAccount||'—',copy:p.bankAccount},
   ];
-  $("#basicInfo").innerHTML=basicRows.map(r=>`
-    <div class="info-row">
+  $("#basicInfo").innerHTML=basicRows.map(r=>{
+    const canCopy=r.copy&&r.k!=='Rank';
+    return `<div class="info-row${canCopy?' copyable':''}"${canCopy?` data-copy-row="${escapeHtml(r.copy)}"`:''}>
       <div class="info-key">${escapeHtml(r.k)}</div>
-      <div class="info-val">
-        <span>${escapeHtml(r.v)}</span>
-        ${r.copy?`<button class="btn-icon" data-copy-text="${escapeHtml(r.copy)}">${copyIcon}</button>`:''}
-      </div>
-    </div>
-  `).join('');
+      <div class="info-val"><span>${escapeHtml(r.v)}</span></div>
+    </div>`;
+  }).join('');
 
   // Training
   renderTraining(p.id);
@@ -2022,6 +2179,9 @@ function renderProfile(){
   // Wire copy buttons
   document.querySelectorAll('button[data-copy-text]').forEach(btn=>{
     btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();copyText(btn.getAttribute('data-copy-text')||'');});
+  });
+  document.querySelectorAll('[data-copy-row]').forEach(row=>{
+    row.addEventListener('click',()=>{copyText(row.getAttribute('data-copy-row')||'');});
   });
 }
 
@@ -2423,7 +2583,7 @@ function renderEntries(pid){
   const list=entriesForPerson(pid);
   host.innerHTML=list.map(e=>{
     const kind=normalizeKind(e.kind);
-    const pillCls=kind==='Strike'?'bad':kind==='Correction'?'warn':kind==='Warning Sent'?'warn':kind==='Dismissal'?'bad':'good';
+    const pillCls=kind==='Strike'?'bad':kind==='Correction'?'warn':kind==='Warning Sent'?'warn':kind==='Dismissal'?'bad':kind==='Fired'?'bad':kind==='Resigned'?'warn':kind==='Hired'?'good':'good';
     const note=(e.note||'').trim();
     const preview=note.length>120?note.slice(0,120)+'…':note;
     return `<div class="entry-card">
@@ -2487,9 +2647,9 @@ function renderReviewPage(){
   document.getElementById('templatesView').style.display="none";
   document.getElementById('auditLogView').style.display="none";
   document.getElementById('interviewView').style.display="none";
-  $("#backBtn").style.display="";
   document.getElementById('leadershipView').style.display="none";
   $("#searchBar").style.display="none";
+  updateSidebarActive('review');
 
   const monthDate=startOfMonth(new Date(state.monthCursor));
   const sub=document.getElementById('reviewSub');
@@ -2600,19 +2760,21 @@ function editBasics(){
   openModal("Edit Info",`
     <div class="row"><div><div class="muted small">Character</div><input id="e_character" value="${escapeHtml(p.character||'')}"></div>
     <div><div class="muted small">Callsign</div><input id="e_callsign" value="${escapeHtml(p.callsign||'')}"></div></div>
-    <div class="row" style="margin-top:8px"><div><div class="muted small">Discord</div><input id="e_discord" value="${escapeHtml(p.discord||'')}" placeholder="@name"></div>
-    <div><div class="muted small">Discord ID</div><input id="e_discordId" value="${escapeHtml(p.discordId||'')}"></div></div>
-    <div class="row" style="margin-top:8px"><div><div class="muted small">Timezone</div><input id="e_tz" value="${escapeHtml(p.timeZone||'')}"></div>
-    <div><div class="muted small">Bank ID</div><input id="e_bank" value="${escapeHtml(p.bankAccount||'')}"></div></div>
-    <div class="row" style="margin-top:8px"><div><div class="muted small">Rank</div>${rankSelect}</div>
-    <div><div class="muted small">Google Email</div><input id="e_google" value="${escapeHtml(p.googleEmail||'')}" placeholder="name@gmail.com"></div></div>
+    <div class="row" style="margin-top:8px"><div><div class="muted small">Steam Name</div><input id="e_steamName" value="${escapeHtml(p.steamName||'')}"></div>
+    <div><div class="muted small">Discord</div><input id="e_discord" value="${escapeHtml(p.discord||'')}" placeholder="@name"></div></div>
+    <div class="row" style="margin-top:8px"><div><div class="muted small">Discord ID</div><input id="e_discordId" value="${escapeHtml(p.discordId||'')}"></div>
+    <div><div class="muted small">Timezone</div><input id="e_tz" value="${escapeHtml(p.timeZone||'')}"></div></div>
+    <div class="row" style="margin-top:8px"><div><div class="muted small">Bank ID</div><input id="e_bank" value="${escapeHtml(p.bankAccount||'')}"></div>
+    <div><div class="muted small">Rank</div>${rankSelect}</div></div>
+    <div class="row" style="margin-top:8px"><div><div class="muted small">Google Email</div><input id="e_google" value="${escapeHtml(p.googleEmail||'')}" placeholder="name@gmail.com"></div><div></div></div>
     <div class="row" style="margin-top:8px"><div><div class="muted small" style="margin-bottom:6px">Media Team</div><label style="display:flex;gap:6px;align-items:center;font-size:12px"><input type="checkbox" id="e_media" ${p.mediaTeam?'checked':''}/> Member of Media & Promotions</label></div><div></div></div>
-    <div class="hint" style="margin-top:10px">Steam fields update from CSV import only. Google Email is used for login.</div>
+    <div class="hint" style="margin-top:10px">Steam ID updates from CSV import only. Google Email is used for login.</div>
     <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn-accent" id="e_save">Save</button></div>
   `);
   $("#e_save").addEventListener("click",()=>{
     const oldRank=p.rank||'';
     p.character=($("#e_character").value||'').trim(); p.callsign=($("#e_callsign").value||'').trim();
+    p.steamName=(document.getElementById('e_steamName')?.value||'').trim();
     p.discord=($("#e_discord").value||'').trim(); p.discordId=($("#e_discordId").value||'').trim();
     p.timeZone=($("#e_tz").value||'').trim(); p.bankAccount=($("#e_bank").value||'').trim();
     if(canEditRank) p.rank=$("#e_rank").value||'';
@@ -2647,6 +2809,10 @@ function deletePerson(){
     p.archiveType=document.getElementById('arc_type').value;
     p.archiveDate=(document.getElementById('arc_date').value||'').trim();
     p.archiveReason=(document.getElementById('arc_reason').value||'').trim();
+    // Auto-log feedback entry
+    const arcKind=p.archiveType==='fired'?'Fired':p.archiveType==='resigned'?'Resigned':'Dismissal';
+    const arcDate=p.archiveDate?isoFromDateValue(p.archiveDate):new Date().toISOString();
+    state.entries.push({id:uid(),personId:p.id,dateISO:arcDate,kind:arcKind,note:p.archiveReason||'Archived'});
     logAction('Archived',p.id,`${p.archiveType}: ${p.archiveReason||'No reason'}`);
     state.selectedId=null; save(); closeModal(); renderHub(); toast("Archived");
   });
@@ -2768,8 +2934,8 @@ function hideAllViews(){
 function renderMgmtCal(){
   hideAllViews();
   document.getElementById('mgmtCalView').style.display="";
-  $("#backBtn").style.display="";
   $("#searchBar").style.display="none";
+  updateSidebarActive('mgmtcal');
   state.ui.view="mgmtcal"; save();
 
   const md=startOfMonth(new Date(state.mgmtMonthCursor));
@@ -2997,8 +3163,8 @@ function openMgmtEventModal(existing){
 function renderAuditLog(){
   hideAllViews();
   document.getElementById('auditLogView').style.display="";
-  $("#backBtn").style.display="";
   $("#searchBar").style.display="none";
+  updateSidebarActive('auditlog');
   state.ui.view="auditlog"; save();
 
   const host=document.getElementById('auditLogBody');
@@ -3043,8 +3209,8 @@ function renderAuditLog(){
 function renderLeadership(){
   hideAllViews();
   document.getElementById('leadershipView').style.display="";
-  $("#backBtn").style.display="";
   $("#searchBar").style.display="none";
+  updateSidebarActive('leadership');
   state.ui.view="leadership"; save();
 
   const fromEl=document.getElementById('laFrom');
@@ -3335,8 +3501,8 @@ Just wanted to let you know that you didn't hit your 4 hours last month. Make su
 function renderTemplates(){
   hideAllViews();
   document.getElementById('templatesView').style.display="";
-  $("#backBtn").style.display="";
   $("#searchBar").style.display="none";
+  updateSidebarActive('templates');
   state.ui.view="templates"; save();
 
   // Auto-populate defaults on first visit
@@ -3410,8 +3576,8 @@ function openTemplateModal(existing){
 function renderInterviews(){
   hideAllViews();
   document.getElementById('interviewView').style.display="";
-  $("#backBtn").style.display="";
   $("#searchBar").style.display="none";
+  updateSidebarActive('interviews');
   state.ui.view="interviews"; save();
 
   // Render question template
@@ -3535,7 +3701,7 @@ function renderCandidateCards(){
         <div class="cand-name">${escapeHtml(c.name||'(no name)')}</div>
         ${statusPill}
       </div>
-      <div class="cand-meta">${escapeHtml(c.discord||'—')} · ${escapeHtml(positions)}</div>
+      <div class="cand-meta">${escapeHtml(c.discord||'—')}${c.discordId?' · <@'+escapeHtml(c.discordId)+'>':''} · ${escapeHtml(positions)}</div>
       <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
         <div class="cand-meta">Accepted: ${escapeHtml(dateLabel)}</div>
         ${graceLabel}
@@ -3565,16 +3731,16 @@ function openAddCandidateModal(){
       <div><div class="muted small">Discord</div><input id="c_discord" placeholder="Discord name"/></div>
     </div>
     <div class="row" style="margin-top:8px">
+      <div><div class="muted small">Discord ID</div><input id="c_discordId" placeholder="e.g. 123456789012345678"/></div>
       <div><div class="muted small">Steam ID</div><input id="c_steam" placeholder="steam:..."/></div>
+    </div>
+    <div class="row" style="margin-top:8px">
       <div><div class="muted small">Accepted Date</div><input type="date" id="c_accepted" value="${dateValueFromISO(new Date().toISOString())}"/></div>
-    </div>
-    <div class="row" style="margin-top:8px">
       <div><div class="muted small">Age</div><input id="c_age" placeholder="Age"/></div>
-      <div><div class="muted small">Timezone</div><input id="c_tz" placeholder="EST, CST, etc."/></div>
     </div>
     <div class="row" style="margin-top:8px">
+      <div><div class="muted small">Timezone</div><input id="c_tz" placeholder="EST, CST, etc."/></div>
       <div><div class="muted small">Bank ID</div><input id="c_bank" placeholder="Bank ID"/></div>
-      <div></div>
     </div>
     <div style="margin-top:8px"><div class="muted small">Chosen Positions</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">${roleChecks}</div>
@@ -3594,6 +3760,7 @@ function openAddCandidateModal(){
       id:uid(),
       name,
       discord:(document.getElementById('c_discord').value||'').trim(),
+      discordId:(document.getElementById('c_discordId').value||'').trim(),
       steam:(document.getElementById('c_steam').value||'').trim(),
       age:(document.getElementById('c_age').value||'').trim(),
       timezone:(document.getElementById('c_tz').value||'').trim(),
@@ -3621,7 +3788,7 @@ function openCandidateDetail(c){
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:12px">
       <div>
         <div style="font-weight:900;font-size:18px">${escapeHtml(c.name||'(no name)')}</div>
-        <div class="muted small" style="margin-top:2px">${escapeHtml(c.discord||'—')} · ${escapeHtml(c.steam||'—')}</div>
+        <div class="muted small" style="margin-top:2px">${escapeHtml(c.discord||'—')}${c.discordId?` · <span style="cursor:pointer;color:var(--cyan)" data-cd-copydiscord>&lt;@${escapeHtml(c.discordId)}&gt;</span>`:''} · ${escapeHtml(c.steam||'—')}</div>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn-accent btn-sm" data-cd-copyinfo>Copy Info</button>
@@ -3704,6 +3871,7 @@ function openCandidateDetail(c){
     const lines=[
       c.name||'',
       `Discord: ${c.discord||'—'}`,
+      c.discordId?`Discord ID: <@${c.discordId}>`:'',
       `Steam: ${c.steam||'—'}`,
       `Accepted: ${c.acceptedDate?fmtMDY(new Date(c.acceptedDate+'T00:00:00')):'—'}`,
       `Positions: ${(c.chosenPositions||[]).join(', ')||'—'}`,
@@ -3713,6 +3881,12 @@ function openCandidateDetail(c){
       `Bank ID: ${c.bankAccount||'—'}`,
     ].filter(Boolean).join('\n');
     copyText(lines);
+  });
+
+  // Copy discord <@id>
+  document.querySelector('[data-cd-copydiscord]')?.addEventListener('click',(e)=>{
+    e.stopPropagation();
+    copyText(`<@${c.discordId}>`);
   });
 
   // Edit info
@@ -3735,7 +3909,7 @@ function openCandidateDetail(c){
       character: c.name||'',
       callsign: '',
       discord: c.discord||'',
-      discordId: '',
+      discordId: c.discordId||'',
       timeZone: c.timezone||'',
       bankAccount: c.bankAccount||'',
       rank: 'Trainee',
@@ -3750,6 +3924,8 @@ function openCandidateDetail(c){
     ensurePerson(newP);
     state.people.push(newP);
     c.status = 'hired';
+    // Auto-log Hired feedback entry
+    state.entries.push({id:uid(),personId:newP.id,dateISO:new Date().toISOString(),kind:'Hired',note:`Converted from interview candidate`});
     save(); closeModal(); renderCandidateCards();
     logAction('Candidate converted',newP.id,`${c.name} converted from interview candidate to Trainee`);
     toast(`${c.name} added as Trainee`);
@@ -3793,16 +3969,16 @@ function openEditCandidateModal(c){
       <div><div class="muted small">Discord</div><input id="ec_discord" value="${escapeHtml(c.discord||'')}"/></div>
     </div>
     <div class="row" style="margin-top:8px">
+      <div><div class="muted small">Discord ID</div><input id="ec_discordId" value="${escapeHtml(c.discordId||'')}"/></div>
       <div><div class="muted small">Steam ID</div><input id="ec_steam" value="${escapeHtml(c.steam||'')}"/></div>
+    </div>
+    <div class="row" style="margin-top:8px">
       <div><div class="muted small">Accepted Date</div><input type="date" id="ec_accepted" value="${escapeHtml(c.acceptedDate||'')}"/></div>
-    </div>
-    <div class="row" style="margin-top:8px">
       <div><div class="muted small">Age</div><input id="ec_age" value="${escapeHtml(c.age||'')}"/></div>
-      <div><div class="muted small">Timezone</div><input id="ec_tz" value="${escapeHtml(c.timezone||'')}"/></div>
     </div>
     <div class="row" style="margin-top:8px">
+      <div><div class="muted small">Timezone</div><input id="ec_tz" value="${escapeHtml(c.timezone||'')}"/></div>
       <div><div class="muted small">Bank ID</div><input id="ec_bank" value="${escapeHtml(c.bankAccount||'')}"/></div>
-      <div></div>
     </div>
     <div style="margin-top:8px"><div class="muted small">Chosen Positions</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">${roleChecks}</div>
@@ -3817,6 +3993,7 @@ function openEditCandidateModal(c){
   document.getElementById('ec_save').addEventListener('click',()=>{
     c.name=(document.getElementById('ec_name').value||'').trim();
     c.discord=(document.getElementById('ec_discord').value||'').trim();
+    c.discordId=(document.getElementById('ec_discordId').value||'').trim();
     c.steam=(document.getElementById('ec_steam').value||'').trim();
     c.acceptedDate=(document.getElementById('ec_accepted').value||'').trim();
     c.age=(document.getElementById('ec_age').value||'').trim();
@@ -3896,26 +4073,53 @@ function openVoteModal(c){
 }
 
 // ═══════════════════════════════════════════
+// SIDEBAR HELPERS
+// ═══════════════════════════════════════════
+function updateSidebarActive(page){
+  document.querySelectorAll('.nav-item[id]').forEach(el=>{
+    const map={navHub:'hub',overviewBtn:'overview',mgmtCalBtn:'mgmtcal',promoBtn:'review',
+      interviewBtn:'interviews',leadershipBtn:'leadership',auditLogBtn:'auditlog',templatesBtn:'templates'};
+    const p=map[el.id]||'';
+    el.classList.toggle('active',p===page);
+  });
+}
+function closeMobileSidebar(){
+  document.getElementById('sidebar')?.classList.remove('mobile-open');
+  document.getElementById('mobileOverlay')?.classList.remove('show');
+}
+
+// ═══════════════════════════════════════════
 // WIRES
 // ═══════════════════════════════════════════
-$("#importCsvBtn").addEventListener("click",()=>$("#csvFile").click());
+// Sidebar
+document.getElementById('collapseBtn')?.addEventListener('click',()=>{document.getElementById('sidebar')?.classList.toggle('collapsed');});
+document.getElementById('hamburger')?.addEventListener('click',()=>{
+  document.getElementById('sidebar')?.classList.toggle('mobile-open');
+  document.getElementById('mobileOverlay')?.classList.toggle('show');
+});
+document.getElementById('mobileOverlay')?.addEventListener('click',closeMobileSidebar);
+document.getElementById('sidebarHome')?.addEventListener('click',()=>{closeMobileSidebar();renderHub();});
+document.getElementById('navHub')?.addEventListener('click',()=>{closeMobileSidebar();renderHub();});
+document.getElementById('signOutBtn')?.addEventListener('click',()=>{ auth.signOut(); });
+
+$("#importCsvBtn").addEventListener("click",()=>{closeMobileSidebar();$("#csvFile").click();});
 $("#csvFile").addEventListener("change",e=>{const f=e.target.files?.[0];if(f) importCSVFile(f);e.target.value="";});
-$("#exportBtn").addEventListener("click",exportBackup);
-$("#importBackupBtn").addEventListener("click",()=>$("#backupFile").click());
+$("#exportBtn").addEventListener("click",()=>{closeMobileSidebar();exportBackup();});
+$("#importBackupBtn").addEventListener("click",()=>{closeMobileSidebar();$("#backupFile").click();});
 $("#backupFile").addEventListener("change",e=>{const f=e.target.files?.[0];if(f) importBackup(f);e.target.value="";});
-$("#addPersonBtn").addEventListener("click",addPerson);
-$("#promoBtn").addEventListener("click",()=>{state.ui.reviewTab='eotm';renderReviewPage();});
-$("#overviewBtn").addEventListener("click",renderOverview);
-$("#mgmtCalBtn").addEventListener("click",renderMgmtCal);
-$("#templatesBtn").addEventListener("click",renderTemplates);
-$("#leadershipBtn").addEventListener("click",renderLeadership);
-$("#auditLogBtn")?.addEventListener("click",renderAuditLog);
+$("#addPersonBtn").addEventListener("click",()=>{closeMobileSidebar();addPerson();});
+$("#promoBtn").addEventListener("click",()=>{closeMobileSidebar();state.ui.reviewTab='eotm';renderReviewPage();});
+$("#overviewBtn").addEventListener("click",()=>{closeMobileSidebar();renderOverview();});
+$("#mgmtCalBtn").addEventListener("click",()=>{closeMobileSidebar();renderMgmtCal();});
+$("#templatesBtn").addEventListener("click",()=>{closeMobileSidebar();renderTemplates();});
+$("#leadershipBtn").addEventListener("click",()=>{closeMobileSidebar();renderLeadership();});
+$("#auditLogBtn")?.addEventListener("click",()=>{closeMobileSidebar();renderAuditLog();});
 document.getElementById('laApply')?.addEventListener('click',renderLeadership);
 document.getElementById('laClear')?.addEventListener('click',()=>{
   const f=document.getElementById('laFrom'),t=document.getElementById('laTo');
   if(f)f.value='';if(t)t.value='';renderLeadership();
 });
-$("#interviewBtn").addEventListener("click",renderInterviews);
+$("#interviewBtn").addEventListener("click",()=>{closeMobileSidebar();renderInterviews();});
 document.getElementById('addTemplateBtn')?.addEventListener('click',()=>openTemplateModal(null));
 document.getElementById('editQuestionsBtn')?.addEventListener('click',openEditQuestionsModal);
 document.getElementById('addCandidateBtn')?.addEventListener('click',openAddCandidateModal);
@@ -3924,7 +4128,7 @@ document.getElementById('ivFilterDone')?.addEventListener('click',()=>{state.ui.
 document.getElementById('ivFilterHired')?.addEventListener('click',()=>{state.ui.ivFilter='hired';save();renderCandidateCards();});
 document.getElementById('ivFilterDenied')?.addEventListener('click',()=>{state.ui.ivFilter='denied';save();renderCandidateCards();});
 document.getElementById('ivFilterAll')?.addEventListener('click',()=>{state.ui.ivFilter='all';save();renderCandidateCards();});
-$("#resetBtn").addEventListener("click",resetAll);
+$("#resetBtn").addEventListener("click",()=>{closeMobileSidebar();resetAll();});
 
 document.getElementById('addMgmtEventBtn')?.addEventListener('click',()=>openMgmtEventModal(null));
 document.getElementById('mcPrev')?.addEventListener('click',()=>{
@@ -3940,7 +4144,6 @@ $("#inactiveBtn").addEventListener("click",()=>{state.ui.inactiveOnly=!state.ui.
 document.getElementById('needsTrainBtn')?.addEventListener("click",()=>{state.ui.needsTrainOnly=!state.ui.needsTrainOnly;if(state.ui.needsTrainOnly){state.ui.showArchived=false;state.ui.inactiveOnly=false;}save();renderHub();});
 $("#pastBtn").addEventListener("click",()=>{state.ui.showArchived=!state.ui.showArchived;if(state.ui.showArchived){state.ui.inactiveOnly=false;state.ui.needsTrainOnly=false;}save();renderHub();});
 
-$("#backBtn").addEventListener("click",renderHub);
 $("#editPersonBtn").addEventListener("click",editBasics);
 $("#addDisciplineBtn").addEventListener("click",()=>addEntry());
 $("#addNoteBtn").addEventListener("click",()=>openNoteModal(null));
