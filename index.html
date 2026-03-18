@@ -8,34 +8,41 @@
     @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,900;1,9..40,400&display=swap');
 
     :root {
-      --bg: #090c10;
-      --panel: #0f1318;
-      --panel2: #141a22;
-      --surface: #1a2230;
-      --line: #1e2a3a;
-      --line2: #263348;
-      --text: #e4e8f0;
-      --muted: #7a869e;
+      --bg: #070b12;
+      --panel: #0c1017;
+      --panel2: #11161f;
+      --surface: #172033;
+      --line: #1b2640;
+      --line2: #243050;
+      --text: #e8ecf4;
+      --muted: #6b7a96;
       --accent: #8b6cff;
-      --accent-dim: rgba(139,108,255,.15);
-      --accent-mid: rgba(139,108,255,.35);
-      --cyan: #4ad3ff;
-      --cyan-dim: rgba(74,211,255,.12);
+      --accent-dim: rgba(139,108,255,.12);
+      --accent-mid: rgba(139,108,255,.3);
+      --cyan: #38bdf8;
+      --cyan-dim: rgba(56,189,248,.1);
+      --cyan-border: rgba(56,189,248,.45);
       --good: #34d399;
-      --good-dim: rgba(52,211,153,.12);
-      --good-border: rgba(52,211,153,.5);
-      --bad: #f87171;
-      --bad-dim: rgba(248,113,113,.1);
-      --bad-border: rgba(248,113,113,.45);
-      --warn: #fbbf24;
-      --warn-dim: rgba(251,191,36,.1);
-      --warn-border: rgba(251,191,36,.45);
-      --loa: #a78bfa;
-      --loa-dim: rgba(167,139,250,.12);
-      --loa-border: rgba(167,139,250,.5);
-      --r: 12px;
-      --r2: 16px;
-      --shadow: 0 8px 32px rgba(0,0,0,.4);
+      --good-dim: rgba(52,211,153,.1);
+      --good-border: rgba(52,211,153,.45);
+      --bad: #fb7185;
+      --bad-dim: rgba(251,113,133,.08);
+      --bad-border: rgba(251,113,133,.4);
+      --warn: #f59e0b;
+      --warn-dim: rgba(245,158,11,.08);
+      --warn-border: rgba(245,158,11,.4);
+      --loa: #60a5fa;
+      --loa-dim: rgba(96,165,250,.1);
+      --loa-border: rgba(96,165,250,.45);
+      --interview: #e879f9;
+      --interview-dim: rgba(232,121,249,.1);
+      --interview-border: rgba(232,121,249,.45);
+      --event: #fbbf24;
+      --event-dim: rgba(251,191,36,.08);
+      --event-border: rgba(251,191,36,.4);
+      --r: 10px;
+      --r2: 14px;
+      --shadow: 0 8px 32px rgba(0,0,0,.5);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -50,18 +57,25 @@
     /* ── HEADER ── */
     header {
       position: sticky; top: 0; z-index: 20;
-      backdrop-filter: blur(16px);
-      background: rgba(9,12,16,.85);
+      backdrop-filter: blur(20px);
+      background: rgba(7,11,18,.9);
       border-bottom: 1px solid var(--line);
+    }
+    header::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--cyan), transparent);
+      opacity: .4;
     }
     .wrap { max-width: 1200px; margin: 0 auto; padding: 14px 20px; }
     .hdr-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
     .brand { display: flex; align-items: center; gap: 10px; }
     .gem {
-      width: 10px; height: 10px; border-radius: 50%;
+      width: 8px; height: 8px; border-radius: 50%;
       background: linear-gradient(135deg, var(--accent), var(--cyan));
-      box-shadow: 0 0 14px rgba(139,108,255,.5);
+      box-shadow: 0 0 12px rgba(139,108,255,.6), 0 0 24px rgba(56,189,248,.2);
+      animation: pulse 3s ease-in-out infinite;
     }
+    @keyframes pulse { 0%,100%{opacity:.8;} 50%{opacity:1;} }
     .brand-name { font-weight: 900; font-size: 15px; letter-spacing: .3px; }
     .brand-sub { font-size: 11px; color: var(--muted); margin-left: 2px; }
 
@@ -76,12 +90,14 @@
       padding: 8px 12px;
       outline: none;
       font-size: 13px;
-      transition: border-color .15s;
+      transition: border-color .15s, background .15s;
     }
-    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
-    input::placeholder, textarea::placeholder { color: rgba(122,134,158,.6); }
+    select { color: var(--text); background-color: var(--panel2); }
+    select option { color: var(--text); background-color: var(--panel2); }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); background: rgba(139,108,255,.05); }
+    input::placeholder, textarea::placeholder { color: rgba(107,122,150,.5); }
     button { cursor: pointer; user-select: none; white-space: nowrap; }
-    button:hover { border-color: var(--accent); }
+    button:hover { border-color: var(--accent); background: rgba(139,108,255,.08); }
 
     .btn-accent {
       background: var(--accent-dim);
@@ -163,7 +179,7 @@
       gap: 8px;
       overflow: hidden;
     }
-    .card:hover { border-color: var(--accent-mid); transform: translateY(-1px); }
+    .card:hover { border-color: var(--accent-mid); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(139,108,255,.1); }
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .card-name { font-weight: 900; font-size: 14px; line-height: 1.2; }
     .card-meta { color: var(--muted); font-size: 11px; margin-top: 3px; line-height: 1.3; }
@@ -253,13 +269,15 @@
     .cal-day.loa .day-num { color: var(--loa); }
     .cal-day .day-tags { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 4px; }
     .day-tag {
-      width: 6px; height: 6px; border-radius: 50%;
+      padding: 1px 5px; border-radius: 6px;
+      font-size: 8px; font-weight: 700; letter-spacing: .3px;
+      text-transform: uppercase; white-space: nowrap;
     }
-    .day-tag.shift { background: var(--good); }
-    .day-tag.training { background: var(--cyan); }
-    .day-tag.interview { background: var(--accent); }
-    .day-tag.event { background: var(--warn); }
-    .day-tag.loa-tag { background: var(--loa); }
+    .day-tag.shift { background: var(--good-dim); color: var(--good); border: 1px solid var(--good-border); }
+    .day-tag.training { background: var(--cyan-dim); color: var(--cyan); border: 1px solid var(--cyan-border); }
+    .day-tag.interview { background: var(--interview-dim); color: var(--interview); border: 1px solid var(--interview-border); }
+    .day-tag.event { background: var(--event-dim); color: var(--event); border: 1px solid var(--event-border); }
+    .day-tag.loa-tag { background: var(--loa-dim); color: var(--loa); border: 1px solid var(--loa-border); }
 
     /* ── FEEDBACK ENTRIES ── */
     .entry-card {
@@ -297,7 +315,8 @@
     /* ── MODAL ── */
     .modal-backdrop {
       position: fixed; inset: 0;
-      background: rgba(0,0,0,.65);
+      background: rgba(0,0,0,.7);
+      backdrop-filter: blur(4px);
       display: none; align-items: center; justify-content: center;
       padding: 20px; z-index: 50;
     }
@@ -402,6 +421,44 @@
     }
     .vote-row:last-child { border-bottom: none; }
 
+    /* ── TAG PICKER ── */
+    .tag-picker { position: relative; }
+    .tag-picker-input {
+      width: 100%; padding: 6px 10px; font-size: 12px;
+      background: var(--surface); border: 1px solid var(--line2); border-radius: var(--r);
+      color: var(--text); outline: none;
+    }
+    .tag-picker-input:focus { border-color: var(--accent); }
+    .tag-picker-input::placeholder { color: rgba(107,122,150,.5); }
+    .tag-picker-dropdown {
+      position: absolute; top: 100%; left: 0; right: 0; z-index: 10;
+      max-height: 160px; overflow-y: auto;
+      background: var(--panel2); border: 1px solid var(--line2); border-top: none;
+      border-radius: 0 0 var(--r) var(--r);
+      display: none;
+    }
+    .tag-picker-dropdown.open { display: block; }
+    .tag-picker-option {
+      padding: 6px 10px; font-size: 12px; cursor: pointer;
+      transition: background .1s;
+    }
+    .tag-picker-option:hover { background: var(--accent-dim); }
+    .tag-chips {
+      display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px;
+    }
+    .tag-chip {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 8px; border-radius: 999px;
+      font-size: 11px; font-weight: 700;
+      background: var(--accent-dim); border: 1px solid var(--accent-mid); color: #c4b5fd;
+      cursor: default;
+    }
+    .tag-chip .tag-x {
+      cursor: pointer; font-size: 13px; line-height: 1; opacity: .6;
+      transition: opacity .1s;
+    }
+    .tag-chip .tag-x:hover { opacity: 1; }
+
     .hidden { display: none !important; }
 
     @media (max-width: 600px) {
@@ -426,6 +483,8 @@
           <button class="btn-ghost btn-sm" id="mgmtCalBtn">Mgmt Calendar</button>
           <button class="btn-ghost btn-sm" id="promoBtn">Promo / EOTM</button>
           <button class="btn-ghost btn-sm" id="interviewBtn">Interviews</button>
+          <button class="btn-ghost btn-sm" id="leadershipBtn">Leadership</button>
+          <button class="btn-ghost btn-sm" id="auditLogBtn">Audit Log</button>
           <button class="btn-ghost btn-sm" id="templatesBtn">Templates</button>
           <button class="btn-ghost btn-sm" id="importCsvBtn">Import CSV</button>
           <input type="file" id="csvFile" accept=".csv,text/csv" style="display:none">
@@ -476,13 +535,34 @@
       <div class="panel">
         <div class="panel-head">
           <div class="h">Monthly Hours Overview</div>
-          <div class="row tight" style="gap:6px">
+          <div class="row tight" style="gap:6px;flex-wrap:wrap">
+            <select id="ovRankFilter" style="padding:4px 8px;font-size:11px">
+              <option value="">All Ranks</option>
+              <option value="Trainee">Trainee</option>
+              <option value="Employee">Employee</option>
+              <option value="Senior Employee">Senior Employee</option>
+              <option value="Supervisor">Supervisor</option>
+              <option value="Manager">Manager</option>
+              <option value="Director">Director</option>
+            </select>
             <button class="btn-ghost btn-sm" id="ovPrev">←</button>
             <span class="pill" id="ovMonthLabel">Month</span>
             <button class="btn-ghost btn-sm" id="ovNext">→</button>
+            <button class="btn-danger btn-sm" id="ovNeedsAction">Needs Action</button>
+            <button class="btn-ghost btn-sm" id="ovGraceMonth">Grace Month</button>
           </div>
         </div>
+        <div style="padding:6px 16px;border-bottom:1px solid var(--line);display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:11px">
+          <span class="muted">Range:</span>
+          <input type="date" id="ovFrom" style="padding:3px 6px;font-size:11px"/>
+          <span class="muted">to</span>
+          <input type="date" id="ovTo" style="padding:3px 6px;font-size:11px"/>
+          <button class="btn-ghost btn-sm" id="ovRangeApply" style="font-size:10px">Apply</button>
+          <button class="btn-ghost btn-sm" id="ovRangeClear" style="font-size:10px">Clear</button>
+        </div>
+        </div>
         <div class="panel-body" id="overviewBody">
+          <div id="needsActionPanel" style="display:none;margin-bottom:12px"></div>
           <div class="chart-bar-wrap" id="hoursChart"></div>
         </div>
       </div>
@@ -503,6 +583,35 @@
         <div class="panel-body">
           <div id="mgmtCalendar"></div>
         </div>
+      </div>
+    </section>
+
+    <!-- AUDIT LOG -->
+    <section id="auditLogView" style="display:none;">
+      <div class="panel">
+        <div class="panel-head">
+          <div class="h">Audit Log</div>
+          <div class="muted small">Last 500 actions</div>
+        </div>
+        <div class="panel-body" id="auditLogBody"></div>
+      </div>
+    </section>
+
+    <!-- LEADERSHIP ACTIVITY -->
+    <section id="leadershipView" style="display:none;">
+      <div class="panel">
+        <div class="panel-head">
+          <div class="h">Leadership Activity</div>
+          <div class="row tight" style="gap:6px;flex-wrap:wrap">
+            <div class="muted small">From:</div>
+            <input type="date" id="laFrom" style="padding:4px 8px;font-size:11px"/>
+            <div class="muted small">To:</div>
+            <input type="date" id="laTo" style="padding:4px 8px;font-size:11px"/>
+            <button class="btn-ghost btn-sm" id="laApply">Apply</button>
+            <button class="btn-ghost btn-sm" id="laClear">Clear</button>
+          </div>
+        </div>
+        <div class="panel-body" id="leadershipBody"></div>
       </div>
     </section>
 
@@ -594,6 +703,7 @@
           <div class="h">Feedback</div>
           <div class="row tight" style="gap:6px">
             <span class="pill" id="strikePill">Strikes: 0</span>
+            <span class="pill" id="warnPill">Warnings: 0</span>
             <button class="btn-ghost btn-sm" id="addDisciplineBtn">+ Entry</button>
           </div>
         </div>
@@ -641,8 +751,21 @@
 
   <div class="toast" id="toast">Copied</div>
 
+  <!-- Login Overlay -->
+  <div id="loginOverlay" style="position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <div class="gem" style="width:12px;height:12px"></div>
+      <span style="font-weight:900;font-size:20px;letter-spacing:.5px">Diamond Casino Tracker</span>
+    </div>
+    <div class="muted" style="font-size:13px;text-align:center;max-width:320px">Sign in with your Google account to access the tracker. Your email must be linked to a staff profile.</div>
+    <button id="googleSignInBtn" class="btn-accent" style="padding:12px 24px;font-size:14px;font-weight:900;border-radius:10px;cursor:pointer">Sign in with Google</button>
+    <div id="loginError" style="display:none;color:var(--bad);font-size:12px;text-align:center;max-width:320px"></div>
+    <div id="loginLoading" style="display:none;color:var(--muted);font-size:12px">Signing in...</div>
+  </div>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 
 <script>
 // ═══════════════════════════════════════════
@@ -660,6 +783,117 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const dbRef = db.ref('tracker');
+const auth = firebase.auth();
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+// ═══════════════════════════════════════════
+// AUTH & PERMISSIONS
+// ═══════════════════════════════════════════
+let currentUser = null; // the person record of the logged-in user
+let currentAuth = null; // the Firebase auth user
+
+const RANK_LEVELS = {Trainee:0,Employee:1,"Senior Employee":2,Supervisor:3,Manager:4,Director:5};
+function rankLevel(rank){ return RANK_LEVELS[rank||'']??-1; }
+function isReadOnly(){ return currentUser && rankLevel(currentUser.rank) < 3; } // below Supervisor
+function canViewAll(){ return !currentUser || rankLevel(currentUser.rank) >= 3; }
+function canManage(targetPerson){
+  if(!currentUser) return true; // fallback if no auth
+  return rankLevel(currentUser.rank) > rankLevel(targetPerson?.rank||'');
+}
+function canPromoteTo(targetPerson){
+  if(!currentUser) return true;
+  const myLevel = rankLevel(currentUser.rank);
+  const theirLevel = rankLevel(targetPerson?.rank||'');
+  return myLevel > theirLevel + 1 || (myLevel >= 5); // Directors can promo anyone
+}
+function canAccessPage(page){
+  if(!currentUser) return true;
+  const level = rankLevel(currentUser.rank);
+  const gated = {leadership:4, auditlog:4, templates:3, interviews:3, mgmtcal:3, overview:3, review:3};
+  return level >= (gated[page]||0);
+}
+
+function findPersonByEmail(email){
+  if(!email) return null;
+  const e = email.toLowerCase().trim();
+  return state.people.find(p => (p.googleEmail||'').toLowerCase().trim() === e) || null;
+}
+
+function showSetupFlow(user){
+  const overlay=document.getElementById('loginOverlay');
+  const mgmt=state.people.filter(p=>!p.archived&&isMgmtRank(p)).sort((a,b)=>(a.character||'').localeCompare(b.character||''));
+  const allPeople=state.people.filter(p=>!p.archived).sort((a,b)=>(a.character||'').localeCompare(b.character||''));
+  const list=mgmt.length?mgmt:allPeople;
+
+  const opts=list.map(p=>{
+    ensurePerson(p);
+    return `<option value="${escapeHtml(p.id)}">${escapeHtml(p.character||p.steamName||'Unknown')} — ${escapeHtml(p.rank||'No rank')}</option>`;
+  }).join('');
+
+  overlay.innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <div class="gem" style="width:12px;height:12px"></div>
+      <span style="font-weight:900;font-size:20px;letter-spacing:.5px">First-Time Setup</span>
+    </div>
+    <div class="muted" style="font-size:13px;text-align:center;max-width:400px;margin-bottom:12px">
+      No accounts are linked yet. Select your profile to connect <b>${escapeHtml(user.email)}</b> to the tracker. This is a one-time setup.
+    </div>
+    <select id="setupPerson" style="min-width:260px;padding:10px;font-size:13px">${opts}</select>
+    <button class="btn-accent" id="setupConfirm" style="padding:12px 24px;font-size:14px;font-weight:900;border-radius:10px;margin-top:8px">Link My Account</button>
+    <div id="setupError" style="display:none;color:var(--bad);font-size:12px;margin-top:8px"></div>
+  `;
+
+  document.getElementById('setupConfirm').addEventListener('click',()=>{
+    const pid=document.getElementById('setupPerson').value;
+    if(!pid){document.getElementById('setupError').style.display='block';document.getElementById('setupError').textContent='Pick your profile.';return;}
+    const p=getPerson(pid);
+    if(!p) return;
+    p.googleEmail=user.email;
+    logAction('Account linked',pid,'First-time setup — Google email linked');
+    save();
+    // Now trigger the auth flow again
+    currentUser=p;
+    ensurePerson(currentUser);
+    hideLoginOverlay();
+    updateHeaderUser();
+    applyPermissions();
+    startApp();
+    toast('Account linked!');
+  });
+}
+
+function showLoginOverlay(){
+  document.getElementById('loginOverlay').style.display='flex';
+  document.querySelector('header').style.display='none';
+  document.querySelector('main').style.display='none';
+}
+function hideLoginOverlay(){
+  document.getElementById('loginOverlay').style.display='none';
+  document.querySelector('header').style.display='';
+  document.querySelector('main').style.display='';
+}
+
+// ═══════════════════════════════════════════
+// AUDIT LOG
+// ═══════════════════════════════════════════
+function logAction(action, targetId, detail){
+  state.auditLog||=[];
+  const who = currentUser ? (currentUser.character||currentUser.steamName||'Unknown') : 'System';
+  const whoId = currentUser?.id||'';
+  const target = targetId ? (getPerson(targetId)?.character||'Unknown') : '';
+  state.auditLog.push({
+    id: uid(),
+    timestamp: new Date().toISOString(),
+    userId: whoId,
+    userName: who,
+    action,
+    targetId: targetId||'',
+    targetName: target,
+    detail: detail||''
+  });
+  // Keep last 500 entries
+  if(state.auditLog.length > 500) state.auditLog = state.auditLog.slice(-500);
+}
 
 // ═══════════════════════════════════════════
 // CONFIG
@@ -671,7 +905,7 @@ const MIN_SHIFT_MINUTES = 30;
 const MONTHLY_MIN_HOURS = 4;
 const MONTHLY_MIN_MS = MONTHLY_MIN_HOURS * 60 * 60 * 1000;
 
-const FIXED_ROLES = ["Security","Croupier","Bartender","Valet","Media"];
+const FIXED_ROLES = ["Security","Croupier","Bartender","Valet"];
 const RANKS = ["Trainee","Employee","Senior Employee","Supervisor","Manager","Director"];
 
 function isMgmtCallsign(cs){
@@ -694,7 +928,9 @@ function promotePerson(pid){
   const nr=nextRank(p.rank);
   if(!nr){toast("Already at max rank");return;}
   if(!confirm(`Promote ${p.character||'this person'} from ${p.rank||'(none)'} to ${nr}?`)) return;
+  const oldRank=p.rank||'None';
   p.rank=nr;
+  logAction('Promoted',pid,`${oldRank} → ${nr}`);
   save();toast(`Promoted to ${nr}`);
   if(state.ui?.view==='hub') renderHub();
   if(state.selectedId===pid) renderProfile();
@@ -722,6 +958,65 @@ function toast(msg="Copied"){
 async function copyText(txt){
   try{ await navigator.clipboard.writeText(txt); toast("Copied"); }
   catch{ const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast("Copied"); }
+}
+
+// ═══════════════════════════════════════════
+// TAG PICKER UTILITY
+// ═══════════════════════════════════════════
+// Creates a search-as-you-type tag picker. Returns an object with getSelected() method.
+// options: [{id, label}], selected: [id], containerId: string
+function createTagPicker(containerId, options, selected=[]){
+  const container=document.getElementById(containerId);
+  if(!container) return {getSelected:()=>[]};
+  let sel=new Set(selected);
+
+  function render(){
+    const chips=Array.from(sel).map(id=>{
+      const opt=options.find(o=>o.id===id);
+      return opt?`<span class="tag-chip" data-tag-id="${escapeHtml(id)}">${escapeHtml(opt.label)} <span class="tag-x" data-tag-rm="${escapeHtml(id)}">×</span></span>`:'';
+    }).join('');
+
+    container.innerHTML=`
+      <div class="tag-picker">
+        <input class="tag-picker-input" placeholder="Search to add..." autocomplete="off"/>
+        <div class="tag-picker-dropdown"></div>
+      </div>
+      <div class="tag-chips">${chips}</div>
+    `;
+
+    const input=container.querySelector('.tag-picker-input');
+    const dropdown=container.querySelector('.tag-picker-dropdown');
+
+    input.addEventListener('input',()=>{
+      const q=input.value.trim().toLowerCase();
+      if(!q){dropdown.classList.remove('open');dropdown.innerHTML='';return;}
+      const matches=options.filter(o=>!sel.has(o.id)&&o.label.toLowerCase().includes(q)).slice(0,8);
+      if(!matches.length){dropdown.classList.remove('open');dropdown.innerHTML='';return;}
+      dropdown.innerHTML=matches.map(o=>`<div class="tag-picker-option" data-tag-add="${escapeHtml(o.id)}">${escapeHtml(o.label)}</div>`).join('');
+      dropdown.classList.add('open');
+      dropdown.querySelectorAll('[data-tag-add]').forEach(el=>{
+        el.addEventListener('mousedown',e=>{
+          e.preventDefault();
+          sel.add(el.getAttribute('data-tag-add'));
+          input.value='';
+          render();
+        });
+      });
+    });
+
+    input.addEventListener('blur',()=>{setTimeout(()=>dropdown.classList.remove('open'),150);});
+    input.addEventListener('focus',()=>{if(input.value.trim()) input.dispatchEvent(new Event('input'));});
+
+    container.querySelectorAll('[data-tag-rm]').forEach(el=>{
+      el.addEventListener('click',()=>{
+        sel.delete(el.getAttribute('data-tag-rm'));
+        render();
+      });
+    });
+  }
+
+  render();
+  return {getSelected:()=>Array.from(sel)};
 }
 
 // ═══════════════════════════════════════════
@@ -790,7 +1085,9 @@ function seed(){
       "How do you typically handle conflict between you and another person?",
       "Scenario Question"
     ],
-    candidates:[]
+    candidates:[],
+    graceMonth:"",
+    auditLog:[]
   };
 }
 
@@ -798,7 +1095,7 @@ function ensureState(data){
   if(!data||!Array.isArray(data.people)) return seed();
   data.clockEvents||=[];data.loas||=[];data.entries||=[];data.notesEntries||=[];data.eotmHistory||=[];
   data.calendarEvents||=[];data.trainingNotes||=[];data.mgmtEvents||=[];
-  data.templates||=[];data.candidates||=[];
+  data.templates||=[];data.candidates||=[];data.graceMonth||="";data.auditLog||=[];
   data.interviewQuestions||=[
     "Tell me about one of your favorite moments here in the city.",
     "Which three words would you use to describe The Diamond Casino & Resort?",
@@ -829,6 +1126,7 @@ function save(){
       $("#saveState").textContent="saved to cloud";
       clearTimeout(save._t2);
       save._t2=setTimeout(()=>$("#saveState").textContent="synced",1500);
+      updatePromoBadge();
     }).catch(err=>{
       console.error("Firebase save error:",err);
       $("#saveState").textContent="save failed!";
@@ -839,6 +1137,9 @@ function save(){
 // Boot: load from Firebase, fall back to localStorage, then start
 function boot(){
   $("#saveState").textContent="connecting...";
+  showLoginOverlay();
+
+  // Load data first, then handle auth
   dbRef.once('value').then(snap=>{
     const data=snap.val();
     if(data && data.people){
@@ -846,7 +1147,6 @@ function boot(){
       firebaseReady=true;
       $("#saveState").textContent="synced";
     } else {
-      // Try localStorage migration
       let migrated=false;
       try{
         const local=localStorage.getItem("casinoTracker.local.v8")||localStorage.getItem("casinoTracker.local.v7");
@@ -854,7 +1154,6 @@ function boot(){
           const parsed=JSON.parse(local);
           if(parsed&&Array.isArray(parsed.people)){
             state=ensureState(parsed);
-            // Push local data to Firebase
             dbRef.set(state);
             migrated=true;
             $("#saveState").textContent="migrated to cloud";
@@ -867,29 +1166,115 @@ function boot(){
       }
       firebaseReady=true;
     }
-    startApp();
+    initAuth();
   }).catch(err=>{
     console.error("Firebase load error:",err);
-    // Fallback to localStorage
     try{
       const local=localStorage.getItem("casinoTracker.local.v8");
       if(local) state=ensureState(JSON.parse(local));
     }catch{}
     firebaseReady=true;
     $("#saveState").textContent="offline mode";
-    startApp();
+    initAuth();
   });
 }
 
+function initAuth(){
+  auth.onAuthStateChanged(user=>{
+    if(user){
+      currentAuth=user;
+      const person=findPersonByEmail(user.email);
+      if(person){
+        currentUser=person;
+        ensurePerson(currentUser);
+        hideLoginOverlay();
+        updateHeaderUser();
+        applyPermissions();
+        startApp();
+      } else {
+        // Check if ANY profiles have googleEmail set — if not, this is first-time setup
+        const anyLinked=state.people.some(p=>(p.googleEmail||'').trim());
+        if(!anyLinked){
+          showSetupFlow(user);
+        } else {
+          const errEl=document.getElementById('loginError');
+          if(errEl){
+            errEl.style.display='block';
+            errEl.innerHTML='No staff profile linked to <b>'+escapeHtml(user.email)+'</b>. Contact management to add your Google email to your profile.';
+          }
+          document.getElementById('loginLoading').style.display='none';
+          document.getElementById('googleSignInBtn').style.display='';
+        }
+      }
+    } else {
+      currentAuth=null;
+      currentUser=null;
+      showLoginOverlay();
+      document.getElementById('loginLoading').style.display='none';
+      document.getElementById('googleSignInBtn').style.display='';
+      document.getElementById('loginError').style.display='none';
+    }
+  });
+
+  document.getElementById('googleSignInBtn').addEventListener('click',()=>{
+    document.getElementById('googleSignInBtn').style.display='none';
+    document.getElementById('loginLoading').style.display='block';
+    document.getElementById('loginError').style.display='none';
+    auth.signInWithPopup(googleProvider).catch(err=>{
+      console.error('Sign-in error:',err);
+      document.getElementById('loginLoading').style.display='none';
+      document.getElementById('googleSignInBtn').style.display='';
+      const errEl=document.getElementById('loginError');
+      if(errEl){errEl.style.display='block';errEl.textContent='Sign-in failed. Try again.';}
+    });
+  });
+}
+
+function updateHeaderUser(){
+  const existing=document.getElementById('userInfoSpan');
+  if(existing) existing.remove();
+  if(!currentUser) return;
+  const span=document.createElement('span');
+  span.id='userInfoSpan';
+  span.style.cssText='font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px';
+  span.innerHTML=escapeHtml(currentUser.character||currentAuth?.email||'')+' <span style="color:var(--accent);font-weight:700;font-size:10px">'+escapeHtml(currentUser.rank||'')+'</span> <button class="btn-ghost btn-sm" id="signOutBtn" style="font-size:10px;padding:3px 8px">Sign Out</button>';
+  document.querySelector('.brand')?.appendChild(span);
+  document.getElementById('signOutBtn')?.addEventListener('click',()=>{ auth.signOut(); });
+}
+
+function applyPermissions(){
+  if(!currentUser) return;
+  const level=rankLevel(currentUser.rank);
+  const gatedBtns={
+    overviewBtn:3, mgmtCalBtn:3, promoBtn:3, interviewBtn:3,
+    leadershipBtn:4, auditLogBtn:4, templatesBtn:3,
+    importCsvBtn:3, exportBtn:3, importBackupBtn:3, addPersonBtn:3, resetBtn:5
+  };
+  for(const [id,minLevel] of Object.entries(gatedBtns)){
+    const el=document.getElementById(id);
+    if(el) el.style.display=level>=minLevel?'':'none';
+  }
+}
+
 function startApp(){
+  if(currentUser && isReadOnly()){
+    state.selectedId=currentUser.id;
+    state.ui.view='profile';
+    renderProfile();
+    return;
+  }
   if(state.ui?.view==="review") renderReviewPage();
   else if(state.ui?.view==="overview") renderOverview();
   else if(state.ui?.view==="mgmtcal") renderMgmtCal();
   else if(state.ui?.view==="templates") renderTemplates();
   else if(state.ui?.view==="interviews") renderInterviews();
+  else if(state.ui?.view==="leadership") renderLeadership();
+  else if(state.ui?.view==="auditlog") renderAuditLog();
   else if(state.selectedId) renderProfile();
   else renderHub();
+  updatePromoBadge();
 }
+
 
 // ═══════════════════════════════════════════
 // MODAL
@@ -914,6 +1299,8 @@ function ensurePerson(p){
   p.training.roles||={};
   for(const r of FIXED_ROLES) p.training.roles[r]||={trainerId:"",date:"",comment:""};
   p.priorityRole||=""; p.crossTrain||=[]; p.notes||=""; p.archived=!!p.archived;
+  p.archiveType||=""; p.archiveReason||=""; p.archiveDate||="";
+  p.rehiredDate||=""; p.mediaTeam=!!p.mediaTeam; p.googleEmail||="";
 }
 function getPerson(id){ const p=state.people.find(x=>x.id===id); if(p) ensurePerson(p); return p; }
 function eventsForPerson(pid){ return state.clockEvents.filter(e=>e.personId===pid).slice().sort((a,b)=>new Date(a.timeISO)-new Date(b.timeISO)); }
@@ -942,11 +1329,43 @@ function getMonthlyHoursMs(pid, monthDate){
 
 function activityStatus(pid){
   const now = new Date();
+  const p = getPerson(pid);
   if(isOnLOA(pid, now)) return { state:'LOA', missedMonths:0, message:null };
+
+  // Trainees: exempt from activity policy for their first full month
+  // If their first clock-in was this month or last month, don't penalize
+  if(p && (p.rank||'') === 'Trainee'){
+    const firstIn = lastClockInISO(pid) ? eventsForPerson(pid).find(e=>e.type==='IN')?.timeISO : null;
+    if(firstIn){
+      const firstMonth = startOfMonth(new Date(firstIn));
+      const thisMonth = startOfMonth(now);
+      const lastMonth = startOfMonth(new Date(thisMonth.getFullYear(), thisMonth.getMonth()-1, 1));
+      if(firstMonth.getTime() >= lastMonth.getTime()){
+        const ms = getMonthlyHoursMs(pid, thisMonth);
+        if(ms >= MONTHLY_MIN_MS) return { state:'ACTIVE', missedMonths:0, message:null };
+        const daysLeft = new Date(thisMonth.getFullYear(), thisMonth.getMonth()+1, 0).getDate() - now.getDate();
+        return { state:'PENDING', missedMonths:0, message:null, hoursNeeded: durLabel(MONTHLY_MIN_MS - ms), daysLeft, traineeExempt:true };
+      }
+    } else {
+      // Trainee with no clock-ins at all — exempt
+      return { state:'PENDING', missedMonths:0, message:null, hoursNeeded:'4h', daysLeft:0, traineeExempt:true };
+    }
+  }
 
   const thisMonth = startOfMonth(now);
   const lastMonth = startOfMonth(new Date(thisMonth.getFullYear(), thisMonth.getMonth()-1, 1));
   const twoMonthsAgo = startOfMonth(new Date(thisMonth.getFullYear(), thisMonth.getMonth()-2, 1));
+
+  // Grace month: skip warnings/terminations
+  if(state.graceMonth){
+    const gm=startOfMonth(new Date(state.graceMonth));
+    if(gm.getTime()===thisMonth.getTime()||gm.getTime()===lastMonth.getTime()){
+      const ms=getMonthlyHoursMs(pid,thisMonth);
+      if(ms>=MONTHLY_MIN_MS) return { state:'ACTIVE', missedMonths:0, message:null };
+      const daysLeft=new Date(thisMonth.getFullYear(),thisMonth.getMonth()+1,0).getDate()-now.getDate();
+      return { state:'PENDING', missedMonths:0, message:null, hoursNeeded:durLabel(MONTHLY_MIN_MS-ms), daysLeft };
+    }
+  }
 
   const thisMonthMs = getMonthlyHoursMs(pid, thisMonth);
   const lastMonthMs = getMonthlyHoursMs(pid, lastMonth);
@@ -1137,6 +1556,7 @@ function markEotm(pid,md){
   const m=startOfMonth(md).toISOString();
   if((state.eotmHistory||[]).some(x=>x.personId===pid&&startOfMonth(new Date(x.monthISO)).toISOString()===m)){toast("Already marked");return;}
   state.eotmHistory||=[];state.eotmHistory.push({id:uid(),personId:pid,monthISO:m,note:""});
+  logAction('Marked EOTM',pid,fmtMonthLabel(md));
   save();toast("EOTM saved");
   if(state.ui?.view==="review") renderReviewPage();
   if(state.selectedId) renderProfile();
@@ -1152,6 +1572,27 @@ function managementTrainerOptions(){
 }
 
 // ═══════════════════════════════════════════
+// PROMO BADGE + WARNING COUNTER
+// ═══════════════════════════════════════════
+function countReadyTrainees(){
+  const md=startOfMonth(new Date());
+  return state.people.filter(p=>{
+    ensurePerson(p);
+    return !p.archived&&(p.rank||'')==='Trainee'&&computeMonthly(p.id,md).countedMs>=MONTHLY_MIN_MS;
+  }).length;
+}
+function updatePromoBadge(){
+  const btn=document.getElementById('promoBtn');
+  if(!btn) return;
+  const count=countReadyTrainees();
+  btn.textContent=count>0?`Promo / EOTM (${count})`:'Promo / EOTM';
+  btn.className=count>0?'btn-accent btn-sm':'btn-ghost btn-sm';
+}
+function countWarningsSent(pid){
+  return (state.entries||[]).filter(e=>e.personId===pid&&e.kind==='Warning Sent').length;
+}
+
+// ═══════════════════════════════════════════
 // RENDER: HUB
 // ═══════════════════════════════════════════
 function renderHub(){
@@ -1162,6 +1603,8 @@ function renderHub(){
   document.getElementById('mgmtCalView').style.display="none";
   document.getElementById('templatesView').style.display="none";
   document.getElementById('interviewView').style.display="none";
+  document.getElementById('leadershipView').style.display="none";
+  document.getElementById('auditLogView').style.display="none";
   $("#backBtn").style.display="none";
   $("#searchBar").style.display="";
   state.ui.view="hub"; state.selectedId=null;
@@ -1233,9 +1676,11 @@ function renderHub(){
     if(a.state==='LOA') badge=`<span class="pill loa">LOA</span>`;
     else if(a.state==='SEPARATION') badge=`<span class="pill bad">TERMINATE</span>`;
     else if(a.state==='WARNING') badge=`<span class="pill warn">WARNING</span>`;
+    else if(a.state==='PENDING'&&a.traineeExempt) badge=`<span class="pill accent">TRAINEE</span>`;
     else if(a.state==='PENDING') badge=`<span class="pill accent">${it.monthly.countedMs>0?durLabel(it.monthly.countedMs)+' / 4h':'PENDING'}</span>`;
     else badge=`<span class="pill good">ACTIVE</span>`;
     if(it.strikes>=3) badge+=` <span class="pill bad">3 STRIKES</span>`;
+    if(p.mediaTeam) badge+=` <span class="pill" style="border-color:var(--interview-border);background:var(--interview-dim);color:var(--interview);font-size:9px">MEDIA</span>`;
 
     const el=document.createElement("div"); el.className="card";
     const rankLabel=p.rank||'No rank';
@@ -1268,7 +1713,13 @@ function renderHub(){
     btn.addEventListener("click",e=>{
       e.preventDefault();e.stopPropagation();
       const pp=state.people.find(x=>x.id===btn.getAttribute("data-revive"));
-      if(pp){pp.archived=false;save();renderHub();}
+      if(pp){
+        pp.archived=false;
+        pp.rehiredDate=new Date().toISOString();
+        pp.archiveType=""; pp.archiveReason=""; pp.archiveDate="";
+        logAction('Revived',pp.id,'Brought back from graveyard');
+        save();renderHub();toast("Revived");
+      }
     });
   });
 }
@@ -1285,18 +1736,50 @@ function renderOverview(){
   document.getElementById('templatesView').style.display="none";
   document.getElementById('interviewView').style.display="none";
   $("#backBtn").style.display="";
+  document.getElementById('auditLogView').style.display="none";
+  document.getElementById('leadershipView').style.display="none";
   $("#searchBar").style.display="none";
   state.ui.view="overview"; save();
 
   const md=startOfMonth(new Date(state.overviewMonthCursor));
-  $("#ovMonthLabel").textContent=fmtMonthLabel(md);
+  const ovFromEl=document.getElementById('ovFrom');
+  const ovToEl=document.getElementById('ovTo');
+  const ovFrom=ovFromEl?.value?new Date(ovFromEl.value+'T00:00:00'):null;
+  const ovTo=ovToEl?.value?new Date(ovToEl.value+'T23:59:59'):null;
+  const useRange=!!(ovFrom&&ovTo);
 
-  const items=state.people.filter(p=>!p.archived).map(p=>{
+  if(useRange){
+    $("#ovMonthLabel").textContent=`${fmtMDY(ovFrom)} — ${fmtMDY(ovTo)}`;
+  } else {
+    $("#ovMonthLabel").textContent=fmtMonthLabel(md);
+  }
+
+  const ovRankFilter=(document.getElementById('ovRankFilter')?.value||'');
+  const naBtn=document.getElementById('ovNeedsAction');
+  if(naBtn){naBtn.className=`btn-${state.ui.showNeedsAction?'danger':'ghost'} btn-sm`;naBtn.textContent=state.ui.showNeedsAction?'Needs Action ✓':'Needs Action';}
+  const gmBtn=document.getElementById('ovGraceMonth');
+  const isGraceActive=state.graceMonth&&startOfMonth(new Date(state.graceMonth)).getTime()===startOfMonth(new Date()).getTime();
+  if(gmBtn){gmBtn.className=`btn-${isGraceActive?'accent':'ghost'} btn-sm`;gmBtn.textContent=isGraceActive?'Grace Month ✓':'Grace Month';}
+
+  // Compute hours: range mode sums across months, normal mode uses single month
+  function getRangeMs(pid){
+    if(!useRange) return computeMonthly(pid,md).countedMs;
+    let total=0;
+    const cur=startOfMonth(ovFrom);
+    const last=startOfMonth(ovTo);
+    while(cur<=last){
+      total+=computeMonthly(pid,cur).countedMs;
+      cur.setMonth(cur.getMonth()+1);
+    }
+    return total;
+  }
+
+  const items=state.people.filter(p=>!p.archived).filter(p=>!ovRankFilter||(p.rank||'')===ovRankFilter).map(p=>{
     ensurePerson(p);
-    const monthly=computeMonthly(p.id,md);
+    const ms=getRangeMs(p.id);
     const activity=activityStatus(p.id);
     return {id:p.id, name:p.character||p.steamName||"Unknown", callsign:p.callsign||"",
-      discordId:p.discordId||"", ms:monthly.countedMs, activity, isMgmt:isMgmtRank(p)};
+      discordId:p.discordId||"", ms, activity, isMgmt:isMgmtRank(p), rank:p.rank||''};
   }).sort((a,b)=>b.ms-a.ms);
 
   const maxMs=Math.max(...items.map(x=>x.ms), MONTHLY_MIN_MS);
@@ -1360,6 +1843,68 @@ function renderOverview(){
       if(pid){state.selectedId=pid;state.profileMonthCursor=new Date().toISOString();state.ui.view='profile';save();renderProfile();}
     });
   });
+
+  // Needs Action panel
+  const naPanel=document.getElementById('needsActionPanel');
+  if(naPanel){
+    const actionItems=items.filter(it=>it.activity.state==='WARNING'||it.activity.state==='SEPARATION');
+    if(state.ui.showNeedsAction&&actionItems.length){
+      let naHtml=`<div style="font-weight:700;font-size:12px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;color:var(--bad)">Needs Action (${actionItems.length})</div>`;
+      naHtml+=actionItems.map(it=>{
+        const a=it.activity;
+        const pillCls=a.state==='SEPARATION'?'bad':'warn';
+        const label=a.state==='SEPARATION'?'TERMINATE':'WARNING';
+        const msg=activityMsgTemplate(a.message,it.name);
+        const warnCount=countWarningsSent(it.id);
+        const warnLabel=warnCount>0?`<span class="muted" style="font-size:10px">(${warnCount} warning${warnCount>1?'s':''} sent)</span>`:'';
+        return `<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px;border:1px solid var(--${pillCls}-border);border-radius:var(--r);background:var(--${pillCls}-dim);margin-bottom:6px;cursor:pointer" data-na-profile="${escapeHtml(it.id)}">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span class="pill ${pillCls}" style="font-size:10px">${label}</span>
+            <span style="font-weight:700;font-size:13px">${escapeHtml(it.name)}</span>
+            <span class="muted" style="font-size:11px">${escapeHtml(it.rank||'')}</span>
+            ${warnLabel}
+          </div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap">
+            <button class="btn-ghost btn-sm" data-na-copy="${escapeHtml(msg)}">Copy Msg</button>
+            ${it.discordId?`<button class="btn-ghost btn-sm" data-na-dc="${escapeHtml(it.discordId)}">Copy ID</button>`:''}
+            ${a.state==='WARNING'?`<button class="btn-accent btn-sm" data-na-logwarn="${escapeHtml(it.id)}">Log Warning</button>`:''}
+            ${a.state==='SEPARATION'?`<button class="btn-danger btn-sm" data-na-fire="${escapeHtml(it.id)}">Fire</button>`:''}
+          </div>
+        </div>`;
+      }).join('');
+      naPanel.innerHTML=naHtml;
+      naPanel.style.display='';
+      naPanel.querySelectorAll('[data-na-copy]').forEach(btn=>{btn.addEventListener('click',e=>{e.stopPropagation();copyText(btn.getAttribute('data-na-copy'));});});
+      naPanel.querySelectorAll('[data-na-dc]').forEach(btn=>{btn.addEventListener('click',e=>{e.stopPropagation();copyText(btn.getAttribute('data-na-dc'));});});
+      naPanel.querySelectorAll('[data-na-logwarn]').forEach(btn=>{btn.addEventListener('click',e=>{
+        e.stopPropagation();
+        const pid=btn.getAttribute('data-na-logwarn');
+        const p=getPerson(pid);
+        state.entries||=[];
+        state.entries.push({id:uid(),personId:pid,dateISO:new Date().toISOString(),kind:'Warning Sent',note:'Activity warning sent — did not meet 4hr minimum last month.'});
+        logAction('Warning sent',pid,'Activity warning — missed hours');
+        const msg=activityMsgTemplate('warning',p?.character||'');
+        copyText(msg);
+        save();renderOverview();toast('Warning logged + message copied');
+      });});
+      naPanel.querySelectorAll('[data-na-fire]').forEach(btn=>{btn.addEventListener('click',e=>{
+        e.stopPropagation();
+        const pid=btn.getAttribute('data-na-fire');
+        const p=getPerson(pid);
+        if(!p) return;
+        state.entries||=[];
+        state.entries.push({id:uid(),personId:pid,dateISO:new Date().toISOString(),kind:'Dismissal',note:'Terminated — missed 4hr minimum two consecutive months.'});
+        logAction('Dismissed',pid,'Missed hours two consecutive months');
+        state.selectedId=pid;
+        save();
+        deletePerson();
+      });});
+      naPanel.querySelectorAll('[data-na-profile]').forEach(el=>{el.addEventListener('click',e=>{
+        if(e.target.closest('button')) return;
+        state.selectedId=el.getAttribute('data-na-profile');state.profileMonthCursor=new Date().toISOString();state.ui.view='profile';save();renderProfile();
+      });});
+    } else { naPanel.style.display='none'; naPanel.innerHTML=''; }
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -1377,7 +1922,9 @@ function renderProfile(){
   document.getElementById('mgmtCalView').style.display="none";
   document.getElementById('templatesView').style.display="none";
   document.getElementById('interviewView').style.display="none";
+  document.getElementById('auditLogView').style.display="none";
   $("#backBtn").style.display="";
+  document.getElementById('leadershipView').style.display="none";
   $("#searchBar").style.display="none";
 
   const monthDate=startOfMonth(new Date(state.profileMonthCursor));
@@ -1391,8 +1938,12 @@ function renderProfile(){
   if(activity.state==='LOA') aBadge=`<span class="pill loa">ON LOA</span>`;
   else if(activity.state==='SEPARATION') aBadge=`<span class="pill bad">TERMINATION NEEDED</span>`;
   else if(activity.state==='WARNING') aBadge=`<span class="pill warn">WARNING — Missed Last Month</span>`;
+  else if(activity.state==='PENDING'&&activity.traineeExempt) aBadge=`<span class="pill accent">TRAINEE — Exempt</span>`;
   else if(activity.state==='PENDING') aBadge=`<span class="pill accent">Need ${escapeHtml(activity.hoursNeeded)} · ${activity.daysLeft}d left</span>`;
   else aBadge=`<span class="pill good">ACTIVE</span>`;
+
+  const mediaBadge=p.mediaTeam?`<span class="pill" style="border-color:var(--interview-border);background:var(--interview-dim);color:var(--interview)">Media Team</span>`:'';
+  const rehiredBadge=p.rehiredDate?`<span class="pill loa">Rehired: ${escapeHtml(fmtMDY(new Date(p.rehiredDate)))}</span>`:'';
 
   // Profile header
   $("#profilePanel").innerHTML=`
@@ -1402,6 +1953,8 @@ function renderProfile(){
         <div class="profile-meta">${escapeHtml(p.callsign||"—")} · ${escapeHtml(p.steamName||"—")} · ${escapeHtml(p.rank||"No rank")}</div>
         <div class="profile-pills">
           ${aBadge}
+          ${mediaBadge}
+          ${rehiredBadge}
           <span class="pill">${escapeHtml(durLabel(monthly.countedMs))} this month</span>
           <span class="pill">Total: ${escapeHtml(durLabel(totalAll))}</span>
           <span class="pill">EOTM: ${escapeHtml(lastEotmLabel(p.id))}</span>
@@ -1410,6 +1963,7 @@ function renderProfile(){
       </div>
       <div class="profile-actions">
         <button class="btn-ghost btn-sm" id="addLOABtn">+ LOA</button>
+        <button class="${p.mediaTeam?'btn-accent':'btn-ghost'} btn-sm" id="toggleMediaBtn">${p.mediaTeam?'Media ✓':'Media'}</button>
         ${activity.message?`<button class="btn-accent btn-sm" data-copy-msg="${escapeHtml(activityMsgTemplate(activity.message, p.character))}">Copy ${activity.message} msg</button>`:''}
         <button class="btn-danger btn-sm" id="deletePersonBtn">Archive</button>
       </div>
@@ -1419,6 +1973,9 @@ function renderProfile(){
   // Wire profile header buttons
   document.getElementById("addLOABtn")?.addEventListener("click",()=>openLOAModal(null));
   document.getElementById("deletePersonBtn")?.addEventListener("click",deletePerson);
+  document.getElementById("toggleMediaBtn")?.addEventListener("click",()=>{
+    p.mediaTeam=!p.mediaTeam; save(); renderProfile(); toast(p.mediaTeam?'Media Team ON':'Media Team OFF');
+  });
   document.querySelectorAll("button[data-copy-msg]").forEach(btn=>{
     btn.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();copyText(btn.getAttribute("data-copy-msg")||"");});
   });
@@ -1455,6 +2012,9 @@ function renderProfile(){
   renderEntries(p.id);
   const sp=document.getElementById('strikePill');
   if(sp) sp.textContent=`Strikes: ${strikeCount}`;
+  const wp=document.getElementById('warnPill');
+  const warnCount=countWarningsSent(p.id);
+  if(wp){ wp.textContent=`Warnings: ${warnCount}`; wp.className=`pill${warnCount>0?' warn':''}`; }
 
   // Notes
   renderNotes(p.id);
@@ -1736,28 +2296,33 @@ function renderCalendar(pid){
     }
     if(dayEvents.length) clickable=true;
 
-    // Tags
+    // Tags - labeled pills, consolidated per type
     let tags="";
-    if(info&&info.countedMs>0) tags+=`<span class="day-tag shift"></span>`;
-    if(onLOA) tags+=`<span class="day-tag loa-tag"></span>`;
+    if(info&&info.countedMs>0) tags+=`<span class="day-tag shift">Shift</span>`;
+    if(onLOA) tags+=`<span class="day-tag loa-tag">LOA</span>`;
+    const tagTypes=new Set();
     for(const ce of dayEvents){
       const tagCls=ce.type==='training'?'training':ce.type==='interview'?'interview':'event';
-      tags+=`<span class="day-tag ${tagCls}"></span>`;
+      if(!tagTypes.has(tagCls)){
+        tagTypes.add(tagCls);
+        const tagLabel=ce.type==='training'?'Train':ce.type==='interview'?'IV':'Event';
+        tags+=`<span class="day-tag ${tagCls}">${tagLabel}</span>`;
+      }
     }
 
-    html+=`<div class="${cls}" data-day="${key}" style="cursor:${clickable?'pointer':'default'}">
+    html+=`<div class="${cls}" data-day="${key}" style="cursor:${clickable?'pointer':'default'}" ${clickable?'ondblclick="this.click()"':''}>
       <div class="day-num">${day}</div>
       <div class="day-tags">${tags}</div>
       <div><div class="day-label">${escapeHtml(label)}</div><div class="day-sub">${escapeHtml(sub)}</div></div>
     </div>`;
   }
   html+=`</div>`;
-  html+=`<div style="display:flex;gap:10px;margin-top:8px;font-size:10px;color:var(--muted);flex-wrap:wrap">
-    <span><span class="day-tag shift" style="display:inline-block;vertical-align:middle"></span> Shift</span>
-    <span><span class="day-tag training" style="display:inline-block;vertical-align:middle"></span> Training</span>
-    <span><span class="day-tag interview" style="display:inline-block;vertical-align:middle"></span> Interview</span>
-    <span><span class="day-tag event" style="display:inline-block;vertical-align:middle"></span> Event</span>
-    <span><span class="day-tag loa-tag" style="display:inline-block;vertical-align:middle"></span> LOA</span>
+  html+=`<div style="display:flex;gap:8px;margin-top:8px;font-size:10px;color:var(--muted);flex-wrap:wrap">
+    <span class="day-tag shift">Shift</span>
+    <span class="day-tag training">Train</span>
+    <span class="day-tag interview">IV</span>
+    <span class="day-tag event">Event</span>
+    <span class="day-tag loa-tag">LOA</span>
   </div>`;
   $("#calendar").innerHTML=html;
 
@@ -1769,6 +2334,11 @@ function renderCalendar(pid){
       const dayEvts=(calEventDays.get(dayKey)||[]);
       if(!info&&!loaInfo&&!dayEvts.length) return;
       openModal("Day Details",buildDayDetailHtml(dayKey,info,loaInfo,dayEvts));
+    });
+    el.addEventListener("dblclick",(e)=>{
+      e.preventDefault();
+      const dayKey=el.getAttribute("data-day");
+      openCalEventModal(dayKey);
     });
   });
 
@@ -1799,10 +2369,22 @@ function buildDayDetailHtml(dayKey,info,loa,calEvts=[]){
   if(calEvts.length){
     html+=`<div style="font-weight:700;font-size:12px;margin:10px 0 6px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">Events</div>`;
     for(const ce of calEvts){
-      const typeColors={training:'var(--cyan)',interview:'var(--accent)',meeting:'var(--warn)',other:'var(--muted)'};
+      const typeColors={training:'var(--cyan)',interview:'var(--interview)',meeting:'var(--warn)',other:'var(--muted)'};
+      // For training events, try to find trainer from mgmt calendar or training records
+      let trainerInfo='';
+      if(ce.type==='training'&&ce.note){
+        const roleName=ce.note.replace(' Training','');
+        // Check mgmt events for this date + role
+        const mgmtMatch=(state.mgmtEvents||[]).find(me=>me.type==='training'&&me.role===roleName&&dateValueFromISO(me.dateISO)===dayKey);
+        if(mgmtMatch&&mgmtMatch.ledBy){
+          const trainer=getPerson(mgmtMatch.ledBy);
+          if(trainer) trainerInfo=`<div class="muted" style="margin-top:4px;font-size:11px">Trained by: <b>${escapeHtml(trainer.character||trainer.steamName||'Unknown')}</b></div>`;
+        }
+      }
       html+=`<div style="padding:8px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;font-size:12px">
         <span class="pill" style="font-size:10px;border-color:${typeColors[ce.type]||typeColors.other}">${escapeHtml(ce.type)}</span>
         <div style="margin-top:4px">${escapeHtml(ce.note||'')}</div>
+        ${trainerInfo}
       </div>`;
     }
   }
@@ -1841,7 +2423,7 @@ function renderEntries(pid){
   const list=entriesForPerson(pid);
   host.innerHTML=list.map(e=>{
     const kind=normalizeKind(e.kind);
-    const pillCls=kind==='Strike'?'bad':kind==='Correction'?'warn':'good';
+    const pillCls=kind==='Strike'?'bad':kind==='Correction'?'warn':kind==='Warning Sent'?'warn':kind==='Dismissal'?'bad':'good';
     const note=(e.note||'').trim();
     const preview=note.length>120?note.slice(0,120)+'…':note;
     return `<div class="entry-card">
@@ -1903,8 +2485,10 @@ function renderReviewPage(){
   document.getElementById('reviewView').style.display="";
   document.getElementById('mgmtCalView').style.display="none";
   document.getElementById('templatesView').style.display="none";
+  document.getElementById('auditLogView').style.display="none";
   document.getElementById('interviewView').style.display="none";
   $("#backBtn").style.display="";
+  document.getElementById('leadershipView').style.display="none";
   $("#searchBar").style.display="none";
 
   const monthDate=startOfMonth(new Date(state.monthCursor));
@@ -1954,6 +2538,27 @@ function renderReviewPage(){
     html+=`<div class="hint" style="margin-bottom:10px"><b>Top 3</b> by monthly hours for EOTM consideration. Supervisors, Managers & Directors excluded.</div>`;
     html+=eotm.length?eotm.map(x=>card(x,{showMark:true})).join(''):`<div class="muted">No candidates yet.</div>`;
   } else {
+    // Ready trainees section
+    const readyTrainees=state.people.filter(p=>{
+      ensurePerson(p);
+      return !p.archived&&(p.rank||'')==='Trainee'&&computeMonthly(p.id,monthDate).countedMs>=MONTHLY_MIN_MS;
+    });
+    if(readyTrainees.length){
+      html+=`<div style="border:1px solid var(--good-border);border-radius:var(--r);background:var(--good-dim);padding:12px;margin-bottom:12px">
+        <div style="font-weight:700;font-size:12px;color:var(--good);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">▲ Trainees Ready to Bump (${readyTrainees.length})</div>`;
+      for(const p of readyTrainees){
+        const ms=computeMonthly(p.id,monthDate).countedMs;
+        html+=`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);margin-bottom:4px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-weight:900;font-size:13px">${escapeHtml(p.character||'')}</span>
+            <span class="pill good" style="font-size:9px">${escapeHtml(durLabel(ms))}</span>
+          </div>
+          <button class="btn-accent btn-sm" data-promo="${escapeHtml(p.id)}">▲ Bump to Employee</button>
+        </div>`;
+      }
+      html+=`</div>`;
+    }
+
     html+=`<div class="hint" style="margin-bottom:10px"><b>Eligible</b> for promotion — met ${MONTHLY_MIN_HOURS}hr minimum. Supervisors, Managers & Directors excluded.</div>`;
     html+=promos.length?promos.map(x=>card(x,{showPromo:true})).join(''):`<div class="muted">No one meets the baseline yet.</div>`;
   }
@@ -1990,6 +2595,8 @@ function addPerson(){
 
 function editBasics(){
   const p=getPerson(state.selectedId); if(!p) return;
+  const canEditRank=!currentUser||canManage(p);
+  const rankSelect=canEditRank?`<select id="e_rank"><option value="">—</option>${RANKS.filter(r=>!currentUser||rankLevel(r)<=rankLevel(currentUser.rank)).map(r=>`<option value="${escapeHtml(r)}" ${p.rank===r?'selected':''}>${escapeHtml(r)}</option>`).join('')}</select>`:`<input value="${escapeHtml(p.rank||'—')}" disabled/>`;
   openModal("Edit Info",`
     <div class="row"><div><div class="muted small">Character</div><input id="e_character" value="${escapeHtml(p.character||'')}"></div>
     <div><div class="muted small">Callsign</div><input id="e_callsign" value="${escapeHtml(p.callsign||'')}"></div></div>
@@ -1997,31 +2604,52 @@ function editBasics(){
     <div><div class="muted small">Discord ID</div><input id="e_discordId" value="${escapeHtml(p.discordId||'')}"></div></div>
     <div class="row" style="margin-top:8px"><div><div class="muted small">Timezone</div><input id="e_tz" value="${escapeHtml(p.timeZone||'')}"></div>
     <div><div class="muted small">Bank ID</div><input id="e_bank" value="${escapeHtml(p.bankAccount||'')}"></div></div>
-    <div class="row" style="margin-top:8px"><div><div class="muted small">Rank</div><select id="e_rank"><option value="">—</option>${RANKS.map(r=>`<option value="${escapeHtml(r)}" ${p.rank===r?'selected':''}>${escapeHtml(r)}</option>`).join('')}</select></div><div></div></div>
-    <div class="hint" style="margin-top:10px">Steam fields update from CSV import only.</div>
+    <div class="row" style="margin-top:8px"><div><div class="muted small">Rank</div>${rankSelect}</div>
+    <div><div class="muted small">Google Email</div><input id="e_google" value="${escapeHtml(p.googleEmail||'')}" placeholder="name@gmail.com"></div></div>
+    <div class="row" style="margin-top:8px"><div><div class="muted small" style="margin-bottom:6px">Media Team</div><label style="display:flex;gap:6px;align-items:center;font-size:12px"><input type="checkbox" id="e_media" ${p.mediaTeam?'checked':''}/> Member of Media & Promotions</label></div><div></div></div>
+    <div class="hint" style="margin-top:10px">Steam fields update from CSV import only. Google Email is used for login.</div>
     <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn-accent" id="e_save">Save</button></div>
   `);
   $("#e_save").addEventListener("click",()=>{
+    const oldRank=p.rank||'';
     p.character=($("#e_character").value||'').trim(); p.callsign=($("#e_callsign").value||'').trim();
     p.discord=($("#e_discord").value||'').trim(); p.discordId=($("#e_discordId").value||'').trim();
     p.timeZone=($("#e_tz").value||'').trim(); p.bankAccount=($("#e_bank").value||'').trim();
-    p.rank=$("#e_rank").value||''; save();closeModal();renderProfile();
+    if(canEditRank) p.rank=$("#e_rank").value||'';
+    p.mediaTeam=!!document.getElementById('e_media')?.checked;
+    p.googleEmail=(document.getElementById('e_google')?.value||'').trim();
+    if(p.rank!==oldRank) logAction('Rank changed',p.id,`${oldRank||'None'} → ${p.rank||'None'}`);
+    logAction('Profile edited',p.id,'Basic info updated');
+    save();closeModal();renderProfile();
   });
 }
 
 function deletePerson(){
   const p=getPerson(state.selectedId); if(!p) return;
-  const btn=document.getElementById('deletePersonBtn'); if(!btn) return;
-  if(btn.dataset.confirming==='true'){
-    p.archived=true; state.selectedId=null; save(); renderHub();
-  } else {
-    btn.dataset.confirming='true';
-    btn.textContent='Click again to confirm';
-    btn.className='btn-danger btn-sm';
-    setTimeout(()=>{
-      if(btn){btn.dataset.confirming='';btn.textContent='Archive';btn.className='btn-danger btn-sm';}
-    },3000);
-  }
+  openModal("Archive — "+p.character,`
+    <div class="muted small" style="margin-bottom:10px">This will move <b>${escapeHtml(p.character)}</b> to the Graveyard.</div>
+    <div><div class="muted small">Type</div>
+      <select id="arc_type">
+        <option value="fired">Fired</option>
+        <option value="resigned">Resigned</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div style="margin-top:8px"><div class="muted small">Date</div><input type="date" id="arc_date" value="${dateValueFromISO(new Date().toISOString())}"/></div>
+    <div style="margin-top:8px"><div class="muted small">Reason</div><textarea id="arc_reason" rows="3" placeholder="Why are they being archived?"></textarea></div>
+    <div style="display:flex;justify-content:flex-end;gap:6px;margin-top:10px">
+      <button class="btn-ghost btn-sm" onclick="closeModal()">Cancel</button>
+      <button class="btn-danger" id="arc_confirm">Archive</button>
+    </div>
+  `);
+  document.getElementById('arc_confirm').addEventListener('click',()=>{
+    p.archived=true;
+    p.archiveType=document.getElementById('arc_type').value;
+    p.archiveDate=(document.getElementById('arc_date').value||'').trim();
+    p.archiveReason=(document.getElementById('arc_reason').value||'').trim();
+    logAction('Archived',p.id,`${p.archiveType}: ${p.archiveReason||'No reason'}`);
+    state.selectedId=null; save(); closeModal(); renderHub(); toast("Archived");
+  });
 }
 
 function addEntry(existingId=null){
@@ -2090,10 +2718,11 @@ function openNoteModal(existing){
   });
 }
 
-function openCalEventModal(){
+function openCalEventModal(prefillDate){
   const p=getPerson(state.selectedId); if(!p) return;
+  const dateVal=prefillDate||dateValueFromISO(new Date().toISOString());
   openModal("Add Calendar Event",`
-    <div class="row"><div><div class="muted small">Date</div><input type="date" id="ce_date" value="${escapeHtml(dateValueFromISO(new Date().toISOString()))}"/></div>
+    <div class="row"><div><div class="muted small">Date</div><input type="date" id="ce_date" value="${escapeHtml(dateVal)}"/></div>
     <div><div class="muted small">Type</div><select id="ce_type">
       <option value="training">Training</option><option value="interview">Interview</option>
       <option value="meeting">Meeting</option><option value="other">Other</option>
@@ -2128,9 +2757,12 @@ function hideAllViews(){
   $("#profileView").style.display="none";
   $("#overviewView").style.display="none";
   document.getElementById('reviewView').style.display="none";
+  document.getElementById('auditLogView').style.display="none";
   document.getElementById('mgmtCalView').style.display="none";
   document.getElementById('templatesView').style.display="none";
   document.getElementById('interviewView').style.display="none";
+  document.getElementById('leadershipView').style.display="none";
+  document.getElementById('auditLogView').style.display="none";
 }
 
 function renderMgmtCal(){
@@ -2175,9 +2807,9 @@ function renderMgmtCal(){
     const clickable=dayEvents.length>0;
 
     let tags="";
-    if(hasTraining) tags+=`<span class="day-tag training"></span>`;
-    if(hasInterview) tags+=`<span class="day-tag interview"></span>`;
-    if(hasEvent) tags+=`<span class="day-tag event"></span>`;
+    if(hasTraining) tags+=`<span class="day-tag training">Train</span>`;
+    if(hasInterview) tags+=`<span class="day-tag interview">IV</span>`;
+    if(hasEvent) tags+=`<span class="day-tag event">Event</span>`;
 
     let cls="cal-day";
     if(dayEvents.length) cls+=" good";
@@ -2223,7 +2855,8 @@ function openMgmtDayDetail(dayKey,evts){
     const typeLabel=me.type.charAt(0).toUpperCase()+me.type.slice(1);
     const roleLabel=me.role?` — ${escapeHtml(me.role)}`:'';
     const ledLabel=me.ledBy?personLabel(me.ledBy):'Not assigned';
-    const attendeeLabels=(me.attendees||[]).map(id=>escapeHtml(personLabel(id)));
+    const ledId=me.ledBy||'';
+    const attendeeItems=(me.attendees||[]).map(id=>({id,label:escapeHtml(personLabel(id))}));
 
     html+=`<div style="padding:10px;border:1px solid var(--line);border-radius:var(--r);margin-bottom:8px;background:var(--surface)">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
@@ -2234,8 +2867,8 @@ function openMgmtDayDetail(dayKey,evts){
         </div>
       </div>
       <div style="margin-top:8px;font-size:12px">
-        <div><span class="muted">Led by:</span> <b>${escapeHtml(ledLabel)}</b></div>
-        ${attendeeLabels.length?`<div style="margin-top:6px"><span class="muted">Attended:</span><div style="display:flex;flex-direction:column;gap:3px;margin-top:4px">${attendeeLabels.map(a=>`<div style="padding:4px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);font-size:11px">${a}</div>`).join('')}</div></div>`:''}
+        <div><span class="muted">Led by:</span> <b style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px" data-goto-profile="${escapeHtml(ledId)}">${escapeHtml(ledLabel)}</b></div>
+        ${attendeeItems.length?`<div style="margin-top:6px"><span class="muted">Attended:</span><div style="display:flex;flex-direction:column;gap:3px;margin-top:4px">${attendeeItems.map(a=>`<div style="padding:4px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);font-size:11px;cursor:pointer" data-goto-profile="${escapeHtml(a.id)}">${a.label}</div>`).join('')}</div></div>`:''}
         ${me.note?`<div style="margin-top:4px;white-space:pre-wrap">${escapeHtml(me.note)}</div>`:''}
       </div>
     </div>`;
@@ -2253,6 +2886,15 @@ function openMgmtDayDetail(dayKey,evts){
     btn.addEventListener('click',()=>{
       state.mgmtEvents=(state.mgmtEvents||[]).filter(x=>x.id!==btn.getAttribute('data-del-mgmt'));
       save();closeModal();renderMgmtCal();
+    });
+  });
+  document.querySelectorAll('[data-goto-profile]').forEach(el=>{
+    el.addEventListener('click',(e)=>{
+      const pid=el.getAttribute('data-goto-profile');
+      if(!pid) return;
+      e.stopPropagation();
+      closeModal();
+      state.selectedId=pid;state.profileMonthCursor=new Date().toISOString();state.ui.view='profile';save();renderProfile();
     });
   });
 }
@@ -2273,11 +2915,7 @@ function openMgmtEventModal(existing){
 
   // Build people options for attendees (everyone active)
   const allPeople=state.people.filter(p=>!p.archived).map(p=>{ensurePerson(p);return p;}).sort((a,b)=>(a.character||'').localeCompare(b.character||''));
-  const attendeeChecks=allPeople.map(p=>{
-    const checked=attendeesVal.includes(p.id);
-    const label=`${(p.callsign||'').toUpperCase()} ${p.character||p.steamName||'Unknown'}`.trim();
-    return `<label style="display:flex;gap:6px;align-items:center;font-size:12px;padding:3px 0"><input type="checkbox" data-att="${escapeHtml(p.id)}" ${checked?'checked':''}/>${escapeHtml(label)}</label>`;
-  }).join('');
+  const allPeopleOpts=allPeople.map(p=>({id:p.id,label:`${(p.callsign||'').toUpperCase()} ${p.character||p.steamName||'Unknown'}`.trim()}));
 
   const roleOpts=['','SOP',...FIXED_ROLES].map(r=>`<option value="${escapeHtml(r)}" ${r===roleVal?'selected':''}>${r||'— None —'}</option>`).join('');
 
@@ -2291,11 +2929,13 @@ function openMgmtEventModal(existing){
     <div class="row" style="margin-top:8px"><div><div class="muted small">Role (training only)</div><select id="me_role">${roleOpts}</select></div>
     <div><div class="muted small">Led by</div><select id="me_led">${ledOpts}</select></div></div>
     <div style="margin-top:8px"><div class="muted small">Attended by</div>
-      <div style="max-height:180px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--r);padding:8px;margin-top:4px;background:var(--surface)">${attendeeChecks}</div>
+      <div id="me_attendee_picker"></div>
     </div>
     <div style="margin-top:8px"><div class="muted small">Note (optional)</div><textarea id="me_note" rows="2" placeholder="Additional details...">${escapeHtml(noteVal)}</textarea></div>
     <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn-accent" id="me_save">Save</button></div>
   `);
+
+  const attendeePicker=createTagPicker('me_attendee_picker',allPeopleOpts,attendeesVal);
 
   document.getElementById('me_save').addEventListener('click',()=>{
     const ds=(document.getElementById('me_date').value||'').trim();
@@ -2304,7 +2944,7 @@ function openMgmtEventModal(existing){
     const type=document.getElementById('me_type').value;
     const role=document.getElementById('me_role').value;
     const ledBy=document.getElementById('me_led').value;
-    const attendees=allPeople.filter(p=>{const cb=document.querySelector(`input[data-att="${CSS.escape(p.id)}"]`);return cb?.checked;}).map(p=>p.id);
+    const attendees=attendeePicker.getSelected();
     const note=(document.getElementById('me_note').value||'').trim();
 
     if(existing){
@@ -2314,7 +2954,253 @@ function openMgmtEventModal(existing){
       state.mgmtEvents||=[];
       state.mgmtEvents.push({id:uid(),dateISO:iso,type,role,ledBy,attendees,note});
     }
-    save();closeModal();renderMgmtCal();toast("Saved");
+
+    // Auto-update training profiles for training events with a role
+    if(type==='training'&&role&&attendees.length){
+      let updated=0;
+      for(const aid of attendees){
+        const ap=getPerson(aid);
+        if(!ap) continue;
+        if(role==='SOP'){
+          if(!ap.training.sop.done){
+            ap.training.sop.done=true;
+            ap.training.sop.trainerId=ledBy||'';
+            ap.training.sop.date=ds;
+            updated++;
+          }
+        } else if(FIXED_ROLES.includes(role)){
+          const tr=ap.training.roles[role];
+          if(tr&&!tr.date){
+            tr.trainerId=ledBy||'';
+            tr.date=ds;
+            updated++;
+          }
+        }
+        // Add personal calendar event
+        state.calendarEvents||=[];
+        const evtNote=`${role} Training`;
+        if(!state.calendarEvents.some(ce=>ce.personId===aid&&ce.type==='training'&&ce.note===evtNote&&dateValueFromISO(ce.dateISO)===ds)){
+          state.calendarEvents.push({id:uid(),personId:aid,dateISO:iso,type:'training',note:evtNote});
+        }
+      }
+      if(updated) toast(`Saved + ${updated} profile${updated>1?'s':''} updated`);
+      else toast("Saved");
+    } else { toast("Saved"); }
+
+    save();closeModal();renderMgmtCal();
+  });
+}
+
+// ═══════════════════════════════════════════
+// RENDER: AUDIT LOG
+// ═══════════════════════════════════════════
+function renderAuditLog(){
+  hideAllViews();
+  document.getElementById('auditLogView').style.display="";
+  $("#backBtn").style.display="";
+  $("#searchBar").style.display="none";
+  state.ui.view="auditlog"; save();
+
+  const host=document.getElementById('auditLogBody');
+  const log=(state.auditLog||[]).slice().reverse();
+  if(!log.length){
+    host.innerHTML=`<div class="muted small">No actions logged yet.</div>`;
+    return;
+  }
+
+  host.innerHTML=`<div style="max-height:600px;overflow-y:auto">` + log.map(entry=>{
+    const time=formatLocal(entry.timestamp);
+    const actionColors={
+      'Promoted':'var(--good)','Archived':'var(--bad)','Dismissed':'var(--bad)',
+      'Revived':'var(--loa)','Warning sent':'var(--warn)','Marked EOTM':'var(--accent)',
+      'Rank changed':'var(--cyan)','Profile edited':'var(--muted)',
+      'Candidate converted':'var(--good)'
+    };
+    const color=actionColors[entry.action]||'var(--muted)';
+    return `<div style="display:flex;gap:10px;padding:8px;border-bottom:1px solid var(--line);font-size:12px;align-items:flex-start">
+      <div style="min-width:130px;color:var(--muted);font-size:11px;flex-shrink:0">${escapeHtml(time)}</div>
+      <div style="min-width:100px;font-weight:700;color:${color};flex-shrink:0">${escapeHtml(entry.action)}</div>
+      <div style="min-width:100px;font-weight:700;flex-shrink:0;cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px" data-al-profile="${escapeHtml(entry.targetId)}">${escapeHtml(entry.targetName||'—')}</div>
+      <div style="color:var(--muted);flex:1">${escapeHtml(entry.detail||'')}</div>
+      <div style="min-width:80px;color:var(--muted);font-size:11px;text-align:right;flex-shrink:0">${escapeHtml(entry.userName||'System')}</div>
+    </div>`;
+  }).join('') + `</div>`;
+
+  host.querySelectorAll('[data-al-profile]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const pid=el.getAttribute('data-al-profile');
+      if(!pid) return;
+      const p=getPerson(pid);
+      if(!p) return;
+      state.selectedId=pid;state.profileMonthCursor=new Date().toISOString();state.ui.view='profile';save();renderProfile();
+    });
+  });
+}
+
+// ═══════════════════════════════════════════
+// RENDER: LEADERSHIP ACTIVITY
+// ═══════════════════════════════════════════
+function renderLeadership(){
+  hideAllViews();
+  document.getElementById('leadershipView').style.display="";
+  $("#backBtn").style.display="";
+  $("#searchBar").style.display="none";
+  state.ui.view="leadership"; save();
+
+  const fromEl=document.getElementById('laFrom');
+  const toEl=document.getElementById('laTo');
+  const fromDate=fromEl?.value?new Date(fromEl.value+'T00:00:00'):null;
+  const toDate=toEl?.value?new Date(toEl.value+'T23:59:59'):null;
+
+  // Get all mgmt events, optionally filtered by date range
+  const allEvents=(state.mgmtEvents||[]).filter(me=>{
+    if(!me.dateISO) return false;
+    const d=new Date(me.dateISO);
+    if(fromDate&&d<fromDate) return false;
+    if(toDate&&d>toDate) return false;
+    return true;
+  });
+
+  // Get all Supervisor+ people
+  const leaders=state.people.filter(p=>{ensurePerson(p);return isMgmtRank(p)&&!p.archived;}).sort((a,b)=>(a.character||'').localeCompare(b.character||''));
+
+  const host=document.getElementById('leadershipBody');
+  if(!leaders.length){
+    host.innerHTML=`<div class="muted small">No Supervisor+ staff found.</div>`;
+    return;
+  }
+
+  // Calculate stats for each leader
+  const stats=leaders.map(p=>{
+    const led=allEvents.filter(me=>me.ledBy===p.id);
+    const attended=allEvents.filter(me=>(me.attendees||[]).includes(p.id));
+    const trainingsLed=led.filter(me=>me.type==='training').length;
+    const interviewsLed=led.filter(me=>me.type==='interview').length;
+    const eventsLed=led.filter(me=>me.type==='event').length;
+    const trainingsAttended=attended.filter(me=>me.type==='training').length;
+    const interviewsAttended=attended.filter(me=>me.type==='interview').length;
+    const totalLed=led.length;
+    const totalAttended=attended.length;
+
+    // Grab profile notes for eval context
+    const notes=notesForPerson(p.id).slice(0,5);
+
+    return {p,trainingsLed,interviewsLed,eventsLed,trainingsAttended,interviewsAttended,totalLed,totalAttended,led,attended,notes};
+  });
+
+  const rangeLabel=(fromDate||toDate)?
+    `${fromDate?fmtMDY(fromDate):'Start'} — ${toDate?fmtMDY(toDate):'Now'}`:'All Time';
+
+  let html=`<div class="muted small" style="margin-bottom:10px">Showing: <b>${escapeHtml(rangeLabel)}</b></div>`;
+
+  // Overview grid
+  html+=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;margin-bottom:16px">`;
+  for(const s of stats){
+    const total=s.totalLed+s.totalAttended;
+    html+=`<div style="padding:12px;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);cursor:pointer;transition:border-color .12s" data-la-person="${escapeHtml(s.p.id)}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div>
+          <div style="font-weight:900;font-size:14px">${escapeHtml(s.p.character||'')}</div>
+          <div class="muted" style="font-size:11px">${escapeHtml(s.p.callsign||'')} · ${escapeHtml(s.p.rank||'')}</div>
+        </div>
+        <span class="pill accent" style="font-size:10px">${total} total</span>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:8px;font-size:11px;flex-wrap:wrap">
+        <span style="color:var(--cyan)"><b>${s.trainingsLed}</b> trainings led</span>
+        <span style="color:var(--interview)"><b>${s.interviewsLed}</b> interviews led</span>
+        <span style="color:var(--event)"><b>${s.eventsLed}</b> events led</span>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:4px;font-size:11px;flex-wrap:wrap">
+        <span class="muted"><b>${s.trainingsAttended}</b> trainings sat in</span>
+        <span class="muted"><b>${s.interviewsAttended}</b> interviews sat in</span>
+      </div>
+    </div>`;
+  }
+  html+=`</div>`;
+
+  host.innerHTML=html;
+
+  // Click to expand individual breakdown
+  host.querySelectorAll('[data-la-person]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const s=stats.find(x=>x.p.id===el.getAttribute('data-la-person'));
+      if(s) openLeadershipDetail(s,rangeLabel);
+    });
+  });
+}
+
+function openLeadershipDetail(s,rangeLabel){
+  let html=`<div style="margin-bottom:12px">
+    <div style="font-weight:900;font-size:18px">${escapeHtml(s.p.character||'')}</div>
+    <div class="muted small">${escapeHtml(s.p.callsign||'')} · ${escapeHtml(s.p.rank||'')} · ${escapeHtml(rangeLabel)}</div>
+  </div>`;
+
+  // Stats summary
+  html+=`<div style="display:flex;gap:12px;margin-bottom:12px;font-size:12px;flex-wrap:wrap">
+    <span class="pill" style="border-color:var(--cyan-border);background:var(--cyan-dim);color:var(--cyan)">${s.trainingsLed} trainings led</span>
+    <span class="pill" style="border-color:var(--interview-border);background:var(--interview-dim);color:var(--interview)">${s.interviewsLed} interviews led</span>
+    <span class="pill" style="border-color:var(--event-border);background:var(--event-dim);color:var(--event)">${s.eventsLed} events led</span>
+    <span class="pill">${s.trainingsAttended} trainings attended</span>
+    <span class="pill">${s.interviewsAttended} interviews attended</span>
+  </div>`;
+
+  // Events led - timeline
+  if(s.led.length){
+    html+=`<div class="muted small" style="font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Led (${s.led.length})</div>`;
+    const sorted=s.led.slice().sort((a,b)=>new Date(b.dateISO)-new Date(a.dateISO));
+    for(const me of sorted){
+      const typeColors={training:'var(--cyan)',interview:'var(--interview)',event:'var(--event)'};
+      const attendeeCount=(me.attendees||[]).length;
+      html+=`<div style="padding:8px;border:1px solid var(--line);border-radius:var(--r);margin-bottom:4px;font-size:12px;display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="pill" style="font-size:9px;border-color:${typeColors[me.type]||'var(--muted)'}">${escapeHtml(me.type)}${me.role?' · '+escapeHtml(me.role):''}</span>
+          <span class="muted">${escapeHtml(fmtMDY(new Date(me.dateISO)))}</span>
+        </div>
+        <span class="muted" style="font-size:11px">${attendeeCount} attendee${attendeeCount!==1?'s':''}</span>
+      </div>`;
+    }
+  }
+
+  // Events attended
+  if(s.attended.length){
+    html+=`<div class="divider"></div>`;
+    html+=`<div class="muted small" style="font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Attended (${s.attended.length})</div>`;
+    const sorted=s.attended.slice().sort((a,b)=>new Date(b.dateISO)-new Date(a.dateISO));
+    for(const me of sorted){
+      const typeColors={training:'var(--cyan)',interview:'var(--interview)',event:'var(--event)'};
+      const leader=me.ledBy?state.people.find(p=>p.id===me.ledBy):null;
+      const leaderName=leader?(leader.character||leader.steamName||'Unknown'):'—';
+      html+=`<div style="padding:8px;border:1px solid var(--line);border-radius:var(--r);margin-bottom:4px;font-size:12px;display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="pill" style="font-size:9px;border-color:${typeColors[me.type]||'var(--muted)'}">${escapeHtml(me.type)}${me.role?' · '+escapeHtml(me.role):''}</span>
+          <span class="muted">${escapeHtml(fmtMDY(new Date(me.dateISO)))}</span>
+        </div>
+        <span class="muted" style="font-size:11px">Led by: ${escapeHtml(leaderName)}</span>
+      </div>`;
+    }
+  }
+
+  // Profile notes for eval context
+  if(s.notes.length){
+    html+=`<div class="divider"></div>`;
+    html+=`<div class="muted small" style="font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Recent Notes</div>`;
+    for(const n of s.notes){
+      html+=`<div class="note-card">
+        <div class="note-date">${escapeHtml(fmtMDY(new Date(n.dateISO)))}</div>
+        <div class="note-text">${escapeHtml(n.note||'')}</div>
+      </div>`;
+    }
+  }
+
+  html+=`<div style="display:flex;justify-content:flex-end;gap:6px;margin-top:12px">
+    <button class="btn-ghost btn-sm" data-la-goto="${escapeHtml(s.p.id)}">View Full Profile</button>
+  </div>`;
+
+  openModal(s.p.character||'Leader',html,{wide:true});
+
+  document.querySelector('[data-la-goto]')?.addEventListener('click',()=>{
+    closeModal();
+    state.selectedId=s.p.id;state.profileMonthCursor=new Date().toISOString();state.ui.view='profile';save();renderProfile();
   });
 }
 
@@ -2739,6 +3625,7 @@ function openCandidateDetail(c){
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn-accent btn-sm" data-cd-copyinfo>Copy Info</button>
+        <button class="btn-accent btn-sm" data-cd-convert>→ Employee</button>
         <button class="btn-ghost btn-sm" data-cd-edit>Edit Info</button>
         <button class="btn-danger btn-sm" data-cd-del>Delete</button>
       </div>
@@ -2831,6 +3718,41 @@ function openCandidateDetail(c){
   // Edit info
   document.querySelector('[data-cd-edit]')?.addEventListener('click',()=>{
     closeModal();openEditCandidateModal(c);
+  });
+
+  // Convert to employee
+  document.querySelector('[data-cd-convert]')?.addEventListener('click',()=>{
+    // Check if steam ID already exists
+    if(c.steam && state.people.some(p=>p.steam===c.steam && !p.archived)){
+      alert('An active employee with this Steam ID already exists. They will merge on next CSV import.');
+      return;
+    }
+    if(!confirm(`Create an employee profile for ${c.name||'this candidate'}? This will add them to the main tracker as a Trainee.`)) return;
+    const newP = {
+      id: uid(),
+      steam: c.steam||'',
+      steamName: '',
+      character: c.name||'',
+      callsign: '',
+      discord: c.discord||'',
+      discordId: '',
+      timeZone: c.timezone||'',
+      bankAccount: c.bankAccount||'',
+      rank: 'Trainee',
+      priorityRole: c.firstChoice||'',
+      crossTrain: [],
+      training: {sop:{done:false,trainerId:'',date:'',comment:''},roles:{}},
+      notes: '',
+      archived: false,
+      archiveType: '', archiveReason: '', archiveDate: '',
+      rehiredDate: '', mediaTeam: false
+    };
+    ensurePerson(newP);
+    state.people.push(newP);
+    c.status = 'hired';
+    save(); closeModal(); renderCandidateCards();
+    logAction('Candidate converted',newP.id,`${c.name} converted from interview candidate to Trainee`);
+    toast(`${c.name} added as Trainee`);
   });
 
   // Delete
@@ -2986,6 +3908,13 @@ $("#promoBtn").addEventListener("click",()=>{state.ui.reviewTab='eotm';renderRev
 $("#overviewBtn").addEventListener("click",renderOverview);
 $("#mgmtCalBtn").addEventListener("click",renderMgmtCal);
 $("#templatesBtn").addEventListener("click",renderTemplates);
+$("#leadershipBtn").addEventListener("click",renderLeadership);
+$("#auditLogBtn")?.addEventListener("click",renderAuditLog);
+document.getElementById('laApply')?.addEventListener('click',renderLeadership);
+document.getElementById('laClear')?.addEventListener('click',()=>{
+  const f=document.getElementById('laFrom'),t=document.getElementById('laTo');
+  if(f)f.value='';if(t)t.value='';renderLeadership();
+});
 $("#interviewBtn").addEventListener("click",renderInterviews);
 document.getElementById('addTemplateBtn')?.addEventListener('click',()=>openTemplateModal(null));
 document.getElementById('editQuestionsBtn')?.addEventListener('click',openEditQuestionsModal);
@@ -3037,6 +3966,21 @@ const ovN=document.getElementById('ovNext');
 if(ovN) ovN.addEventListener('click',()=>{
   const d=startOfMonth(new Date(state.overviewMonthCursor));
   d.setMonth(d.getMonth()+1); state.overviewMonthCursor=d.toISOString(); save(); renderOverview();
+});
+document.getElementById('ovRankFilter')?.addEventListener('change',renderOverview);
+document.getElementById('ovRangeApply')?.addEventListener('click',renderOverview);
+document.getElementById('ovRangeClear')?.addEventListener('click',()=>{
+  const f=document.getElementById('ovFrom'),t=document.getElementById('ovTo');
+  if(f)f.value='';if(t)t.value='';renderOverview();
+});
+document.getElementById('ovNeedsAction')?.addEventListener('click',()=>{state.ui.showNeedsAction=!state.ui.showNeedsAction;save();renderOverview();});
+document.getElementById('ovGraceMonth')?.addEventListener('click',()=>{
+  const current=startOfMonth(new Date()).toISOString();
+  if(state.graceMonth&&startOfMonth(new Date(state.graceMonth)).toISOString()===current){
+    if(confirm('Remove grace month? Activity policy will apply normally.')) { state.graceMonth=''; save(); renderOverview(); toast('Grace month removed'); }
+  } else {
+    if(confirm('Mark this month as a transition month? All warning/termination notices will be paused until next month.')) { state.graceMonth=current; save(); renderOverview(); toast('Grace month set'); }
+  }
 });
 
 $("#search").addEventListener("input",()=>{if(state.ui?.view==='hub') renderHub();});
