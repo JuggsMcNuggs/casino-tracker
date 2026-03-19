@@ -218,6 +218,7 @@
       overflow: hidden;
     }
     .panel + .panel { margin-top: 12px; }
+    #profileGrid > .panel + .panel { margin-top: 0; }
     .panel-head {
       padding: 12px 16px;
       border-bottom: 1px solid var(--line);
@@ -277,7 +278,6 @@
     }
     .info-row.copyable { cursor: pointer; }
     .info-row.copyable:hover { background: rgba(139,108,255,.05); }
-    .info-row:last-child { border-bottom: none; }
     .info-key { color: var(--muted); min-width: 120px; font-size: 12px; }
     .info-val { display: flex; align-items: center; gap: 8px; text-align: right; }
 
@@ -307,7 +307,7 @@
     }
     .train-detail-row {
       display: grid; grid-template-columns: 100px 80px 1fr 1fr; align-items: center; gap: 12px;
-      padding: 8px 0; border-bottom: 1px solid var(--line);
+      padding: 8px 0;
       font-size: 12px;
     }
     .train-detail-row:last-child { border-bottom: none; }
@@ -345,6 +345,7 @@
       padding: 1px 5px; border-radius: 6px;
       font-size: 8px; font-weight: 700; letter-spacing: .3px;
       text-transform: uppercase; white-space: nowrap;
+      max-width: 100%; overflow: hidden; text-overflow: ellipsis;
     }
     .day-tag.shift { background: var(--good-dim); color: var(--good); border: 1px solid var(--good-border); }
     .day-tag.training { background: var(--cyan-dim); color: var(--cyan); border: 1px solid var(--cyan-border); }
@@ -489,7 +490,7 @@
 
     .vote-row {
       display: flex; align-items: center; gap: 8px;
-      padding: 6px 0; border-bottom: 1px solid var(--line);
+      padding: 6px 0;
       font-size: 12px;
     }
     .vote-row:last-child { border-bottom: none; }
@@ -534,6 +535,33 @@
 
     .hidden { display: none !important; }
 
+    /* ── COLLAPSIBLE SOP CARDS ── */
+    .sop-card {
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: rgba(20,26,34,.4);
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+    .sop-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 14px; cursor: pointer;
+      transition: background .1s;
+    }
+    .sop-header:hover { background: rgba(139,108,255,.04); }
+    .sop-title { font-weight: 900; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+    .sop-chevron {
+      width: 14px; height: 14px; transition: transform .2s;
+      color: var(--muted); flex-shrink: 0;
+    }
+    .sop-card.open .sop-chevron { transform: rotate(90deg); }
+    .sop-body {
+      display: none; padding: 0 14px 14px;
+      font-size: 12px; white-space: pre-wrap; word-break: break-word;
+      color: var(--muted); line-height: 1.6;
+    }
+    .sop-card.open .sop-body { display: block; }
+
     @media (max-width: 768px) {
       .hamburger { display: flex; }
       .collapse-btn { display: none; }
@@ -544,6 +572,7 @@
       .hub-grid { grid-template-columns: 1fr; }
       .card { min-height: 90px; }
       .cand-grid { grid-template-columns: 1fr; }
+      #profileGrid { grid-template-columns: 1fr !important; }
     }
   </style>
 </head>
@@ -580,30 +609,34 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
         <span class="nav-item-text">Hours Overview</span>
       </div>
-      <div class="nav-item" id="mgmtCalBtn" title="Mgmt Calendar">
+      <div class="nav-item" id="mgmtCalBtn" title="Calendar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        <span class="nav-item-text">Mgmt Calendar</span>
+        <span class="nav-item-text">Calendar</span>
       </div>
       <div class="nav-item" id="promoBtn" title="Promo / EOTM">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         <span class="nav-item-text">Promo / EOTM</span>
         <span class="nav-badge" id="promoBadge" style="display:none"></span>
       </div>
-      <div class="nav-item" id="interviewBtn" title="Interviews">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <span class="nav-item-text">Interviews</span>
-      </div>
       <div class="nav-item" id="leadershipBtn" title="Leadership">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
         <span class="nav-item-text">Leadership</span>
       </div>
-      <div class="nav-item" id="auditLogBtn" title="Audit Log">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        <span class="nav-item-text">Audit Log</span>
+      <div class="nav-item" id="interviewBtn" title="Interviews">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="nav-item-text">Interviews</span>
       </div>
       <div class="nav-item" id="templatesBtn" title="Templates">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
         <span class="nav-item-text">Templates</span>
+      </div>
+      <div class="nav-item" id="sopBtn" title="SOPs & Training">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        <span class="nav-item-text">SOPs & Training</span>
+      </div>
+      <div class="nav-item" id="auditLogBtn" title="Audit Log">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span class="nav-item-text">Audit Log</span>
       </div>
 
       <div class="nav-divider"></div>
@@ -721,7 +754,7 @@
     <section id="mgmtCalView" style="display:none;">
       <div class="panel">
         <div class="panel-head">
-          <div class="h">Management Calendar</div>
+          <div class="h">Calendar</div>
           <div class="row tight" style="gap:6px">
             <button class="btn-ghost btn-sm" id="mcPrev">←</button>
             <span class="pill" id="mcMonthLabel">Month</span>
@@ -752,6 +785,13 @@
         <div class="panel-head">
           <div class="h">Leadership Activity</div>
           <div class="row tight" style="gap:6px;flex-wrap:wrap">
+            <select id="laSort" style="padding:4px 8px;font-size:11px">
+              <option value="az">A → Z</option>
+              <option value="rank">By Rank</option>
+              <option value="most">Most Active</option>
+              <option value="least">Least Active</option>
+              <option value="recent">Most Recent</option>
+            </select>
             <div class="muted small">From:</div>
             <input type="date" id="laFrom" style="padding:4px 8px;font-size:11px"/>
             <div class="muted small">To:</div>
@@ -777,8 +817,20 @@
 
     <!-- INTERVIEWS -->
     <section id="interviewView" style="display:none;">
-      <!-- Candidates -->
+      <!-- Question Template Editor (collapsible) -->
       <div class="panel">
+        <div class="panel-head" style="cursor:pointer" id="ivQuestionsToggle">
+          <div style="display:flex;align-items:center;gap:8px">
+            <svg class="sop-chevron" id="ivQChevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:14px;height:14px;color:var(--muted);transition:transform .2s"><polyline points="9 18 15 12 9 6"/></svg>
+            <div class="h">Interview Questions (Template)</div>
+          </div>
+          <button class="btn-ghost btn-sm" id="editQuestionsBtn">Edit Questions</button>
+        </div>
+        <div class="panel-body" id="questionsBody" style="display:none"></div>
+      </div>
+
+      <!-- Candidates -->
+      <div class="panel" style="margin-top:12px">
         <div class="panel-head">
           <div class="h">Candidates</div>
           <div class="row tight" style="gap:6px">
@@ -794,14 +846,16 @@
           <div class="cand-grid" id="candidateCards"></div>
         </div>
       </div>
+    </section>
 
-      <!-- Question Template Editor -->
-      <div class="panel" style="margin-top:12px">
+    <!-- SOPs & TRAINING GUIDES -->
+    <section id="sopView" style="display:none;">
+      <div class="panel">
         <div class="panel-head">
-          <div class="h">Interview Questions (Template)</div>
-          <button class="btn-ghost btn-sm" id="editQuestionsBtn">Edit Questions</button>
+          <div class="h">SOPs & Training Guides</div>
+          <button class="btn-accent btn-sm" id="addSopBtn" style="display:none">+ Guide</button>
         </div>
-        <div class="panel-body" id="questionsBody"></div>
+        <div class="panel-body" id="sopBody"></div>
       </div>
     </section>
 
@@ -810,22 +864,25 @@
       <!-- Profile header -->
       <div class="panel" id="profilePanel"></div>
 
-      <!-- Basic Info -->
-      <div class="panel">
-        <div class="panel-head">
-          <div class="h">Basic Info</div>
-          <button class="btn-ghost btn-sm" id="editPersonBtn">Edit</button>
+      <!-- Basic Info + Training (side by side) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch;margin-top:12px;margin-bottom:12px" id="profileGrid">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="h">Basic Info</div>
+            <button class="btn-ghost btn-sm" id="editPersonBtn">Edit</button>
+          </div>
+          <div class="panel-body" id="basicInfo"></div>
         </div>
-        <div class="panel-body" id="basicInfo"></div>
-      </div>
-
-      <!-- Training -->
-      <div class="panel">
-        <div class="panel-head">
-          <div class="h">Training</div>
-          <div class="train-overview" id="trainSnap"></div>
+        <div class="panel">
+          <div class="panel-head">
+            <div class="h">Training</div>
+            <div style="display:flex;gap:6px;align-items:center">
+              <div class="train-overview" id="trainSnap"></div>
+              <button class="btn-ghost btn-sm" id="editTrainingBtn">Edit</button>
+            </div>
+          </div>
+          <div class="panel-body" id="training"></div>
         </div>
-        <div class="panel-body" id="training"></div>
       </div>
 
       <!-- Calendar -->
@@ -1049,7 +1106,7 @@ function logAction(action, targetId, detail){
 // CONFIG
 // ═══════════════════════════════════════════
 const STORE_KEY = "casinoTracker.local.v8";
-const TZ = "America/Chicago";
+const TZ = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Chicago";
 
 const MIN_SHIFT_MINUTES = 30;
 const MONTHLY_MIN_HOURS = 4;
@@ -1075,6 +1132,7 @@ function nextRank(current){
 }
 function promotePerson(pid){
   const p=getPerson(pid);if(!p) return;
+  if(!canPromoteFire(p)){toast("Insufficient rank");return;}
   const nr=nextRank(p.rank);
   if(!nr){toast("Already at max rank");return;}
   if(!confirm(`Promote ${p.character||'this person'} from ${p.rank||'(none)'} to ${nr}?`)) return;
@@ -1196,6 +1254,15 @@ function dateInputToISOStart(ymd){ const m=(ymd||'').match(/^(\d{4})-(\d{2})-(\d
 function dateInputToISOEnd(ymd){ const m=(ymd||'').match(/^(\d{4})-(\d{2})-(\d{2})$/); if(!m) return null; return new Date(+m[1],+m[2]-1,+m[3],23,59,59,999).toISOString(); }
 function dateValueFromStored(s){ if(!s) return ''; if(s.includes('T')) return dateValueFromISO(s); if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s; return ''; }
 
+function fmtTime(iso){
+  if(!iso) return '';
+  return new Intl.DateTimeFormat("en-US",{timeZone:TZ,hour:"numeric",minute:"2-digit"}).format(new Date(iso));
+}
+function makeStartISO(dateStr,timeStr){
+  if(!dateStr||!timeStr) return '';
+  return new Date(`${dateStr}T${timeStr}:00`).toISOString();
+}
+
 // ═══════════════════════════════════════════
 // CSV PARSER
 // ═══════════════════════════════════════════
@@ -1228,6 +1295,7 @@ function seed(){
     trainingNotes:[],
     mgmtEvents:[],
     templates:[],
+    sops:[],
     interviewQuestions:[
       "Tell me about one of your favorite moments here in the city.",
       "Which three words would you use to describe The Diamond Casino & Resort?",
@@ -1245,7 +1313,7 @@ function ensureState(data){
   if(!data||!Array.isArray(data.people)) return seed();
   data.clockEvents||=[];data.loas||=[];data.entries||=[];data.notesEntries||=[];data.eotmHistory||=[];
   data.calendarEvents||=[];data.trainingNotes||=[];data.mgmtEvents||=[];
-  data.templates||=[];data.candidates||=[];data.graceMonth||="";data.auditLog||=[];
+  data.templates||=[];data.sops||=[];data.candidates||=[];data.graceMonth||="";data.auditLog||=[];
   data.interviewQuestions||=[
     "Tell me about one of your favorite moments here in the city.",
     "Which three words would you use to describe The Diamond Casino & Resort?",
@@ -1286,7 +1354,27 @@ function save(){
 }
 
 // Boot: load from Firebase, fall back to localStorage, then start
+const DEV_MODE = new URLSearchParams(window.location.search).has('dev');
+
 function boot(){
+  // Dev mode: skip auth, load data, go straight in
+  if(DEV_MODE){
+    $("#saveState").textContent="dev mode";
+    hideLoginOverlay();
+    // Try Firebase first, fall back to localStorage
+    dbRef.once('value').then(snap=>{
+      const data=snap.val();
+      if(data && data.people){ state=ensureState(data); firebaseReady=true; $("#saveState").textContent="dev · synced"; }
+      else { try{ const local=localStorage.getItem("casinoTracker.local.v8"); if(local) state=ensureState(JSON.parse(local)); }catch{} firebaseReady=true; }
+      updateHeaderUser(); updateEmployeeCount(); startApp();
+    }).catch(()=>{
+      try{ const local=localStorage.getItem("casinoTracker.local.v8"); if(local) state=ensureState(JSON.parse(local)); }catch{}
+      firebaseReady=true; $("#saveState").textContent="dev · offline";
+      updateHeaderUser(); updateEmployeeCount(); startApp();
+    });
+    return;
+  }
+
   $("#saveState").textContent="connecting...";
   showLoginOverlay();
 
@@ -1403,9 +1491,16 @@ function updateEmployeeCount(){
 function applyPermissions(){
   if(!currentUser) return;
   const level=rankLevel(currentUser.rank);
+  // Visibility rules:
+  // Employee/Senior (0-2): own profile + SOPs only. navHub shows but renderHub gates to own profile.
+  // Supervisor (3): everything except Audit Log
+  // Manager (4): everything except Audit Log
+  // Director (5): everything
   const gatedBtns={
+    navHub:0, sopBtn:0,
     overviewBtn:3, mgmtCalBtn:3, promoBtn:3, interviewBtn:3,
-    leadershipBtn:4, auditLogBtn:4, templatesBtn:3,
+    leadershipBtn:3, templatesBtn:3,
+    auditLogBtn:5,
     importCsvBtn:3, exportBtn:3, importBackupBtn:3, addPersonBtn:3, resetBtn:5
   };
   for(const [id,minLevel] of Object.entries(gatedBtns)){
@@ -1414,8 +1509,32 @@ function applyPermissions(){
   }
 }
 
+// Can this user edit/manage the target person's profile?
+function canEditProfile(targetPerson){
+  if(!currentUser) return true; // dev mode / no auth
+  if(DEV_MODE) return true;
+  const myLevel=rankLevel(currentUser.rank);
+  const theirLevel=rankLevel(targetPerson?.rank||'');
+  if(myLevel>=5) return true; // Director = god mode
+  if(myLevel<3) return false; // Employee/Senior = view only
+  return myLevel>theirLevel; // Must outrank to edit
+}
+
+// Can this user promote/fire the target?
+function canPromoteFire(targetPerson){
+  if(!currentUser) return true;
+  if(DEV_MODE) return true;
+  const myLevel=rankLevel(currentUser.rank);
+  const theirLevel=rankLevel(targetPerson?.rank||'');
+  if(myLevel>=5) return true; // Director
+  if(myLevel<3) return false; // Employee/Senior
+  return myLevel>theirLevel; // Supervisor can do Employee/Senior, Manager can do up to Supervisor
+}
+
 function startApp(){
   if(currentUser && isReadOnly()){
+    // Employees can see their own profile or SOPs
+    if(state.ui?.view==='sops'){ renderSOPs(); return; }
     state.selectedId=currentUser.id;
     state.ui.view='profile';
     renderProfile();
@@ -1428,6 +1547,7 @@ function startApp(){
   else if(state.ui?.view==="interviews") renderInterviews();
   else if(state.ui?.view==="leadership") renderLeadership();
   else if(state.ui?.view==="auditlog") renderAuditLog();
+  else if(state.ui?.view==="sops") renderSOPs();
   else if(state.selectedId) renderProfile();
   else renderHub();
   updatePromoBadge();
@@ -1751,6 +1871,13 @@ function countWarningsSent(pid){
 // RENDER: HUB
 // ═══════════════════════════════════════════
 function renderHub(){
+  // Employees/Senior Employees can only see their own profile
+  if(currentUser && isReadOnly()){
+    state.selectedId=currentUser.id;
+    state.ui.view='profile';
+    renderProfile();
+    return;
+  }
   $("#hubView").style.display="";
   $("#profileView").style.display="none";
   $("#overviewView").style.display="none";
@@ -1760,6 +1887,7 @@ function renderHub(){
   document.getElementById('interviewView').style.display="none";
   document.getElementById('leadershipView').style.display="none";
   document.getElementById('auditLogView').style.display="none";
+  document.getElementById('sopView').style.display="none";
   $("#searchBar").style.display="";
   updateSidebarActive('hub');
   state.ui.view="hub"; state.selectedId=null;
@@ -1836,7 +1964,6 @@ function renderHub(){
     else if(a.state==='PENDING') badge=`<span class="pill accent">${it.monthly.countedMs>0?durLabel(it.monthly.countedMs)+' / 4h':'PENDING'}</span>`;
     else badge=`<span class="pill good">ACTIVE</span>`;
     if(it.strikes>=3) badge+=` <span class="pill bad">3 STRIKES</span>`;
-    if(p.mediaTeam) badge+=` <span class="pill" style="border-color:var(--interview-border);background:var(--interview-dim);color:var(--interview);font-size:9px">MEDIA</span>`;
 
     const el=document.createElement("div"); el.className="card";
     const rankLabel=p.rank||'No rank';
@@ -1893,6 +2020,7 @@ function renderOverview(){
   document.getElementById('interviewView').style.display="none";
   document.getElementById('auditLogView').style.display="none";
   document.getElementById('leadershipView').style.display="none";
+  document.getElementById('sopView').style.display="none";
   $("#searchBar").style.display="none";
   updateSidebarActive('overview');
   state.ui.view="overview"; save();
@@ -1959,7 +2087,7 @@ function renderOverview(){
 
     // Name is clickable to copy discord ID, pill is clickable to copy message
     const nameColor=it.isMgmt?'color:var(--accent)':'';
-    const nameClickable=it.discordId?`cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px`:'';
+    const nameClickable=it.discordId?`cursor:pointer`:'';
     const nameData=it.discordId?`data-ov-copy-dc="${escapeHtml(it.discordId)}"`:'';
 
     const pillClickable=(a.state==='WARNING'||a.state==='SEPARATION')?`cursor:pointer`:'';
@@ -2080,6 +2208,7 @@ function renderProfile(){
   document.getElementById('interviewView').style.display="none";
   document.getElementById('auditLogView').style.display="none";
   document.getElementById('leadershipView').style.display="none";
+  document.getElementById('sopView').style.display="none";
   $("#searchBar").style.display="none";
   updateSidebarActive('');
 
@@ -2101,10 +2230,12 @@ function renderProfile(){
   const mediaBadge=p.mediaTeam?`<span class="pill" style="border-color:var(--interview-border);background:var(--interview-dim);color:var(--interview)">Media Team</span>`:'';
   const rehiredBadge=p.rehiredDate?`<span class="pill loa">Rehired: ${escapeHtml(fmtMDY(new Date(p.rehiredDate)))}</span>`:'';
 
-  // Profile header
+  // Profile header — gate actions by permissions
+  const _canEdit=canEditProfile(p);
+  const _canFire=canPromoteFire(p);
   $("#profilePanel").innerHTML=`
     <div class="profile-header">
-      <div>
+      <div style="flex:1">
         <div class="profile-name">${escapeHtml(p.character||"(no name)")}</div>
         <div class="profile-meta">${escapeHtml(p.callsign||"—")} · ${escapeHtml(p.steamName||"—")} · ${escapeHtml(p.rank||"No rank")}</div>
         <div class="profile-pills">
@@ -2115,13 +2246,13 @@ function renderProfile(){
           <span class="pill">Total: ${escapeHtml(durLabel(totalAll))}</span>
           <span class="pill">EOTM: ${escapeHtml(lastEotmLabel(p.id))}</span>
           ${strikeCount>0?`<span class="pill ${strikeCount>=3?'bad':'warn'}">Strikes: ${strikeCount}</span>`:''}
+          ${_canEdit?`<button class="${p.mediaTeam?'btn-accent':'btn-ghost'} btn-sm" id="toggleMediaBtn" style="margin-left:4px">${p.mediaTeam?'Media ✓':'Media'}</button>`:''}
         </div>
       </div>
       <div class="profile-actions">
-        <button class="btn-ghost btn-sm" id="addLOABtn">+ LOA</button>
-        <button class="${p.mediaTeam?'btn-accent':'btn-ghost'} btn-sm" id="toggleMediaBtn">${p.mediaTeam?'Media ✓':'Media'}</button>
-        ${activity.message?`<button class="btn-accent btn-sm" data-copy-msg="${escapeHtml(activityMsgTemplate(activity.message, p.character))}">Copy ${activity.message} msg</button>`:''}
-        <button class="btn-danger btn-sm" id="deletePersonBtn">Archive</button>
+        ${_canEdit?`<button class="btn-ghost btn-sm" id="addLOABtn">+ LOA</button>`:''}
+        ${_canEdit&&activity.message?`<button class="btn-accent btn-sm" data-copy-msg="${escapeHtml(activityMsgTemplate(activity.message, p.character))}">Copy ${activity.message} msg</button>`:''}
+        ${_canFire?`<button class="btn-danger btn-sm" id="deletePersonBtn">Archive</button>`:''}
       </div>
     </div>
   `;
@@ -2135,6 +2266,18 @@ function renderProfile(){
   document.querySelectorAll("button[data-copy-msg]").forEach(btn=>{
     btn.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();copyText(btn.getAttribute("data-copy-msg")||"");});
   });
+
+  // Gate panel-level edit buttons by permissions
+  const _editBtn=document.getElementById('editPersonBtn');
+  if(_editBtn) _editBtn.style.display=_canEdit?'':'none';
+  const _editTrainBtn=document.getElementById('editTrainingBtn');
+  if(_editTrainBtn){ _editTrainBtn.style.display=_canEdit?'':'none'; _editTrainBtn.addEventListener('click',()=>openTrainingModal(p.id)); }
+  const _calBtn=document.getElementById('addCalEventBtn');
+  if(_calBtn) _calBtn.style.display=_canEdit?'':'none';
+  const _discBtn=document.getElementById('addDisciplineBtn');
+  if(_discBtn) _discBtn.style.display=_canEdit?'':'none';
+  const _noteBtn=document.getElementById('addNoteBtn');
+  if(_noteBtn) _noteBtn.style.display=_canEdit?'':'none';
 
   // Basic Info
   const basicRows=[
@@ -2225,7 +2368,7 @@ function renderTraining(pid){
 
   // SOP row
   detailHtml+=`<div class="train-detail">`;
-  detailHtml+=`<div class="train-detail-row" style="border-bottom:1px solid var(--line2);padding-bottom:6px;margin-bottom:2px">
+  detailHtml+=`<div class="train-detail-row" style="padding-bottom:6px;margin-bottom:2px">
     <div class="muted" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Role</div>
     <div class="muted" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Status</div>
     <div class="muted" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Date</div>
@@ -2253,48 +2396,7 @@ function renderTraining(pid){
   }
   detailHtml+=`</div>`;
 
-  // Edit button
-  detailHtml+=`<div style="display:flex;justify-content:flex-end;gap:6px;margin-top:10px">
-    <button class="btn-ghost btn-sm" id="editTrainingBtn">Edit Training</button>
-  </div>`;
-
-  // Training notes
-  const tNotes=trainingNotesForPerson(pid);
-  detailHtml+=`<div class="divider"></div>`;
-  detailHtml+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-    <div class="muted small" style="font-weight:700;text-transform:uppercase;letter-spacing:.5px">Training Notes</div>
-    <button class="btn-ghost btn-sm" id="addTrainNoteBtn">+ Note</button>
-  </div>`;
-  detailHtml+=tNotes.map(n=>`
-    <div class="note-card">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div class="note-date">${escapeHtml(fmtMDY(new Date(n.dateISO)))}</div>
-        <div style="display:flex;gap:4px">
-          <button class="btn-ghost btn-sm" data-edit-tnote="${escapeHtml(n.id)}">Edit</button>
-          <button class="btn-ghost btn-sm" data-del-tnote="${escapeHtml(n.id)}">Del</button>
-        </div>
-      </div>
-      <div class="note-text">${escapeHtml(n.note||'')}</div>
-    </div>
-  `).join('')||`<div class="muted small">No training notes yet.</div>`;
-
   host.innerHTML=detailHtml;
-
-  // Wire buttons
-  document.getElementById('editTrainingBtn')?.addEventListener('click',()=>openTrainingModal(pid));
-  document.getElementById('addTrainNoteBtn')?.addEventListener('click',()=>openTrainingNoteModal(pid,null));
-  document.querySelectorAll('[data-edit-tnote]').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      const n=(state.trainingNotes||[]).find(x=>x.id===btn.getAttribute('data-edit-tnote'));
-      if(n) openTrainingNoteModal(pid,n);
-    });
-  });
-  document.querySelectorAll('[data-del-tnote]').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      state.trainingNotes=(state.trainingNotes||[]).filter(x=>x.id!==btn.getAttribute('data-del-tnote'));
-      save(); renderTraining(pid);
-    });
-  });
 }
 
 function openTrainingModal(pid){
@@ -2470,7 +2572,7 @@ function renderCalendar(pid){
       }
     }
 
-    html+=`<div class="${cls}" data-day="${key}" style="cursor:${clickable?'pointer':'default'}" ${clickable?'ondblclick="this.click()"':''}>
+    html+=`<div class="${cls}" data-day="${key}" style="cursor:pointer">
       <div class="day-num">${day}</div>
       <div class="day-tags">${tags}</div>
       <div><div class="day-label">${escapeHtml(label)}</div><div class="day-sub">${escapeHtml(sub)}</div></div>
@@ -2492,8 +2594,27 @@ function renderCalendar(pid){
       const info=monthly.byDay.get(dayKey);
       const loaInfo=loas.find(l=>{const d=new Date(dayKey+"T12:00:00"),s=new Date(l.startISO),e=new Date(l.endISO);return s<=d&&d<=e;});
       const dayEvts=(calEventDays.get(dayKey)||[]);
-      if(!info&&!loaInfo&&!dayEvts.length) return;
-      openModal("Day Details",buildDayDetailHtml(dayKey,info,loaInfo,dayEvts));
+      openModal("Day Details",buildDayDetailHtml(dayKey,info,loaInfo,dayEvts,pid));
+      // Wire cal event edit/delete
+      document.querySelectorAll('[data-ce-del]').forEach(btn=>{
+        btn.addEventListener('click',()=>{
+          if(!confirm('Delete this event?')) return;
+          state.calendarEvents=(state.calendarEvents||[]).filter(x=>x.id!==btn.getAttribute('data-ce-del'));
+          save();closeModal();renderProfile();
+        });
+      });
+      document.querySelectorAll('[data-ce-edit]').forEach(btn=>{
+        btn.addEventListener('click',()=>{
+          const ce=(state.calendarEvents||[]).find(x=>x.id===btn.getAttribute('data-ce-edit'));
+          if(ce){ closeModal(); openEditCalEventModal(ce); }
+        });
+      });
+      document.querySelectorAll('[data-ce-add]').forEach(btn=>{
+        btn.addEventListener('click',()=>{
+          const dk=btn.getAttribute('data-ce-add');
+          closeModal(); openCalEventModal(dk);
+        });
+      });
     });
     el.addEventListener("dblclick",(e)=>{
       e.preventDefault();
@@ -2505,7 +2626,7 @@ function renderCalendar(pid){
   return monthly;
 }
 
-function buildDayDetailHtml(dayKey,info,loa,calEvts=[]){
+function buildDayDetailHtml(dayKey,info,loa,calEvts=[],pid=null){
   const dateObj=new Date(dayKey+"T00:00:00");
   const pretty=new Intl.DateTimeFormat("en-US",{month:"long",day:"numeric",year:"numeric"}).format(dateObj);
   let html=`<div style="font-weight:900;font-size:16px;margin-bottom:10px">${escapeHtml(pretty)}</div>`;
@@ -2527,14 +2648,13 @@ function buildDayDetailHtml(dayKey,info,loa,calEvts=[]){
   }
 
   if(calEvts.length){
+    const _ceDay=pid?canEditProfile(getPerson(pid)):false;
     html+=`<div style="font-weight:700;font-size:12px;margin:10px 0 6px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">Events</div>`;
     for(const ce of calEvts){
       const typeColors={training:'var(--cyan)',interview:'var(--interview)',meeting:'var(--warn)',other:'var(--muted)'};
-      // For training events, try to find trainer from mgmt calendar or training records
       let trainerInfo='';
       if(ce.type==='training'&&ce.note){
         const roleName=ce.note.replace(' Training','');
-        // Check mgmt events for this date + role
         const mgmtMatch=(state.mgmtEvents||[]).find(me=>me.type==='training'&&me.role===roleName&&dateValueFromISO(me.dateISO)===dayKey);
         if(mgmtMatch&&mgmtMatch.ledBy){
           const trainer=getPerson(mgmtMatch.ledBy);
@@ -2542,7 +2662,13 @@ function buildDayDetailHtml(dayKey,info,loa,calEvts=[]){
         }
       }
       html+=`<div style="padding:8px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;font-size:12px">
-        <span class="pill" style="font-size:10px;border-color:${typeColors[ce.type]||typeColors.other}">${escapeHtml(ce.type)}</span>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="pill" style="font-size:10px;border-color:${typeColors[ce.type]||typeColors.other}">${escapeHtml(ce.type)}</span>
+          ${_ceDay?`<div style="display:flex;gap:4px">
+            <button class="btn-ghost btn-sm" data-ce-edit="${escapeHtml(ce.id)}">Edit</button>
+            <button class="btn-ghost btn-sm" data-ce-del="${escapeHtml(ce.id)}">Del</button>
+          </div>`:''}
+        </div>
         <div style="margin-top:4px">${escapeHtml(ce.note||'')}</div>
         ${trainerInfo}
       </div>`;
@@ -2550,6 +2676,9 @@ function buildDayDetailHtml(dayKey,info,loa,calEvts=[]){
   }
 
   if(!info&&!loa&&!calEvts.length) html+=`<div class="muted">Nothing recorded for this day.</div>`;
+  if(pid&&canEditProfile(getPerson(pid))){
+    html+=`<div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn-accent btn-sm" data-ce-add="${escapeHtml(dayKey)}">+ Event</button></div>`;
+  }
   return html;
 }
 
@@ -2581,6 +2710,7 @@ function renderLOABanner(pid){
 function renderEntries(pid){
   const host=$("#discipline"); if(!host) return;
   const list=entriesForPerson(pid);
+  const _ce=canEditProfile(getPerson(pid));
   host.innerHTML=list.map(e=>{
     const kind=normalizeKind(e.kind);
     const pillCls=kind==='Strike'?'bad':kind==='Correction'?'warn':kind==='Warning Sent'?'warn':kind==='Dismissal'?'bad':kind==='Fired'?'bad':kind==='Resigned'?'warn':kind==='Hired'?'good':'good';
@@ -2593,8 +2723,8 @@ function renderEntries(pid){
       </div>
       <div class="entry-actions">
         ${note.length>120?`<button class="btn-ghost btn-sm" data-view-entry="${escapeHtml(e.id)}">View</button>`:''}
-        <button class="btn-ghost btn-sm" data-edit-entry="${escapeHtml(e.id)}">Edit</button>
-        <button class="btn-ghost btn-sm" data-del-entry="${escapeHtml(e.id)}">Del</button>
+        ${_ce?`<button class="btn-ghost btn-sm" data-edit-entry="${escapeHtml(e.id)}">Edit</button>`:''}
+        ${_ce?`<button class="btn-ghost btn-sm" data-del-entry="${escapeHtml(e.id)}">Del</button>`:''}
       </div>
     </div>`;
   }).join('')||`<div class="muted small">No entries yet.</div>`;
@@ -2614,14 +2744,15 @@ function renderEntries(pid){
 function renderNotes(pid){
   const list=notesForPerson(pid);
   const host=$("#notesList"); if(!host) return;
+  const _ce=canEditProfile(getPerson(pid));
   host.innerHTML=list.map(n=>`
     <div class="note-card">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div class="note-date">${escapeHtml(fmtMDY(new Date(n.dateISO)))}</div>
-        <div style="display:flex;gap:4px">
+        ${_ce?`<div style="display:flex;gap:4px">
           <button class="btn-ghost btn-sm" data-edit-note="${escapeHtml(n.id)}">Edit</button>
           <button class="btn-ghost btn-sm" data-del-note="${escapeHtml(n.id)}">Del</button>
-        </div>
+        </div>`:''}
       </div>
       <div class="note-text">${escapeHtml(n.note||'')}</div>
     </div>
@@ -2648,6 +2779,7 @@ function renderReviewPage(){
   document.getElementById('auditLogView').style.display="none";
   document.getElementById('interviewView').style.display="none";
   document.getElementById('leadershipView').style.display="none";
+  document.getElementById('sopView').style.display="none";
   $("#searchBar").style.display="none";
   updateSidebarActive('review');
 
@@ -2755,7 +2887,7 @@ function addPerson(){
 
 function editBasics(){
   const p=getPerson(state.selectedId); if(!p) return;
-  const canEditRank=!currentUser||canManage(p);
+  const canEditRank=!currentUser||canPromoteFire(p);
   const rankSelect=canEditRank?`<select id="e_rank"><option value="">—</option>${RANKS.filter(r=>!currentUser||rankLevel(r)<=rankLevel(currentUser.rank)).map(r=>`<option value="${escapeHtml(r)}" ${p.rank===r?'selected':''}>${escapeHtml(r)}</option>`).join('')}</select>`:`<input value="${escapeHtml(p.rank||'—')}" disabled/>`;
   openModal("Edit Info",`
     <div class="row"><div><div class="muted small">Character</div><input id="e_character" value="${escapeHtml(p.character||'')}"></div>
@@ -2767,7 +2899,6 @@ function editBasics(){
     <div class="row" style="margin-top:8px"><div><div class="muted small">Bank ID</div><input id="e_bank" value="${escapeHtml(p.bankAccount||'')}"></div>
     <div><div class="muted small">Rank</div>${rankSelect}</div></div>
     <div class="row" style="margin-top:8px"><div><div class="muted small">Google Email</div><input id="e_google" value="${escapeHtml(p.googleEmail||'')}" placeholder="name@gmail.com"></div><div></div></div>
-    <div class="row" style="margin-top:8px"><div><div class="muted small" style="margin-bottom:6px">Media Team</div><label style="display:flex;gap:6px;align-items:center;font-size:12px"><input type="checkbox" id="e_media" ${p.mediaTeam?'checked':''}/> Member of Media & Promotions</label></div><div></div></div>
     <div class="hint" style="margin-top:10px">Steam ID updates from CSV import only. Google Email is used for login.</div>
     <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn-accent" id="e_save">Save</button></div>
   `);
@@ -2778,7 +2909,6 @@ function editBasics(){
     p.discord=($("#e_discord").value||'').trim(); p.discordId=($("#e_discordId").value||'').trim();
     p.timeZone=($("#e_tz").value||'').trim(); p.bankAccount=($("#e_bank").value||'').trim();
     if(canEditRank) p.rank=$("#e_rank").value||'';
-    p.mediaTeam=!!document.getElementById('e_media')?.checked;
     p.googleEmail=(document.getElementById('e_google')?.value||'').trim();
     if(p.rank!==oldRank) logAction('Rank changed',p.id,`${oldRank||'None'} → ${p.rank||'None'}`);
     logAction('Profile edited',p.id,'Basic info updated');
@@ -2906,6 +3036,29 @@ function openCalEventModal(prefillDate){
   });
 }
 
+function openEditCalEventModal(ce){
+  if(!ce) return;
+  const dateVal=dateValueFromISO(ce.dateISO);
+  openModal("Edit Calendar Event",`
+    <div class="row"><div><div class="muted small">Date</div><input type="date" id="ece_date" value="${escapeHtml(dateVal)}"/></div>
+    <div><div class="muted small">Type</div><select id="ece_type">
+      <option value="training" ${ce.type==='training'?'selected':''}>Training</option>
+      <option value="interview" ${ce.type==='interview'?'selected':''}>Interview</option>
+      <option value="meeting" ${ce.type==='meeting'?'selected':''}>Meeting</option>
+      <option value="other" ${ce.type==='other'?'selected':''}>Other</option>
+    </select></div></div>
+    <div style="margin-top:8px"><div class="muted small">Note</div><textarea id="ece_note" rows="3">${escapeHtml(ce.note||'')}</textarea></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn-accent" id="ece_save">Save</button></div>
+  `);
+  document.getElementById('ece_save').addEventListener('click',()=>{
+    const ds=(document.getElementById('ece_date').value||'').trim(); if(!ds) return alert('Pick a date.');
+    ce.dateISO=isoFromDateValue(ds);
+    ce.type=document.getElementById('ece_type').value;
+    ce.note=(document.getElementById('ece_note').value||'').trim();
+    save();closeModal();renderProfile();toast('Updated');
+  });
+}
+
 function resetAll(){
   if(!confirm("Reset EVERYTHING? This wipes the entire tracker for all users.")) return;
   if(!confirm("Are you SURE? This cannot be undone.")) return;
@@ -2929,6 +3082,7 @@ function hideAllViews(){
   document.getElementById('interviewView').style.display="none";
   document.getElementById('leadershipView').style.display="none";
   document.getElementById('auditLogView').style.display="none";
+  document.getElementById('sopView').style.display="none";
 }
 
 function renderMgmtCal(){
@@ -2967,23 +3121,29 @@ function renderMgmtCal(){
   for(let day=1;day<=daysInMonth;day++){
     const key=`${year}-${String(mIdx+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
     const dayEvents=mgmtByDay.get(key)||[];
-    const hasTraining=dayEvents.some(e=>e.type==='training');
-    const hasInterview=dayEvents.some(e=>e.type==='interview');
-    const hasEvent=dayEvents.some(e=>e.type==='event');
-    const clickable=dayEvents.length>0;
 
-    let tags="";
-    if(hasTraining) tags+=`<span class="day-tag training">Train</span>`;
-    if(hasInterview) tags+=`<span class="day-tag interview">IV</span>`;
-    if(hasEvent) tags+=`<span class="day-tag event">Event</span>`;
+    // Build compact pills with time baked in
+    let pills='';
+    for(const me of dayEvents){
+      const timeLabel=me.startISO?fmtTime(me.startISO):(me.time||'');
+      const timeSuffix=timeLabel?` · ${timeLabel}`:'';
+      if(me.type==='training'){
+        const label=(me.role||'Train')+timeSuffix;
+        pills+=`<div style="margin-top:3px"><span class="day-tag training">${escapeHtml(label)}</span></div>`;
+      } else if(me.type==='interview'){
+        pills+=`<div style="margin-top:3px"><span class="day-tag interview">Interview${timeSuffix}</span></div>`;
+      } else {
+        const label=(me.note||'Event')+timeSuffix;
+        pills+=`<div style="margin-top:3px"><span class="day-tag event">${escapeHtml(label)}</span></div>`;
+      }
+    }
 
     let cls="cal-day";
     if(dayEvents.length) cls+=" good";
 
-    html+=`<div class="${cls}" data-mday="${key}" style="cursor:${clickable?'pointer':'default'}">
+    html+=`<div class="${cls}" data-mday="${key}" style="cursor:pointer">
       <div class="day-num">${day}</div>
-      <div class="day-tags">${tags}</div>
-      <div><div class="day-label">${dayEvents.length?dayEvents.length+' entr'+(dayEvents.length===1?'y':'ies'):''}</div></div>
+      ${pills}
     </div>`;
   }
   html+=`</div>`;
@@ -3001,6 +3161,11 @@ function renderMgmtCal(){
       const evts=mgmtByDay.get(dk)||[];
       if(!evts.length) return;
       openMgmtDayDetail(dk,evts);
+    });
+    el.addEventListener('dblclick',(e)=>{
+      e.preventDefault();
+      const dk=el.getAttribute('data-mday');
+      openMgmtEventModal(null,dk);
     });
   });
 }
@@ -3020,20 +3185,24 @@ function openMgmtDayDetail(dayKey,evts){
     const typeColors={training:'var(--cyan)',interview:'var(--accent)',event:'var(--warn)'};
     const typeLabel=me.type.charAt(0).toUpperCase()+me.type.slice(1);
     const roleLabel=me.role?` — ${escapeHtml(me.role)}`:'';
+    const timeLabel=me.startISO?fmtTime(me.startISO):(me.time||'');
     const ledLabel=me.ledBy?personLabel(me.ledBy):'Not assigned';
     const ledId=me.ledBy||'';
     const attendeeItems=(me.attendees||[]).map(id=>({id,label:escapeHtml(personLabel(id))}));
 
     html+=`<div style="padding:10px;border:1px solid var(--line);border-radius:var(--r);margin-bottom:8px;background:var(--surface)">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
-        <div><span class="pill" style="font-size:10px;border-color:${typeColors[me.type]||'var(--muted)'}">${escapeHtml(typeLabel)}${roleLabel}</span></div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="pill" style="font-size:10px;border-color:${typeColors[me.type]||'var(--muted)'}">${escapeHtml(typeLabel)}${roleLabel}</span>
+          ${timeLabel?`<span class="muted" style="font-size:11px;font-weight:700">${escapeHtml(timeLabel)}</span>`:''}
+        </div>
         <div style="display:flex;gap:4px">
           <button class="btn-ghost btn-sm" data-edit-mgmt="${escapeHtml(me.id)}">Edit</button>
           <button class="btn-ghost btn-sm" data-del-mgmt="${escapeHtml(me.id)}">Del</button>
         </div>
       </div>
       <div style="margin-top:8px;font-size:12px">
-        <div><span class="muted">Led by:</span> <b style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px" data-goto-profile="${escapeHtml(ledId)}">${escapeHtml(ledLabel)}</b></div>
+        <div><span class="muted">Led by:</span> <b style="cursor:pointer" data-goto-profile="${escapeHtml(ledId)}">${escapeHtml(ledLabel)}</b></div>
         ${attendeeItems.length?`<div style="margin-top:6px"><span class="muted">Attended:</span><div style="display:flex;flex-direction:column;gap:3px;margin-top:4px">${attendeeItems.map(a=>`<div style="padding:4px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);font-size:11px;cursor:pointer" data-goto-profile="${escapeHtml(a.id)}">${a.label}</div>`).join('')}</div></div>`:''}
         ${me.note?`<div style="margin-top:4px;white-space:pre-wrap">${escapeHtml(me.note)}</div>`:''}
       </div>
@@ -3065,19 +3234,19 @@ function openMgmtDayDetail(dayKey,evts){
   });
 }
 
-function openMgmtEventModal(existing){
+function openMgmtEventModal(existing,prefillDate){
   const isEdit=!!existing;
   const title=isEdit?"Edit Entry":"Add Entry";
-  const dateVal=isEdit?dateValueFromISO(existing.dateISO):dateValueFromISO(new Date().toISOString());
+  const dateVal=isEdit?dateValueFromISO(existing.dateISO):prefillDate||dateValueFromISO(new Date().toISOString());
   const typeVal=isEdit?existing.type:'training';
   const roleVal=isEdit?existing.role||'':'';
+  const timeVal=isEdit?(existing.time||(existing.startISO?new Intl.DateTimeFormat("en-CA",{timeZone:TZ,hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date(existing.startISO)):'')):'';
   const ledVal=isEdit?existing.ledBy||'':'';
   const attendeesVal=isEdit?(existing.attendees||[]):[];
   const noteVal=isEdit?existing.note||'':'';
 
   // Build people options for led by (DC1-19 management)
   const mgmtOpts=managementTrainerOptions();
-  const ledOpts=[`<option value="">— Select —</option>`].concat(mgmtOpts.map(t=>`<option value="${escapeHtml(t.id)}" ${t.id===ledVal?'selected':''}>${escapeHtml(t.label)}</option>`)).join('');
 
   // Build people options for attendees (everyone active)
   const allPeople=state.people.filter(p=>!p.archived).map(p=>{ensurePerson(p);return p;}).sort((a,b)=>(a.character||'').localeCompare(b.character||''));
@@ -3087,13 +3256,14 @@ function openMgmtEventModal(existing){
 
   openModal(title,`
     <div class="row"><div><div class="muted small">Date</div><input type="date" id="me_date" value="${escapeHtml(dateVal)}"/></div>
+    <div><div class="muted small">Time</div><input type="time" id="me_time" value="${escapeHtml(timeVal)}"/></div>
     <div><div class="muted small">Type</div><select id="me_type">
       <option value="training" ${typeVal==='training'?'selected':''}>Training</option>
       <option value="interview" ${typeVal==='interview'?'selected':''}>Interview</option>
       <option value="event" ${typeVal==='event'?'selected':''}>Event</option>
     </select></div></div>
     <div class="row" style="margin-top:8px"><div><div class="muted small">Role (training only)</div><select id="me_role">${roleOpts}</select></div>
-    <div><div class="muted small">Led by</div><select id="me_led">${ledOpts}</select></div></div>
+    <div><div class="muted small">Led by</div><div id="me_led_picker"></div></div></div>
     <div style="margin-top:8px"><div class="muted small">Attended by</div>
       <div id="me_attendee_picker"></div>
     </div>
@@ -3101,6 +3271,7 @@ function openMgmtEventModal(existing){
     <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn-accent" id="me_save">Save</button></div>
   `);
 
+  const ledPicker=createTagPicker('me_led_picker',mgmtOpts,ledVal?[ledVal]:[]);
   const attendeePicker=createTagPicker('me_attendee_picker',allPeopleOpts,attendeesVal);
 
   document.getElementById('me_save').addEventListener('click',()=>{
@@ -3109,16 +3280,18 @@ function openMgmtEventModal(existing){
     const iso=isoFromDateValue(ds);
     const type=document.getElementById('me_type').value;
     const role=document.getElementById('me_role').value;
-    const ledBy=document.getElementById('me_led').value;
+    const time=(document.getElementById('me_time').value||'').trim();
+    const ledBy=ledPicker.getSelected()[0]||'';
     const attendees=attendeePicker.getSelected();
     const note=(document.getElementById('me_note').value||'').trim();
 
     if(existing){
-      existing.dateISO=iso; existing.type=type; existing.role=role;
+      existing.dateISO=iso; existing.type=type; existing.role=role; existing.time=time;
+      existing.startISO=makeStartISO(ds,time);
       existing.ledBy=ledBy; existing.attendees=attendees; existing.note=note;
     } else {
       state.mgmtEvents||=[];
-      state.mgmtEvents.push({id:uid(),dateISO:iso,type,role,ledBy,attendees,note});
+      state.mgmtEvents.push({id:uid(),dateISO:iso,type,role,time,startISO:makeStartISO(ds,time),ledBy,attendees,note});
     }
 
     // Auto-update training profiles for training events with a role
@@ -3236,7 +3409,7 @@ function renderLeadership(){
   });
 
   // Get all Supervisor+ people
-  const leaders=state.people.filter(p=>{ensurePerson(p);return isMgmtRank(p)&&!p.archived;}).sort((a,b)=>(a.character||'').localeCompare(b.character||''));
+  const leaders=state.people.filter(p=>{ensurePerson(p);return isMgmtRank(p)&&!p.archived;});
 
   const host=document.getElementById('leadershipBody');
   if(!leaders.length){
@@ -3255,12 +3428,19 @@ function renderLeadership(){
     const interviewsAttended=attended.filter(me=>me.type==='interview').length;
     const totalLed=led.length;
     const totalAttended=attended.length;
-
-    // Grab profile notes for eval context
+    const allPersonEvents=[...led,...attended];
+    const lastEventDate=allPersonEvents.length?Math.max(...allPersonEvents.map(e=>new Date(e.dateISO).getTime())):0;
     const notes=notesForPerson(p.id).slice(0,5);
-
-    return {p,trainingsLed,interviewsLed,eventsLed,trainingsAttended,interviewsAttended,totalLed,totalAttended,led,attended,notes};
+    return {p,trainingsLed,interviewsLed,eventsLed,trainingsAttended,interviewsAttended,totalLed,totalAttended,led,attended,notes,lastEventDate};
   });
+
+  // Sort
+  const sortVal=document.getElementById('laSort')?.value||'az';
+  if(sortVal==='az') stats.sort((a,b)=>(a.p.character||'').localeCompare(b.p.character||''));
+  else if(sortVal==='rank') stats.sort((a,b)=>rankLevel(b.p.rank)-rankLevel(a.p.rank)||(a.p.character||'').localeCompare(b.p.character||''));
+  else if(sortVal==='most') stats.sort((a,b)=>(b.totalLed+b.totalAttended)-(a.totalLed+a.totalAttended));
+  else if(sortVal==='least') stats.sort((a,b)=>(a.totalLed+a.totalAttended)-(b.totalLed+b.totalAttended));
+  else if(sortVal==='recent') stats.sort((a,b)=>b.lastEventDate-a.lastEventDate);
 
   const rangeLabel=(fromDate||toDate)?
     `${fromDate?fmtMDY(fromDate):'Start'} — ${toDate?fmtMDY(toDate):'Now'}`:'All Time';
@@ -3526,17 +3706,29 @@ function renderTemplates(){
   }
 
   host.innerHTML=state.templates.map(t=>{
-    const preview=(t.body||'').length>200?(t.body||'').slice(0,200)+'…':(t.body||'');
-    return `<div class="tpl-card">
-      <div class="tpl-title">${escapeHtml(t.title||'Untitled')}</div>
-      <div class="tpl-body">${escapeHtml(preview)}</div>
-      <div class="tpl-actions">
-        <button class="btn-ghost btn-sm" data-tpl-copy="${escapeHtml(t.id)}">Copy</button>
-        <button class="btn-ghost btn-sm" data-tpl-edit="${escapeHtml(t.id)}">Edit</button>
-        <button class="btn-ghost btn-sm" data-tpl-del="${escapeHtml(t.id)}">Del</button>
+    return `<div class="sop-card" data-tpl-id="${escapeHtml(t.id)}">
+      <div class="sop-header">
+        <div class="sop-title">
+          <svg class="sop-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          ${escapeHtml(t.title||'Untitled')}
+        </div>
+        <div style="display:flex;gap:4px">
+          <button class="btn-ghost btn-sm" data-tpl-copy="${escapeHtml(t.id)}">Copy</button>
+          <button class="btn-ghost btn-sm" data-tpl-edit="${escapeHtml(t.id)}">Edit</button>
+          <button class="btn-ghost btn-sm" data-tpl-del="${escapeHtml(t.id)}">Del</button>
+        </div>
       </div>
+      <div class="sop-body">${escapeHtml(t.body||'')}</div>
     </div>`;
   }).join('');
+
+  // Toggle collapse
+  host.querySelectorAll('.sop-header').forEach(hdr=>{
+    hdr.addEventListener('click',e=>{
+      if(e.target.closest('button')) return;
+      hdr.closest('.sop-card')?.classList.toggle('open');
+    });
+  });
 
   host.querySelectorAll('[data-tpl-copy]').forEach(btn=>{
     btn.addEventListener('click',()=>{
@@ -3581,6 +3773,100 @@ function openTemplateModal(existing){
 // ═══════════════════════════════════════════
 // RENDER: INTERVIEWS
 // ═══════════════════════════════════════════
+// ═══════════════════════════════════════════
+// RENDER: SOPs & TRAINING GUIDES
+// ═══════════════════════════════════════════
+function renderSOPs(){
+  hideAllViews();
+  document.getElementById('sopView').style.display="";
+  $("#searchBar").style.display="none";
+  updateSidebarActive('sops');
+  state.ui.view="sops"; save();
+
+  const canEdit=!currentUser||rankLevel(currentUser.rank)>=3||DEV_MODE;
+  const addBtn=document.getElementById('addSopBtn');
+  if(addBtn) addBtn.style.display=canEdit?'':'none';
+
+  const host=document.getElementById('sopBody');
+  const sops=(state.sops||[]).slice();
+
+  if(!sops.length){
+    host.innerHTML=`<div class="muted small">No SOPs or training guides yet.${canEdit?' Click + Guide to add one.':''}</div>`;
+    return;
+  }
+
+  host.innerHTML=sops.map(s=>`
+    <div class="sop-card" data-sop-id="${escapeHtml(s.id)}">
+      <div class="sop-header">
+        <div class="sop-title">
+          <svg class="sop-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+          ${escapeHtml(s.title||'(untitled)')}
+        </div>
+        ${canEdit?`<div style="display:flex;gap:4px">
+          <button class="btn-ghost btn-sm" data-sop-edit="${escapeHtml(s.id)}">Edit</button>
+          <button class="btn-ghost btn-sm" data-sop-copy="${escapeHtml(s.id)}">Copy</button>
+          <button class="btn-ghost btn-sm" data-sop-del="${escapeHtml(s.id)}">Del</button>
+        </div>`:`<button class="btn-ghost btn-sm" data-sop-copy="${escapeHtml(s.id)}">Copy</button>`}
+      </div>
+      <div class="sop-body">${escapeHtml(s.body||'')}</div>
+    </div>
+  `).join('');
+
+  // Toggle collapse
+  host.querySelectorAll('.sop-header').forEach(hdr=>{
+    hdr.addEventListener('click',e=>{
+      if(e.target.closest('button')) return;
+      hdr.closest('.sop-card')?.classList.toggle('open');
+    });
+  });
+
+  // Copy
+  host.querySelectorAll('[data-sop-copy]').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const s=sops.find(x=>x.id===btn.getAttribute('data-sop-copy'));
+      if(s) copyText(s.body||'');
+    });
+  });
+
+  // Edit
+  host.querySelectorAll('[data-sop-edit]').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const s=sops.find(x=>x.id===btn.getAttribute('data-sop-edit'));
+      if(s) openSopModal(s);
+    });
+  });
+
+  // Delete
+  host.querySelectorAll('[data-sop-del]').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const sid=btn.getAttribute('data-sop-del');
+      if(!confirm('Delete this SOP?')) return;
+      state.sops=(state.sops||[]).filter(x=>x.id!==sid);
+      save(); renderSOPs(); toast('Deleted');
+    });
+  });
+}
+
+function openSopModal(existing){
+  const isNew=!existing;
+  openModal(isNew?'Add SOP / Training Guide':'Edit SOP / Training Guide',`
+    <div><div class="muted small">Title</div><input id="sop_title" value="${escapeHtml(existing?.title||'')}" placeholder="e.g. SOP: Opening Procedures"/></div>
+    <div style="margin-top:8px"><div class="muted small">Content</div><textarea id="sop_body" rows="12" placeholder="Write or paste your SOP content here...">${escapeHtml(existing?.body||'')}</textarea></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn-accent" id="sop_save">Save</button></div>
+  `);
+  document.getElementById('sop_save').addEventListener('click',()=>{
+    const title=(document.getElementById('sop_title').value||'').trim();
+    const body=(document.getElementById('sop_body').value||'').trim();
+    if(!title) return alert('Title is required.');
+    if(existing){ existing.title=title; existing.body=body; }
+    else { state.sops||=[]; state.sops.push({id:uid(),title,body}); }
+    save(); closeModal(); renderSOPs(); toast('Saved');
+  });
+}
+
 function renderInterviews(){
   hideAllViews();
   document.getElementById('interviewView').style.display="";
@@ -4085,7 +4371,7 @@ function openVoteModal(c){
 // ═══════════════════════════════════════════
 function updateSidebarActive(page){
   document.querySelectorAll('.nav-item[id]').forEach(el=>{
-    const map={navHub:'hub',overviewBtn:'overview',mgmtCalBtn:'mgmtcal',promoBtn:'review',
+    const map={navHub:'hub',sopBtn:'sops',overviewBtn:'overview',mgmtCalBtn:'mgmtcal',promoBtn:'review',
       interviewBtn:'interviews',leadershipBtn:'leadership',auditLogBtn:'auditlog',templatesBtn:'templates'};
     const p=map[el.id]||'';
     el.classList.toggle('active',p===page);
@@ -4108,6 +4394,8 @@ document.getElementById('hamburger')?.addEventListener('click',()=>{
 document.getElementById('mobileOverlay')?.addEventListener('click',closeMobileSidebar);
 document.getElementById('sidebarHome')?.addEventListener('click',()=>{closeMobileSidebar();renderHub();});
 document.getElementById('navHub')?.addEventListener('click',()=>{closeMobileSidebar();renderHub();});
+document.getElementById('sopBtn')?.addEventListener('click',()=>{closeMobileSidebar();renderSOPs();});
+document.getElementById('addSopBtn')?.addEventListener('click',()=>openSopModal(null));
 document.getElementById('signOutBtn')?.addEventListener('click',()=>{ auth.signOut(); });
 
 $("#importCsvBtn").addEventListener("click",()=>{closeMobileSidebar();$("#csvFile").click();});
@@ -4123,13 +4411,21 @@ $("#templatesBtn").addEventListener("click",()=>{closeMobileSidebar();renderTemp
 $("#leadershipBtn").addEventListener("click",()=>{closeMobileSidebar();renderLeadership();});
 $("#auditLogBtn")?.addEventListener("click",()=>{closeMobileSidebar();renderAuditLog();});
 document.getElementById('laApply')?.addEventListener('click',renderLeadership);
+document.getElementById('laSort')?.addEventListener('change',renderLeadership);
 document.getElementById('laClear')?.addEventListener('click',()=>{
   const f=document.getElementById('laFrom'),t=document.getElementById('laTo');
   if(f)f.value='';if(t)t.value='';renderLeadership();
 });
 $("#interviewBtn").addEventListener("click",()=>{closeMobileSidebar();renderInterviews();});
 document.getElementById('addTemplateBtn')?.addEventListener('click',()=>openTemplateModal(null));
-document.getElementById('editQuestionsBtn')?.addEventListener('click',openEditQuestionsModal);
+document.getElementById('editQuestionsBtn')?.addEventListener('click',(e)=>{e.stopPropagation();openEditQuestionsModal();});
+document.getElementById('ivQuestionsToggle')?.addEventListener('click',(e)=>{
+  if(e.target.closest('button')) return;
+  const body=document.getElementById('questionsBody');
+  const chev=document.getElementById('ivQChevron');
+  if(body){body.style.display=body.style.display==='none'?'':'none';}
+  if(chev){chev.style.transform=body.style.display==='none'?'':'rotate(90deg)';}
+});
 document.getElementById('addCandidateBtn')?.addEventListener('click',openAddCandidateModal);
 document.getElementById('ivFilterAwait')?.addEventListener('click',()=>{state.ui.ivFilter='awaiting';save();renderCandidateCards();});
 document.getElementById('ivFilterDone')?.addEventListener('click',()=>{state.ui.ivFilter='interviewed';save();renderCandidateCards();});
