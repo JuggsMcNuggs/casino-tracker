@@ -364,7 +364,7 @@
     }
     .entry-card .entry-left { flex: 1; }
     .entry-card .entry-date { font-size: 11px; color: var(--muted); }
-    .entry-card .entry-note { font-size: 12px; margin-top: 4px; white-space: pre-wrap; word-break: break-word; }
+    .entry-card .entry-note { font-size: 14px; margin-top: 6px; white-space: pre-wrap; word-break: break-word; line-height: 1.5; }
     .entry-card .entry-actions { display: flex; gap: 4px; flex-shrink: 0; }
 
     /* ── NOTE CARDS ── */
@@ -376,7 +376,7 @@
       margin-bottom: 8px;
     }
     .note-card .note-date { font-size: 11px; color: var(--muted); }
-    .note-card .note-text { font-size: 12px; margin-top: 4px; white-space: pre-wrap; word-break: break-word; }
+    .note-card .note-text { font-size: 14px; margin-top: 6px; white-space: pre-wrap; word-break: break-word; line-height: 1.5; }
 
     /* ── HOURS CHART ── */
     .chart-bar-wrap { display: flex; flex-direction: column; gap: 4px; }
@@ -478,15 +478,14 @@
     .cand-votes .no { color: var(--bad); font-weight: 700; }
 
     .iq-card {
-      padding: 10px 12px;
+      padding: 14px 16px;
       border: 1px solid var(--line);
       border-radius: var(--r);
       background: rgba(20,26,34,.4);
-      margin-bottom: 6px;
-      font-size: 12px;
+      margin-bottom: 8px;
     }
-    .iq-card .iq-q { font-weight: 700; margin-bottom: 4px; }
-    .iq-card .iq-a { color: var(--muted); white-space: pre-wrap; word-break: break-word; }
+    .iq-card .iq-q { font-weight: 700; margin-bottom: 6px; font-size: 14px; line-height: 1.4; }
+    .iq-card .iq-a { color: var(--text); white-space: pre-wrap; word-break: break-word; font-size: 14px; line-height: 1.6; }
 
     .vote-row {
       display: flex; align-items: center; gap: 8px;
@@ -556,9 +555,9 @@
     }
     .sop-card.open .sop-chevron { transform: rotate(90deg); }
     .sop-body {
-      display: none; padding: 0 14px 14px;
-      font-size: 12px; white-space: pre-wrap; word-break: break-word;
-      color: var(--muted); line-height: 1.6;
+      display: none; padding: 0 16px 16px;
+      font-size: 14px; white-space: pre-wrap; word-break: break-word;
+      color: var(--text); line-height: 1.6;
     }
     .sop-card.open .sop-body { display: block; }
 
