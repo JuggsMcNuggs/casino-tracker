@@ -2996,19 +2996,21 @@ function editBasics(){
   openModal("Edit Info",`
     <div class="row"><div><div class="muted small">Character</div><input id="e_character" value="${escapeHtml(p.character||'')}"></div>
     <div><div class="muted small">Callsign</div><input id="e_callsign" value="${escapeHtml(p.callsign||'')}"></div></div>
-    <div class="row" style="margin-top:8px"><div><div class="muted small">Steam Name</div><input id="e_steamName" value="${escapeHtml(p.steamName||'')}"></div>
-    <div><div class="muted small">Discord</div><input id="e_discord" value="${escapeHtml(p.discord||'')}" placeholder="@name"></div></div>
-    <div class="row" style="margin-top:8px"><div><div class="muted small">Discord ID</div><input id="e_discordId" value="${escapeHtml(p.discordId||'')}"></div>
-    <div><div class="muted small">Timezone</div><input id="e_tz" value="${escapeHtml(p.timeZone||'')}"></div></div>
-    <div class="row" style="margin-top:8px"><div><div class="muted small">Bank ID</div><input id="e_bank" value="${escapeHtml(p.bankAccount||'')}"></div>
-    <div><div class="muted small">Rank</div>${rankSelect}</div></div>
-    <div class="row" style="margin-top:8px"><div><div class="muted small">Google Email</div><input id="e_google" value="${escapeHtml(p.googleEmail||'')}" placeholder="name@gmail.com"></div><div></div></div>
-    <div class="hint" style="margin-top:10px">Steam ID updates from CSV import only. Google Email is used for login.</div>
+    <div class="row" style="margin-top:8px"><div><div class="muted small">Steam ID</div><input id="e_steam" value="${escapeHtml(p.steam||'')}"></div>
+    <div><div class="muted small">Steam Name</div><input id="e_steamName" value="${escapeHtml(p.steamName||'')}"></div></div>
+    <div class="row" style="margin-top:8px"><div><div class="muted small">Discord</div><input id="e_discord" value="${escapeHtml(p.discord||'')}" placeholder="@name"></div>
+    <div><div class="muted small">Discord ID</div><input id="e_discordId" value="${escapeHtml(p.discordId||'')}"></div></div>
+    <div class="row" style="margin-top:8px"><div><div class="muted small">Timezone</div><input id="e_tz" value="${escapeHtml(p.timeZone||'')}"></div>
+    <div><div class="muted small">Bank ID</div><input id="e_bank" value="${escapeHtml(p.bankAccount||'')}"></div></div>
+    <div class="row" style="margin-top:8px"><div><div class="muted small">Rank</div>${rankSelect}</div>
+    <div><div class="muted small">Google Email</div><input id="e_google" value="${escapeHtml(p.googleEmail||'')}" placeholder="name@gmail.com"></div></div>
+    <div class="hint" style="margin-top:10px">Google Email is used for login. Steam ID also updates from CSV import.</div>
     <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn-accent" id="e_save">Save</button></div>
   `);
   $("#e_save").addEventListener("click",()=>{
     const oldRank=p.rank||'';
     p.character=($("#e_character").value||'').trim(); p.callsign=($("#e_callsign").value||'').trim();
+    p.steam=(document.getElementById('e_steam')?.value||'').trim();
     p.steamName=(document.getElementById('e_steamName')?.value||'').trim();
     p.discord=($("#e_discord").value||'').trim(); p.discordId=($("#e_discordId").value||'').trim();
     p.timeZone=($("#e_tz").value||'').trim(); p.bankAccount=($("#e_bank").value||'').trim();
