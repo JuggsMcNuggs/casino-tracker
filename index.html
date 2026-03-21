@@ -645,6 +645,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
         <span class="nav-item-text">+ Person</span>
       </div>
+      <div class="nav-item" id="dcNumbersBtn" title="DC Numbers">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9h16"/><path d="M4 15h16"/><path d="M10 3v18"/><path d="M16 3v18"/></svg>
+        <span class="nav-item-text">DC Numbers</span>
+      </div>
       <div class="nav-item" id="importCsvBtn" title="Import CSV">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         <span class="nav-item-text">Import CSV</span>
@@ -1163,6 +1167,91 @@ function nextAvailableDC(){
   return '';
 }
 
+function openDCNumbersModal(){
+  // Build a map of all DC numbers in use
+  const assigned=[];
+  const archivedDCs=[];
+  for(const p of state.people){
+    const n=dcNumberFromCallsign(p.callsign);
+    if(n===Infinity) continue;
+    if(p.archived) archivedDCs.push({n,p});
+    else assigned.push({n,p});
+  }
+  assigned.sort((a,b)=>a.n-b.n);
+  archivedDCs.sort((a,b)=>a.n-b.n);
+
+  // Find available slots 21+
+  const usedActive=new Set(assigned.map(x=>x.n));
+  const available=[];
+  for(let i=21;i<=Math.max(60,...assigned.map(x=>x.n+5));i++){
+    if(!usedActive.has(i)) available.push(i);
+  }
+
+  // Management block (1-20)
+  const mgmtSlots=[];
+  for(let i=1;i<=20;i++){
+    const owner=assigned.find(x=>x.n===i);
+    mgmtSlots.push({n:i,owner:owner?.p||null});
+  }
+
+  // Staff block (21+)
+  const staffSlots=assigned.filter(x=>x.n>=21);
+
+  let html=`<div style="display:flex;gap:6px;margin-bottom:12px;align-items:center">
+    <span class="pill accent">Next available: ${escapeHtml(nextAvailableDC()||'None')}</span>
+    <span class="pill">${assigned.length} active</span>
+    <span class="pill">${available.length} open (21+)</span>
+  </div>`;
+
+  // Management grid
+  html+=`<div style="font-weight:700;font-size:12px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">Management (DC 1-20)</div>`;
+  html+=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px;margin-bottom:16px">`;
+  for(const s of mgmtSlots){
+    const filled=!!s.owner;
+    const bg=filled?'var(--accent-dim)':'var(--surface)';
+    const border=filled?'var(--accent-mid)':'var(--line)';
+    const name=filled?escapeHtml(s.owner.character||s.owner.steamName||'Unknown'):'<span style="color:var(--muted)">Open</span>';
+    const rank=filled?`<span style="font-size:10px;color:var(--muted)">${escapeHtml(s.owner.rank||'')}</span>`:'';
+    html+=`<div style="padding:8px 10px;border:1px solid ${border};border-radius:8px;background:${bg};font-size:12px;display:flex;justify-content:space-between;align-items:center">
+      <div><span style="font-weight:900;color:var(--accent);margin-right:6px">DC-${s.n}</span>${name}</div>
+      ${rank}
+    </div>`;
+  }
+  html+=`</div>`;
+
+  // Staff grid
+  html+=`<div style="font-weight:700;font-size:12px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">Staff (DC 21+)</div>`;
+  html+=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px;margin-bottom:16px">`;
+  for(const s of staffSlots){
+    html+=`<div style="padding:8px 10px;border:1px solid var(--good-border);border-radius:8px;background:var(--good-dim);font-size:12px;display:flex;justify-content:space-between;align-items:center">
+      <div><span style="font-weight:900;color:var(--good);margin-right:6px">DC-${s.n}</span>${escapeHtml(s.p.character||s.p.steamName||'Unknown')}</div>
+      <span style="font-size:10px;color:var(--muted)">${escapeHtml(s.p.rank||'')}</span>
+    </div>`;
+  }
+  html+=`</div>`;
+
+  // Available slots
+  html+=`<div style="font-weight:700;font-size:12px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">Available (DC 21+)</div>`;
+  html+=`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px">`;
+  for(const n of available.slice(0,30)){
+    html+=`<span class="pill" style="font-size:11px;font-weight:700">DC-${n}</span>`;
+  }
+  if(available.length>30) html+=`<span class="pill" style="font-size:11px">+${available.length-30} more</span>`;
+  html+=`</div>`;
+
+  // Archived (recycled numbers)
+  if(archivedDCs.length){
+    html+=`<div style="font-weight:700;font-size:12px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">Archived (numbers recycled)</div>`;
+    html+=`<div style="display:flex;flex-wrap:wrap;gap:4px">`;
+    for(const s of archivedDCs){
+      html+=`<span class="pill bad" style="font-size:10px">DC-${s.n} ${escapeHtml(s.p.character||'')}</span>`;
+    }
+    html+=`</div>`;
+  }
+
+  openModal("DC Number Map",html,{wide:true});
+}
+
 // ═══════════════════════════════════════════
 // DOM HELPERS
 // ═══════════════════════════════════════════
@@ -1513,7 +1602,7 @@ function applyPermissions(){
     overviewBtn:3, mgmtCalBtn:3, promoBtn:3, interviewBtn:3,
     leadershipBtn:3, templatesBtn:3,
     auditLogBtn:5,
-    importCsvBtn:3, exportBtn:3, importBackupBtn:3, addPersonBtn:3, resetBtn:5
+    importCsvBtn:3, exportBtn:3, importBackupBtn:3, addPersonBtn:3, dcNumbersBtn:3, resetBtn:5
   };
   for(const [id,minLevel] of Object.entries(gatedBtns)){
     const el=document.getElementById(id);
@@ -4419,6 +4508,7 @@ $("#exportBtn").addEventListener("click",()=>{closeMobileSidebar();exportBackup(
 $("#importBackupBtn").addEventListener("click",()=>{closeMobileSidebar();$("#backupFile").click();});
 $("#backupFile").addEventListener("change",e=>{const f=e.target.files?.[0];if(f) importBackup(f);e.target.value="";});
 $("#addPersonBtn").addEventListener("click",()=>{closeMobileSidebar();addPerson();});
+document.getElementById('dcNumbersBtn')?.addEventListener('click',()=>{closeMobileSidebar();openDCNumbersModal();});
 $("#promoBtn").addEventListener("click",()=>{closeMobileSidebar();state.ui.reviewTab='eotm';renderReviewPage();});
 $("#overviewBtn").addEventListener("click",()=>{closeMobileSidebar();renderOverview();});
 $("#mgmtCalBtn").addEventListener("click",()=>{closeMobileSidebar();renderMgmtCal();});
