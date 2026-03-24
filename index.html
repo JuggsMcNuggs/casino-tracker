@@ -54,101 +54,33 @@
       min-height: 100vh;
     }
 
-    /* ── SIDEBAR ── */
-    .sidebar {
-      position: fixed; top: 0; left: 0; bottom: 0;
-      width: 220px; background: var(--panel);
-      border-right: 1px solid var(--line);
-      display: flex; flex-direction: column;
-      z-index: 30; transition: width .2s ease, transform .2s ease;
-      overflow: hidden;
+    /* ── HEADER ── */
+    header {
+      position: sticky; top: 0; z-index: 20;
+      backdrop-filter: blur(20px);
+      background: rgba(7,11,18,.9);
+      border-bottom: 1px solid var(--line);
     }
-    .sidebar::after {
-      content: ''; position: absolute; top: 0; right: -1px; bottom: 0; width: 1px;
-      background: linear-gradient(180deg, transparent 10%, var(--accent) 40%, var(--cyan) 60%, transparent 90%);
-      opacity: .35;
+    header::after {
+      content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--cyan), transparent);
+      opacity: .4;
     }
-    .sidebar.collapsed { width: 56px; }
-    .sidebar-logo {
-      padding: 14px 12px; display: flex; align-items: center; gap: 10px;
-      cursor: pointer; border-bottom: 1px solid var(--line); flex-shrink: 0; min-height: 52px; transition: padding .2s;
-    }
-    .sidebar.collapsed .sidebar-logo { padding: 14px 8px; justify-content: center; }
-    .sidebar-logo:hover { background: rgba(139,108,255,.04); }
-    .logo-img { width: 32px; height: 32px; border-radius: 8px; object-fit: contain; flex-shrink: 0; background: #000; padding: 2px; }
-    .logo-text { display: flex; flex-direction: column; overflow: hidden; white-space: nowrap; transition: opacity .15s; }
-    .sidebar.collapsed .logo-text { opacity: 0; width: 0; }
-    .logo-title { font-weight: 900; font-size: 13px; letter-spacing: .2px; line-height: 1.2; }
-    .logo-sub { font-size: 10px; color: var(--muted); letter-spacing: .3px; }
-    .collapse-btn {
-      position: absolute; top: 12px; right: -12px; width: 24px; height: 24px; border-radius: 50%;
-      background: var(--panel2); border: 1px solid var(--line2);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; z-index: 31; transition: background .15s; color: var(--muted);
-    }
-    .collapse-btn:hover { background: var(--accent-dim); border-color: var(--accent-mid); color: var(--text); }
-    .collapse-btn svg { width: 12px; height: 12px; transition: transform .2s; }
-    .sidebar.collapsed .collapse-btn svg { transform: rotate(180deg); }
-    .nav-section { padding: 8px; flex: 1; overflow-y: auto; overflow-x: hidden; }
-    .nav-label {
-      font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted);
-      padding: 8px 8px 4px; font-weight: 700; white-space: nowrap; overflow: hidden; transition: opacity .15s;
-    }
-    .sidebar.collapsed .nav-label { opacity: 0; height: 0; padding: 0; }
-    .nav-item {
-      display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px;
-      font-size: 12px; font-weight: 500; cursor: pointer; transition: background .1s, color .1s;
-      white-space: nowrap; overflow: hidden; color: var(--muted); position: relative;
-      border: 1px solid transparent;
-    }
-    .nav-item:hover { background: rgba(139,108,255,.06); color: var(--text); }
-    .nav-item.active { background: var(--accent-dim); color: #c4b5fd; border-color: var(--accent-mid); }
-    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; opacity: .7; }
-    .nav-item.active svg { opacity: 1; }
-    .nav-item-text { transition: opacity .15s; overflow: hidden; text-overflow: ellipsis; }
-    .sidebar.collapsed .nav-item-text { opacity: 0; width: 0; }
-    .sidebar.collapsed .nav-item { justify-content: center; padding: 8px; }
-    .nav-badge {
-      background: var(--accent); color: #fff; font-size: 9px; font-weight: 900;
-      padding: 1px 5px; border-radius: 999px; margin-left: auto; flex-shrink: 0; line-height: 1.4;
-    }
-    .sidebar.collapsed .nav-badge { position: absolute; top: 2px; right: 2px; margin: 0; width: 8px; height: 8px; padding: 0; font-size: 0; }
-    .nav-divider { height: 1px; background: var(--line); margin: 6px 8px; }
-    .sidebar-user {
-      padding: 10px 12px; border-top: 1px solid var(--line);
-      display: flex; align-items: center; gap: 8px; flex-shrink: 0; min-height: 48px; overflow: hidden;
-    }
-    .user-avatar {
-      width: 28px; height: 28px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--cyan));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: 900; flex-shrink: 0; color: #fff;
-    }
-    .user-info { overflow: hidden; transition: opacity .15s; }
-    .sidebar.collapsed .user-info { opacity: 0; width: 0; }
-    .user-name { font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .user-rank { font-size: 10px; color: var(--accent); font-weight: 700; }
-    .user-signout {
-      margin-left: auto; font-size: 10px; color: var(--muted); cursor: pointer; flex-shrink: 0;
-      padding: 2px 6px; border-radius: 4px; transition: color .1s, background .1s; border: none; background: none;
-    }
-    .user-signout:hover { color: var(--bad); background: rgba(251,113,133,.08); }
-    .sidebar.collapsed .user-signout { display: none; }
-    .hamburger {
-      display: none; position: fixed; top: 12px; left: 12px; z-index: 40;
-      width: 36px; height: 36px; border-radius: 8px; background: var(--panel2);
-      border: 1px solid var(--line2); align-items: center; justify-content: center; cursor: pointer; color: var(--text);
-    }
-    .hamburger svg { width: 18px; height: 18px; }
-    .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 25; }
-    .mobile-overlay.show { display: block; }
-    @keyframes pulse { 0%,100%{opacity:.8;} 50%{opacity:1;} }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 14px 20px; }
+    .hdr-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .brand { display: flex; align-items: center; gap: 10px; }
     .gem {
       width: 8px; height: 8px; border-radius: 50%;
       background: linear-gradient(135deg, var(--accent), var(--cyan));
       box-shadow: 0 0 12px rgba(139,108,255,.6), 0 0 24px rgba(56,189,248,.2);
       animation: pulse 3s ease-in-out infinite;
     }
+    @keyframes pulse { 0%,100%{opacity:.8;} 50%{opacity:1;} }
+    .brand-name { font-weight: 900; font-size: 15px; letter-spacing: .3px; }
+    .brand-sub { font-size: 11px; color: var(--muted); margin-left: 2px; transition: color 0.3s; cursor: default; }
+    .brand-sub[data-warn] { cursor: pointer; }
+
+    .hdr-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 
     /* ── BUTTONS & INPUTS ── */
     input, select, button, textarea {
@@ -207,8 +139,7 @@
     .search-bar select { min-width: 180px; }
 
     /* ── MAIN ── */
-    main { margin-left: 220px; padding: 16px 28px; transition: margin-left .2s ease; }
-    .sidebar.collapsed ~ main { margin-left: 56px; }
+    main { max-width: 1200px; margin: 0 auto; padding: 16px 20px; }
 
     /* ── PANELS ── */
     .panel {
@@ -218,7 +149,6 @@
       overflow: hidden;
     }
     .panel + .panel { margin-top: 12px; }
-    #profileGrid > .panel + .panel { margin-top: 0; }
     .panel-head {
       padding: 12px 16px;
       border-bottom: 1px solid var(--line);
@@ -272,12 +202,10 @@
     /* Basic Info rows */
     .info-row {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 12px; margin: 0 -12px;
-      font-size: 13px; border-radius: 8px;
-      transition: background .1s;
+      padding: 10px 0; border-bottom: 1px solid var(--line);
+      font-size: 13px;
     }
-    .info-row.copyable { cursor: pointer; }
-    .info-row.copyable:hover { background: rgba(139,108,255,.05); }
+    .info-row:last-child { border-bottom: none; }
     .info-key { color: var(--muted); min-width: 120px; font-size: 12px; }
     .info-val { display: flex; align-items: center; gap: 8px; text-align: right; }
 
@@ -307,7 +235,7 @@
     }
     .train-detail-row {
       display: grid; grid-template-columns: 100px 80px 1fr 1fr; align-items: center; gap: 12px;
-      padding: 8px 0;
+      padding: 8px 0; border-bottom: 1px solid var(--line);
       font-size: 12px;
     }
     .train-detail-row:last-child { border-bottom: none; }
@@ -345,7 +273,6 @@
       padding: 1px 5px; border-radius: 6px;
       font-size: 8px; font-weight: 700; letter-spacing: .3px;
       text-transform: uppercase; white-space: nowrap;
-      max-width: 100%; overflow: hidden; text-overflow: ellipsis;
     }
     .day-tag.shift { background: var(--good-dim); color: var(--good); border: 1px solid var(--good-border); }
     .day-tag.training { background: var(--cyan-dim); color: var(--cyan); border: 1px solid var(--cyan-border); }
@@ -364,7 +291,7 @@
     }
     .entry-card .entry-left { flex: 1; }
     .entry-card .entry-date { font-size: 11px; color: var(--muted); }
-    .entry-card .entry-note { font-size: 14px; margin-top: 6px; white-space: pre-wrap; word-break: break-word; line-height: 1.5; }
+    .entry-card .entry-note { font-size: 12px; margin-top: 4px; white-space: pre-wrap; word-break: break-word; }
     .entry-card .entry-actions { display: flex; gap: 4px; flex-shrink: 0; }
 
     /* ── NOTE CARDS ── */
@@ -376,7 +303,7 @@
       margin-bottom: 8px;
     }
     .note-card .note-date { font-size: 11px; color: var(--muted); }
-    .note-card .note-text { font-size: 14px; margin-top: 6px; white-space: pre-wrap; word-break: break-word; line-height: 1.5; }
+    .note-card .note-text { font-size: 12px; margin-top: 4px; white-space: pre-wrap; word-break: break-word; }
 
     /* ── HOURS CHART ── */
     .chart-bar-wrap { display: flex; flex-direction: column; gap: 4px; }
@@ -478,18 +405,19 @@
     .cand-votes .no { color: var(--bad); font-weight: 700; }
 
     .iq-card {
-      padding: 14px 16px;
+      padding: 10px 12px;
       border: 1px solid var(--line);
       border-radius: var(--r);
       background: rgba(20,26,34,.4);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      font-size: 12px;
     }
-    .iq-card .iq-q { font-weight: 700; margin-bottom: 6px; font-size: 14px; line-height: 1.4; }
-    .iq-card .iq-a { color: var(--text); white-space: pre-wrap; word-break: break-word; font-size: 14px; line-height: 1.6; }
+    .iq-card .iq-q { font-weight: 700; margin-bottom: 4px; }
+    .iq-card .iq-a { color: var(--muted); white-space: pre-wrap; word-break: break-word; }
 
     .vote-row {
       display: flex; align-items: center; gap: 8px;
-      padding: 6px 0;
+      padding: 6px 0; border-bottom: 1px solid var(--line);
       font-size: 12px;
     }
     .vote-row:last-child { border-bottom: none; }
@@ -534,182 +462,70 @@
 
     .hidden { display: none !important; }
 
-    /* ── COLLAPSIBLE SOP CARDS ── */
-    .sop-card {
-      border: 1px solid var(--line);
-      border-radius: var(--r);
-      background: rgba(20,26,34,.4);
-      margin-bottom: 8px;
-      overflow: hidden;
-    }
-    .sop-header {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 12px 14px; cursor: pointer;
-      transition: background .1s;
-    }
-    .sop-header:hover { background: rgba(139,108,255,.04); }
-    .sop-title { font-weight: 900; font-size: 13px; display: flex; align-items: center; gap: 8px; }
-    .sop-chevron {
-      width: 14px; height: 14px; transition: transform .2s;
-      color: var(--muted); flex-shrink: 0;
-    }
-    .sop-card.open .sop-chevron { transform: rotate(90deg); }
-    .sop-body {
-      display: none; padding: 0 16px 16px;
-      font-size: 14px; white-space: pre-wrap; word-break: break-word;
-      color: var(--text); line-height: 1.6;
-    }
-    .sop-card.open .sop-body { display: block; }
-
-    @media (max-width: 768px) {
-      .hamburger { display: flex; }
-      .collapse-btn { display: none; }
-      .sidebar { transform: translateX(-100%); width: 220px; }
-      .sidebar.collapsed { width: 220px; }
-      .sidebar.mobile-open { transform: translateX(0); }
-      main { margin-left: 0 !important; padding-top: 56px; max-width: 100%; }
+    @media (max-width: 600px) {
       .hub-grid { grid-template-columns: 1fr; }
       .card { min-height: 90px; }
       .cand-grid { grid-template-columns: 1fr; }
-      #profileGrid { grid-template-columns: 1fr !important; }
     }
   </style>
 </head>
 <body>
 
-  <!-- HAMBURGER (mobile) -->
-  <div class="hamburger" id="hamburger">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-  </div>
-  <div class="mobile-overlay" id="mobileOverlay"></div>
-
-  <!-- SIDEBAR -->
-  <nav class="sidebar" id="sidebar">
-    <div class="collapse-btn" id="collapseBtn" title="Collapse sidebar">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-    </div>
-
-    <div class="sidebar-logo" id="sidebarHome" title="Home">
-      <img class="logo-img" src="logo_white.png" alt="DC" onerror="this.outerHTML='<div class=\'gem\' style=\'width:12px;height:12px;flex-shrink:0\'></div>'"/>
-      <div class="logo-text">
-        <span class="logo-title">Diamond Casino</span>
-        <span class="logo-sub" id="sidebarCount">Staff Tracker</span>
+  <header>
+    <div class="wrap">
+      <div class="hdr-top">
+        <div class="brand">
+          <div class="gem"></div>
+          <span class="brand-name">Diamond Casino</span>
+          <span class="brand-sub" id="saveState">saved locally</span>
+        </div>
+        <div class="hdr-actions">
+          <button class="btn-ghost btn-sm" id="overviewBtn">Hours Overview</button>
+          <button class="btn-ghost btn-sm" id="mgmtCalBtn">Mgmt Calendar</button>
+          <button class="btn-ghost btn-sm" id="promoBtn">Promo / EOTM</button>
+          <button class="btn-ghost btn-sm" id="interviewBtn">Interviews</button>
+          <button class="btn-ghost btn-sm" id="leadershipBtn">Leadership</button>
+          <button class="btn-ghost btn-sm" id="auditLogBtn">Audit Log</button>
+          <button class="btn-ghost btn-sm" id="templatesBtn">Templates</button>
+          <button class="btn-ghost btn-sm" id="importCsvBtn">Import CSV</button>
+          <input type="file" id="csvFile" accept=".csv,text/csv" style="display:none">
+          <button class="btn-ghost btn-sm" id="exportBtn">Export</button>
+          <button class="btn-ghost btn-sm" id="importBackupBtn">Import</button>
+          <input type="file" id="backupFile" accept="application/json" style="display:none">
+          <button class="btn-accent btn-sm" id="addPersonBtn">+ Person</button>
+          <button class="btn-ghost btn-sm" id="backBtn" style="display:none;">← Back</button>
+        </div>
+      </div>
+      <div class="search-bar" id="searchBar">
+        <input id="search" placeholder="Search name, callsign, steam..." />
+        <select id="sort">
+          <option value="az">A → Z</option>
+          <option value="dc">DC Number</option>
+          <option value="month_desc">Hours: High → Low</option>
+          <option value="month_asc">Hours: Low → High</option>
+          <option value="total_desc">Total: High → Low</option>
+          <option value="total_asc">Total: Low → High</option>
+          <option value="recent">Most Recent</option>
+          <option value="least_recent">Least Recent</option>
+        </select>
+        <select id="rankFilter">
+          <option value="">All Ranks</option>
+          <option value="Trainee">Trainee</option>
+          <option value="Employee">Employee</option>
+          <option value="Senior Employee">Senior Employee</option>
+          <option value="Supervisor">Supervisor</option>
+          <option value="Manager">Manager</option>
+          <option value="Director">Director</option>
+        </select>
+        <button class="btn-ghost btn-sm" id="inactiveBtn">Inactive</button>
+        <button class="btn-ghost btn-sm" id="needsTrainBtn">Needs Training</button>
+        <button class="btn-ghost btn-sm" id="pastBtn">Graveyard</button>
+        <button class="btn-danger btn-sm" id="resetBtn">Reset</button>
       </div>
     </div>
-
-    <div class="nav-section">
-      <div class="nav-label">Pages</div>
-
-      <div class="nav-item active" id="navHub" title="Staff Hub">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        <span class="nav-item-text">Staff Hub</span>
-      </div>
-      <div class="nav-item" id="overviewBtn" title="Hours Overview">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
-        <span class="nav-item-text">Hours Overview</span>
-      </div>
-      <div class="nav-item" id="mgmtCalBtn" title="Calendar">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        <span class="nav-item-text">Calendar</span>
-      </div>
-      <div class="nav-item" id="promoBtn" title="Promo / EOTM">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        <span class="nav-item-text">Promo / EOTM</span>
-        <span class="nav-badge" id="promoBadge" style="display:none"></span>
-      </div>
-      <div class="nav-item" id="leadershipBtn" title="Leadership">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-        <span class="nav-item-text">Leadership</span>
-      </div>
-      <div class="nav-item" id="interviewBtn" title="Interviews">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <span class="nav-item-text">Interviews</span>
-      </div>
-      <div class="nav-item" id="templatesBtn" title="Templates">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-        <span class="nav-item-text">Templates</span>
-      </div>
-      <div class="nav-item" id="sopBtn" title="SOPs & Training">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-        <span class="nav-item-text">SOPs & Training</span>
-      </div>
-      <div class="nav-item" id="auditLogBtn" title="Audit Log">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        <span class="nav-item-text">Audit Log</span>
-      </div>
-
-      <div class="nav-divider"></div>
-      <div class="nav-label">Tools</div>
-
-      <div class="nav-item" id="addPersonBtn" title="Add Person">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-        <span class="nav-item-text">+ Person</span>
-      </div>
-      <div class="nav-item" id="dcNumbersBtn" title="DC Numbers">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9h16"/><path d="M4 15h16"/><path d="M10 3v18"/><path d="M16 3v18"/></svg>
-        <span class="nav-item-text">DC Numbers</span>
-      </div>
-      <div class="nav-item" id="importCsvBtn" title="Import CSV">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <span class="nav-item-text">Import CSV</span>
-      </div>
-      <input type="file" id="csvFile" accept=".csv,text/csv" style="display:none">
-      <div class="nav-item" id="exportBtn" title="Export Backup">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        <span class="nav-item-text">Export Backup</span>
-      </div>
-      <div class="nav-item" id="importBackupBtn" title="Import Backup">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 15v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <span class="nav-item-text">Import Backup</span>
-      </div>
-      <input type="file" id="backupFile" accept="application/json" style="display:none">
-      <div class="nav-item" id="resetBtn" title="Reset" style="color:var(--bad)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-        <span class="nav-item-text">Reset</span>
-      </div>
-    </div>
-
-    <div class="sidebar-user" id="sidebarUser" style="display:none">
-      <div class="user-avatar" id="userAvatar">?</div>
-      <div class="user-info">
-        <div class="user-name" id="userName">—</div>
-        <div class="user-rank" id="userRank">—</div>
-      </div>
-      <span class="user-signout" id="signOutBtn" title="Sign out">Sign out</span>
-    </div>
-  </nav>
+  </header>
 
   <main>
-    <!-- Save state indicator -->
-    <span id="saveState" style="display:none">saved locally</span>
-
-    <!-- SEARCH BAR (hub only) -->
-    <div class="search-bar" id="searchBar">
-      <input id="search" placeholder="Search name, callsign, steam..." />
-      <select id="sort">
-        <option value="az">A → Z</option>
-        <option value="dc">DC Number</option>
-        <option value="month_desc">Hours: High → Low</option>
-        <option value="month_asc">Hours: Low → High</option>
-        <option value="total_desc">Total: High → Low</option>
-        <option value="total_asc">Total: Low → High</option>
-        <option value="recent">Most Recent</option>
-        <option value="least_recent">Least Recent</option>
-      </select>
-      <select id="rankFilter">
-        <option value="">All Ranks</option>
-        <option value="Trainee">Trainee</option>
-        <option value="Employee">Employee</option>
-        <option value="Senior Employee">Senior Employee</option>
-        <option value="Supervisor">Supervisor</option>
-        <option value="Manager">Manager</option>
-        <option value="Director">Director</option>
-      </select>
-      <button class="btn-ghost btn-sm" id="inactiveBtn">Inactive</button>
-      <button class="btn-ghost btn-sm" id="needsTrainBtn">Needs Training</button>
-      <button class="btn-ghost btn-sm" id="pastBtn">Graveyard</button>
-    </div>
-
     <!-- HUB -->
     <section id="hubView">
       <div class="hub-grid" id="cards"></div>
@@ -757,7 +573,7 @@
     <section id="mgmtCalView" style="display:none;">
       <div class="panel">
         <div class="panel-head">
-          <div class="h">Calendar</div>
+          <div class="h">Management Calendar</div>
           <div class="row tight" style="gap:6px">
             <button class="btn-ghost btn-sm" id="mcPrev">←</button>
             <span class="pill" id="mcMonthLabel">Month</span>
@@ -788,13 +604,6 @@
         <div class="panel-head">
           <div class="h">Leadership Activity</div>
           <div class="row tight" style="gap:6px;flex-wrap:wrap">
-            <select id="laSort" style="padding:4px 8px;font-size:11px">
-              <option value="az">A → Z</option>
-              <option value="rank">By Rank</option>
-              <option value="most">Most Active</option>
-              <option value="least">Least Active</option>
-              <option value="recent">Most Recent</option>
-            </select>
             <div class="muted small">From:</div>
             <input type="date" id="laFrom" style="padding:4px 8px;font-size:11px"/>
             <div class="muted small">To:</div>
@@ -820,16 +629,13 @@
 
     <!-- INTERVIEWS -->
     <section id="interviewView" style="display:none;">
-      <!-- Question Template Editor (collapsible) -->
+      <!-- Question Template Editor -->
       <div class="panel">
-        <div class="panel-head" style="cursor:pointer" id="ivQuestionsToggle">
-          <div style="display:flex;align-items:center;gap:8px">
-            <svg class="sop-chevron" id="ivQChevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="width:14px;height:14px;color:var(--muted);transition:transform .2s"><polyline points="9 18 15 12 9 6"/></svg>
-            <div class="h">Interview Questions (Template)</div>
-          </div>
+        <div class="panel-head">
+          <div class="h">Interview Questions (Template)</div>
           <button class="btn-ghost btn-sm" id="editQuestionsBtn">Edit Questions</button>
         </div>
-        <div class="panel-body" id="questionsBody" style="display:none"></div>
+        <div class="panel-body" id="questionsBody"></div>
       </div>
 
       <!-- Candidates -->
@@ -851,41 +657,27 @@
       </div>
     </section>
 
-    <!-- SOPs & TRAINING GUIDES -->
-    <section id="sopView" style="display:none;">
-      <div class="panel">
-        <div class="panel-head">
-          <div class="h">SOPs & Training Guides</div>
-          <button class="btn-accent btn-sm" id="addSopBtn" style="display:none">+ Guide</button>
-        </div>
-        <div class="panel-body" id="sopBody"></div>
-      </div>
-    </section>
-
     <!-- PROFILE -->
     <section id="profileView" style="display:none;">
       <!-- Profile header -->
       <div class="panel" id="profilePanel"></div>
 
-      <!-- Basic Info + Training (side by side) -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch;margin-top:12px;margin-bottom:12px" id="profileGrid">
-        <div class="panel">
-          <div class="panel-head">
-            <div class="h">Basic Info</div>
-            <button class="btn-ghost btn-sm" id="editPersonBtn">Edit</button>
-          </div>
-          <div class="panel-body" id="basicInfo"></div>
+      <!-- Basic Info -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="h">Basic Info</div>
+          <button class="btn-ghost btn-sm" id="editPersonBtn">Edit</button>
         </div>
-        <div class="panel">
-          <div class="panel-head">
-            <div class="h">Training</div>
-            <div style="display:flex;gap:6px;align-items:center">
-              <div class="train-overview" id="trainSnap"></div>
-              <button class="btn-ghost btn-sm" id="editTrainingBtn">Edit</button>
-            </div>
-          </div>
-          <div class="panel-body" id="training"></div>
+        <div class="panel-body" id="basicInfo"></div>
+      </div>
+
+      <!-- Training -->
+      <div class="panel">
+        <div class="panel-head">
+          <div class="h">Training</div>
+          <div class="train-overview" id="trainSnap"></div>
         </div>
+        <div class="panel-body" id="training"></div>
       </div>
 
       <!-- Calendar -->
@@ -996,6 +788,32 @@ const auth = firebase.auth();
 const googleProvider = new firebase.auth.GoogleAuthProvider();
 
 // ═══════════════════════════════════════════
+// FIREBASE CONNECTION MONITORING
+// ═══════════════════════════════════════════
+let fbConnected = false;
+let pendingSave = false;
+
+db.ref('.info/connected').on('value', snap => {
+  fbConnected = !!snap.val();
+  const el = document.getElementById('saveState');
+  if(!el) return;
+  if(fbConnected){
+    el.textContent = pendingSave ? 'reconnected — saving...' : 'connected';
+    el.style.color = '';
+    el.removeAttribute('data-warn');
+    // If we have unsaved changes, push them now
+    if(pendingSave){
+      pendingSave = false;
+      save();
+    }
+  } else {
+    el.textContent = '⚠ disconnected — click to reconnect';
+    el.style.color = '#ff6b6b';
+    el.setAttribute('data-warn','1');
+  }
+});
+
+// ═══════════════════════════════════════════
 // AUTH & PERMISSIONS
 // ═══════════════════════════════════════════
 let currentUser = null; // the person record of the logged-in user
@@ -1073,13 +891,12 @@ function showSetupFlow(user){
 
 function showLoginOverlay(){
   document.getElementById('loginOverlay').style.display='flex';
-  document.getElementById('sidebar').style.display='none';
+  document.querySelector('header').style.display='none';
   document.querySelector('main').style.display='none';
-  document.getElementById('hamburger').style.display='none';
 }
 function hideLoginOverlay(){
   document.getElementById('loginOverlay').style.display='none';
-  document.getElementById('sidebar').style.display='';
+  document.querySelector('header').style.display='';
   document.querySelector('main').style.display='';
 }
 
@@ -1109,7 +926,7 @@ function logAction(action, targetId, detail){
 // CONFIG
 // ═══════════════════════════════════════════
 const STORE_KEY = "casinoTracker.local.v8";
-const TZ = Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Chicago";
+const TZ = "America/Chicago";
 
 const MIN_SHIFT_MINUTES = 30;
 const MONTHLY_MIN_HOURS = 4;
@@ -1135,7 +952,6 @@ function nextRank(current){
 }
 function promotePerson(pid){
   const p=getPerson(pid);if(!p) return;
-  if(!canPromoteFire(p)){toast("Insufficient rank");return;}
   const nr=nextRank(p.rank);
   if(!nr){toast("Already at max rank");return;}
   if(!confirm(`Promote ${p.character||'this person'} from ${p.rank||'(none)'} to ${nr}?`)) return;
@@ -1148,108 +964,10 @@ function promotePerson(pid){
 }
 function dcNumberFromCallsign(cs){
   const c = (cs||"").toUpperCase().replace(/\s+/g,"");
-  const m = c.match(/^DC-?0?(\d{1,3})$/);
+  const m = c.match(/^DC-?0?(\d{1,2})$/);
   if(!m) return Infinity;
   const n = parseInt(m[1],10);
   return isNaN(n) ? Infinity : n;
-}
-
-function nextAvailableDC(){
-  const used=new Set();
-  for(const p of state.people){
-    if(p.archived) continue;
-    const n=dcNumberFromCallsign(p.callsign);
-    if(n!==Infinity) used.add(n);
-  }
-  for(let i=21;i<=999;i++){
-    if(!used.has(i)) return `DC-${i}`;
-  }
-  return '';
-}
-
-function openDCNumbersModal(){
-  // Build a map of all DC numbers in use
-  const assigned=[];
-  const archivedDCs=[];
-  for(const p of state.people){
-    const n=dcNumberFromCallsign(p.callsign);
-    if(n===Infinity) continue;
-    if(p.archived) archivedDCs.push({n,p});
-    else assigned.push({n,p});
-  }
-  assigned.sort((a,b)=>a.n-b.n);
-  archivedDCs.sort((a,b)=>a.n-b.n);
-
-  // Find available slots 21+
-  const usedActive=new Set(assigned.map(x=>x.n));
-  const available=[];
-  for(let i=21;i<=Math.max(60,...assigned.map(x=>x.n+5));i++){
-    if(!usedActive.has(i)) available.push(i);
-  }
-
-  // Management block (1-20)
-  const mgmtSlots=[];
-  for(let i=1;i<=20;i++){
-    const owner=assigned.find(x=>x.n===i);
-    mgmtSlots.push({n:i,owner:owner?.p||null});
-  }
-
-  // Staff block (21+)
-  const staffSlots=assigned.filter(x=>x.n>=21);
-
-  let html=`<div style="display:flex;gap:6px;margin-bottom:12px;align-items:center">
-    <span class="pill accent">Next available: ${escapeHtml(nextAvailableDC()||'None')}</span>
-    <span class="pill">${assigned.length} active</span>
-    <span class="pill">${available.length} open (21+)</span>
-  </div>`;
-
-  // Management grid
-  html+=`<div style="font-weight:700;font-size:12px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">Management (DC 1-20)</div>`;
-  html+=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px;margin-bottom:16px">`;
-  for(const s of mgmtSlots){
-    const filled=!!s.owner;
-    const bg=filled?'var(--accent-dim)':'var(--surface)';
-    const border=filled?'var(--accent-mid)':'var(--line)';
-    const name=filled?escapeHtml(s.owner.character||s.owner.steamName||'Unknown'):'<span style="color:var(--muted)">Open</span>';
-    const rank=filled?`<span style="font-size:10px;color:var(--muted)">${escapeHtml(s.owner.rank||'')}</span>`:'';
-    html+=`<div style="padding:8px 10px;border:1px solid ${border};border-radius:8px;background:${bg};font-size:12px;display:flex;justify-content:space-between;align-items:center">
-      <div><span style="font-weight:900;color:var(--accent);margin-right:6px">DC-${s.n}</span>${name}</div>
-      ${rank}
-    </div>`;
-  }
-  html+=`</div>`;
-
-  // Staff grid
-  html+=`<div style="font-weight:700;font-size:12px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">Staff (DC 21+)</div>`;
-  html+=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px;margin-bottom:16px">`;
-  for(const s of staffSlots){
-    html+=`<div style="padding:8px 10px;border:1px solid var(--good-border);border-radius:8px;background:var(--good-dim);font-size:12px;display:flex;justify-content:space-between;align-items:center">
-      <div><span style="font-weight:900;color:var(--good);margin-right:6px">DC-${s.n}</span>${escapeHtml(s.p.character||s.p.steamName||'Unknown')}</div>
-      <span style="font-size:10px;color:var(--muted)">${escapeHtml(s.p.rank||'')}</span>
-    </div>`;
-  }
-  html+=`</div>`;
-
-  // Available slots
-  html+=`<div style="font-weight:700;font-size:12px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">Available (DC 21+)</div>`;
-  html+=`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px">`;
-  for(const n of available.slice(0,30)){
-    html+=`<span class="pill" style="font-size:11px;font-weight:700">DC-${n}</span>`;
-  }
-  if(available.length>30) html+=`<span class="pill" style="font-size:11px">+${available.length-30} more</span>`;
-  html+=`</div>`;
-
-  // Archived (recycled numbers)
-  if(archivedDCs.length){
-    html+=`<div style="font-weight:700;font-size:12px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">Archived (numbers recycled)</div>`;
-    html+=`<div style="display:flex;flex-wrap:wrap;gap:4px">`;
-    for(const s of archivedDCs){
-      html+=`<span class="pill bad" style="font-size:10px">DC-${s.n} ${escapeHtml(s.p.character||'')}</span>`;
-    }
-    html+=`</div>`;
-  }
-
-  openModal("DC Number Map",html,{wide:true});
 }
 
 // ═══════════════════════════════════════════
@@ -1355,15 +1073,6 @@ function dateInputToISOStart(ymd){ const m=(ymd||'').match(/^(\d{4})-(\d{2})-(\d
 function dateInputToISOEnd(ymd){ const m=(ymd||'').match(/^(\d{4})-(\d{2})-(\d{2})$/); if(!m) return null; return new Date(+m[1],+m[2]-1,+m[3],23,59,59,999).toISOString(); }
 function dateValueFromStored(s){ if(!s) return ''; if(s.includes('T')) return dateValueFromISO(s); if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s; return ''; }
 
-function fmtTime(iso){
-  if(!iso) return '';
-  return new Intl.DateTimeFormat("en-US",{timeZone:TZ,hour:"numeric",minute:"2-digit"}).format(new Date(iso));
-}
-function makeStartISO(dateStr,timeStr){
-  if(!dateStr||!timeStr) return '';
-  return new Date(`${dateStr}T${timeStr}:00`).toISOString();
-}
-
 // ═══════════════════════════════════════════
 // CSV PARSER
 // ═══════════════════════════════════════════
@@ -1396,7 +1105,6 @@ function seed(){
     trainingNotes:[],
     mgmtEvents:[],
     templates:[],
-    sops:[],
     interviewQuestions:[
       "Tell me about one of your favorite moments here in the city.",
       "Which three words would you use to describe The Diamond Casino & Resort?",
@@ -1414,7 +1122,7 @@ function ensureState(data){
   if(!data||!Array.isArray(data.people)) return seed();
   data.clockEvents||=[];data.loas||=[];data.entries||=[];data.notesEntries||=[];data.eotmHistory||=[];
   data.calendarEvents||=[];data.trainingNotes||=[];data.mgmtEvents||=[];
-  data.templates||=[];data.sops||=[];data.candidates||=[];data.graceMonth||="";data.auditLog||=[];
+  data.templates||=[];data.candidates||=[];data.graceMonth||="";data.auditLog||=[];
   data.interviewQuestions||=[
     "Tell me about one of your favorite moments here in the city.",
     "Which three words would you use to describe The Diamond Casino & Resort?",
@@ -1433,59 +1141,92 @@ function ensureState(data){
 let state = seed();
 let firebaseReady = false;
 
-// Save to Firebase (debounced)
+// Save to Firebase (debounced) with connection awareness
 function save(){
-  // Also keep localStorage as fallback
+  // Always keep localStorage as fallback
   try{ localStorage.setItem("casinoTracker.local.v8", JSON.stringify(state)); }catch{}
 
+  // If Firebase isn't connected, mark as pending and save locally only
+  if(!fbConnected){
+    pendingSave = true;
+    $("#saveState").textContent="⚠ saved locally — waiting for connection";
+    $("#saveState").style.color="#ff6b6b";
+    return;
+  }
+
   $("#saveState").textContent="saving...";
+  $("#saveState").style.color="";
   clearTimeout(save._t);
   save._t = setTimeout(()=>{
+    // Set a timeout — if Firebase doesn't confirm in 8 seconds, something's wrong
+    let confirmed = false;
+    const saveTimeout = setTimeout(()=>{
+      if(!confirmed){
+        pendingSave = true;
+        $("#saveState").textContent="⚠ save timed out — retrying...";
+        $("#saveState").style.color="#ff6b6b";
+        console.warn("Firebase save timed out after 8s — will retry on reconnect");
+        // Force Firebase to reconnect
+        db.goOffline();
+        setTimeout(()=>db.goOnline(), 1000);
+      }
+    }, 8000);
+
     dbRef.set(state).then(()=>{
-      $("#saveState").textContent="saved to cloud";
+      confirmed = true;
+      clearTimeout(saveTimeout);
+      $("#saveState").textContent="✓ synced";
+      $("#saveState").style.color="#4ade80";
       clearTimeout(save._t2);
-      save._t2=setTimeout(()=>$("#saveState").textContent="synced",1500);
+      save._t2=setTimeout(()=>{
+        $("#saveState").textContent="connected";
+        $("#saveState").style.color="";
+      },2000);
       updatePromoBadge();
-      updateEmployeeCount();
     }).catch(err=>{
+      confirmed = true;
+      clearTimeout(saveTimeout);
       console.error("Firebase save error:",err);
-      $("#saveState").textContent="save failed!";
+      $("#saveState").textContent="⚠ save failed!";
+      $("#saveState").style.color="#ff6b6b";
+      pendingSave = true;
     });
   }, 400);
 }
 
 // Boot: load from Firebase, fall back to localStorage, then start
-const DEV_MODE = new URLSearchParams(window.location.search).has('dev');
-
 function boot(){
-  // Dev mode: skip auth, load data, go straight in
-  if(DEV_MODE){
-    $("#saveState").textContent="dev mode";
-    hideLoginOverlay();
-    // Try Firebase first, fall back to localStorage
-    dbRef.once('value').then(snap=>{
-      const data=snap.val();
-      if(data && data.people){ state=ensureState(data); firebaseReady=true; $("#saveState").textContent="dev · synced"; }
-      else { try{ const local=localStorage.getItem("casinoTracker.local.v8"); if(local) state=ensureState(JSON.parse(local)); }catch{} firebaseReady=true; }
-      updateHeaderUser(); updateEmployeeCount(); startApp();
-    }).catch(()=>{
-      try{ const local=localStorage.getItem("casinoTracker.local.v8"); if(local) state=ensureState(JSON.parse(local)); }catch{}
-      firebaseReady=true; $("#saveState").textContent="dev · offline";
-      updateHeaderUser(); updateEmployeeCount(); startApp();
-    });
-    return;
-  }
-
   $("#saveState").textContent="connecting...";
+  $("#saveState").style.color="";
   showLoginOverlay();
+
+  // Set a boot timeout — if Firebase doesn't respond in 10s, go offline
+  const bootTimeout = setTimeout(()=>{
+    console.warn("Firebase boot timed out after 10s — loading from localStorage");
+    try{
+      const local=localStorage.getItem("casinoTracker.local.v8");
+      if(local) state=ensureState(JSON.parse(local));
+    }catch{}
+    firebaseReady=true;
+    $("#saveState").textContent="⚠ offline — using local data";
+    $("#saveState").style.color="#ff6b6b";
+    pendingSave = true; // flag so reconnect will push local state
+    initAuth();
+  }, 10000);
 
   // Load data first, then handle auth
   dbRef.once('value').then(snap=>{
+    clearTimeout(bootTimeout);
     const data=snap.val();
     if(data && data.people){
       state=ensureState(data);
       firebaseReady=true;
-      $("#saveState").textContent="synced";
+      $("#saveState").textContent="✓ synced";
+      $("#saveState").style.color="#4ade80";
+      setTimeout(()=>{
+        $("#saveState").textContent="connected";
+        $("#saveState").style.color="";
+      }, 2000);
     } else {
       let migrated=false;
       try{
@@ -1508,13 +1249,16 @@ function boot(){
     }
     initAuth();
   }).catch(err=>{
+    clearTimeout(bootTimeout);
     console.error("Firebase load error:",err);
     try{
       const local=localStorage.getItem("casinoTracker.local.v8");
       if(local) state=ensureState(JSON.parse(local));
     }catch{}
     firebaseReady=true;
-    $("#saveState").textContent="offline mode";
+    $("#saveState").textContent="⚠ offline mode";
+    $("#saveState").style.color="#ff6b6b";
+    pendingSave = true;
     initAuth();
   });
 }
@@ -1571,38 +1315,24 @@ function initAuth(){
 }
 
 function updateHeaderUser(){
-  const userEl=document.getElementById('sidebarUser');
-  if(!currentUser){ if(userEl) userEl.style.display='none'; return; }
-  if(userEl) userEl.style.display='';
-  const avatar=document.getElementById('userAvatar');
-  const name=document.getElementById('userName');
-  const rank=document.getElementById('userRank');
-  const charName=currentUser.character||currentAuth?.email||'';
-  if(avatar){ const initials=(charName||'?').split(' ').map(w=>w[0]||'').join('').slice(0,2).toUpperCase(); avatar.textContent=initials; }
-  if(name) name.textContent=charName;
-  if(rank) rank.textContent=currentUser.rank||'';
-}
-function updateEmployeeCount(){
-  const el=document.getElementById('sidebarCount');
-  if(!el) return;
-  const count=state.people.filter(p=>!p.archived).length;
-  el.textContent=`Staff Tracker · ${count}`;
+  const existing=document.getElementById('userInfoSpan');
+  if(existing) existing.remove();
+  if(!currentUser) return;
+  const span=document.createElement('span');
+  span.id='userInfoSpan';
+  span.style.cssText='font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px';
+  span.innerHTML=escapeHtml(currentUser.character||currentAuth?.email||'')+' <span style="color:var(--accent);font-weight:700;font-size:10px">'+escapeHtml(currentUser.rank||'')+'</span> <button class="btn-ghost btn-sm" id="signOutBtn" style="font-size:10px;padding:3px 8px">Sign Out</button>';
+  document.querySelector('.brand')?.appendChild(span);
+  document.getElementById('signOutBtn')?.addEventListener('click',()=>{ auth.signOut(); });
 }
 
 function applyPermissions(){
   if(!currentUser) return;
   const level=rankLevel(currentUser.rank);
-  // Visibility rules:
-  // Employee/Senior (0-2): own profile + SOPs only. navHub shows but renderHub gates to own profile.
-  // Supervisor (3): everything except Audit Log
-  // Manager (4): everything except Audit Log
-  // Director (5): everything
   const gatedBtns={
-    navHub:0, sopBtn:0,
     overviewBtn:3, mgmtCalBtn:3, promoBtn:3, interviewBtn:3,
-    leadershipBtn:3, templatesBtn:3,
-    auditLogBtn:5,
-    importCsvBtn:3, exportBtn:3, importBackupBtn:3, addPersonBtn:3, dcNumbersBtn:3, resetBtn:5
+    leadershipBtn:4, auditLogBtn:4, templatesBtn:3,
+    importCsvBtn:3, exportBtn:3, importBackupBtn:3, addPersonBtn:3, resetBtn:5
   };
   for(const [id,minLevel] of Object.entries(gatedBtns)){
     const el=document.getElementById(id);
@@ -1610,32 +1340,8 @@ function applyPermissions(){
   }
 }
 
-// Can this user edit/manage the target person's profile?
-function canEditProfile(targetPerson){
-  if(!currentUser) return true; // dev mode / no auth
-  if(DEV_MODE) return true;
-  const myLevel=rankLevel(currentUser.rank);
-  const theirLevel=rankLevel(targetPerson?.rank||'');
-  if(myLevel>=5) return true; // Director = god mode
-  if(myLevel<3) return false; // Employee/Senior = view only
-  return myLevel>theirLevel; // Must outrank to edit
-}
-
-// Can this user promote/fire the target?
-function canPromoteFire(targetPerson){
-  if(!currentUser) return true;
-  if(DEV_MODE) return true;
-  const myLevel=rankLevel(currentUser.rank);
-  const theirLevel=rankLevel(targetPerson?.rank||'');
-  if(myLevel>=5) return true; // Director
-  if(myLevel<3) return false; // Employee/Senior
-  return myLevel>theirLevel; // Supervisor can do Employee/Senior, Manager can do up to Supervisor
-}
-
 function startApp(){
   if(currentUser && isReadOnly()){
-    // Employees can see their own profile or SOPs
-    if(state.ui?.view==='sops'){ renderSOPs(); return; }
     state.selectedId=currentUser.id;
     state.ui.view='profile';
     renderProfile();
@@ -1648,12 +1354,14 @@ function startApp(){
   else if(state.ui?.view==="interviews") renderInterviews();
   else if(state.ui?.view==="leadership") renderLeadership();
   else if(state.ui?.view==="auditlog") renderAuditLog();
-  else if(state.ui?.view==="sops") renderSOPs();
   else if(state.selectedId) renderProfile();
   else renderHub();
   updatePromoBadge();
-  updateEmployeeCount();
 }
+
+
+// ═══════════════════════════════════════════
+// MODAL
 // ═══════════════════════════════════════════
 function openModal(title,html,opts={}){
   const modal=document.querySelector('.modal');
@@ -1688,7 +1396,7 @@ function notesForPerson(pid){ return (state.notesEntries||[]).filter(n=>n.person
 function trainingNotesForPerson(pid){ return (state.trainingNotes||[]).filter(n=>n.personId===pid).slice().sort((a,b)=>new Date(b.dateISO)-new Date(a.dateISO)); }
 function calEventsForPerson(pid){ return (state.calendarEvents||[]).filter(e=>e.personId===pid).slice().sort((a,b)=>new Date(a.dateISO)-new Date(b.dateISO)); }
 
-function normalizeKind(k){ const v=(k||'').trim(); if(!v) return 'Commendation'; if(v==='Correction') return 'Correction'; if(v==='Comment') return 'Commendation'; if(v==='Discipline') return 'Strike'; if(v==='Fired'||v==='Resigned'||v==='Hired') return v; return v; }
+function normalizeKind(k){ const v=(k||'').trim(); if(!v) return 'Commendation'; if(v==='Correction') return 'Correction'; if(v==='Comment') return 'Commendation'; if(v==='Discipline') return 'Strike'; return v; }
 function isStrike(e){ return normalizeKind(e.kind)==="Strike"; }
 function strikesInMonth(pid,md){ const f=startOfMonth(md),t=endOfMonth(md); return entriesForPerson(pid).filter(e=>isStrike(e)).filter(e=>{const d=new Date(e.dateISO);return d>=f&&d<t;}).length; }
 
@@ -1958,11 +1666,11 @@ function countReadyTrainees(){
   }).length;
 }
 function updatePromoBadge(){
-  const badge=document.getElementById('promoBadge');
-  if(!badge) return;
+  const btn=document.getElementById('promoBtn');
+  if(!btn) return;
   const count=countReadyTrainees();
-  if(count>0){ badge.style.display=''; badge.textContent=count; }
-  else { badge.style.display='none'; }
+  btn.textContent=count>0?`Promo / EOTM (${count})`:'Promo / EOTM';
+  btn.className=count>0?'btn-accent btn-sm':'btn-ghost btn-sm';
 }
 function countWarningsSent(pid){
   return (state.entries||[]).filter(e=>e.personId===pid&&e.kind==='Warning Sent').length;
@@ -1972,13 +1680,6 @@ function countWarningsSent(pid){
 // RENDER: HUB
 // ═══════════════════════════════════════════
 function renderHub(){
-  // Employees/Senior Employees can only see their own profile
-  if(currentUser && isReadOnly()){
-    state.selectedId=currentUser.id;
-    state.ui.view='profile';
-    renderProfile();
-    return;
-  }
   $("#hubView").style.display="";
   $("#profileView").style.display="none";
   $("#overviewView").style.display="none";
@@ -1988,14 +1689,12 @@ function renderHub(){
   document.getElementById('interviewView').style.display="none";
   document.getElementById('leadershipView').style.display="none";
   document.getElementById('auditLogView').style.display="none";
-  document.getElementById('sopView').style.display="none";
+  $("#backBtn").style.display="none";
   $("#searchBar").style.display="";
-  updateSidebarActive('hub');
   state.ui.view="hub"; state.selectedId=null;
   // Reset hub to current month always
   state.monthCursor=new Date().toISOString();
   save();
-  updateEmployeeCount();
 
   const q=($("#search").value||"").trim().toLowerCase();
   const sort=$("#sort").value;
@@ -2065,6 +1764,7 @@ function renderHub(){
     else if(a.state==='PENDING') badge=`<span class="pill accent">${it.monthly.countedMs>0?durLabel(it.monthly.countedMs)+' / 4h':'PENDING'}</span>`;
     else badge=`<span class="pill good">ACTIVE</span>`;
     if(it.strikes>=3) badge+=` <span class="pill bad">3 STRIKES</span>`;
+    if(p.mediaTeam) badge+=` <span class="pill" style="border-color:var(--interview-border);background:var(--interview-dim);color:var(--interview);font-size:9px">MEDIA</span>`;
 
     const el=document.createElement("div"); el.className="card";
     const rankLabel=p.rank||'No rank';
@@ -2119,11 +1819,10 @@ function renderOverview(){
   document.getElementById('mgmtCalView').style.display="none";
   document.getElementById('templatesView').style.display="none";
   document.getElementById('interviewView').style.display="none";
+  $("#backBtn").style.display="";
   document.getElementById('auditLogView').style.display="none";
   document.getElementById('leadershipView').style.display="none";
-  document.getElementById('sopView').style.display="none";
   $("#searchBar").style.display="none";
-  updateSidebarActive('overview');
   state.ui.view="overview"; save();
 
   const md=startOfMonth(new Date(state.overviewMonthCursor));
@@ -2188,7 +1887,7 @@ function renderOverview(){
 
     // Name is clickable to copy discord ID, pill is clickable to copy message
     const nameColor=it.isMgmt?'color:var(--accent)':'';
-    const nameClickable=it.discordId?`cursor:pointer`:'';
+    const nameClickable=it.discordId?`cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px`:'';
     const nameData=it.discordId?`data-ov-copy-dc="${escapeHtml(it.discordId)}"`:'';
 
     const pillClickable=(a.state==='WARNING'||a.state==='SEPARATION')?`cursor:pointer`:'';
@@ -2308,10 +2007,9 @@ function renderProfile(){
   document.getElementById('templatesView').style.display="none";
   document.getElementById('interviewView').style.display="none";
   document.getElementById('auditLogView').style.display="none";
+  $("#backBtn").style.display="";
   document.getElementById('leadershipView').style.display="none";
-  document.getElementById('sopView').style.display="none";
   $("#searchBar").style.display="none";
-  updateSidebarActive('');
 
   const monthDate=startOfMonth(new Date(state.profileMonthCursor));
   const monthly=computeMonthly(p.id,monthDate);
@@ -2331,12 +2029,10 @@ function renderProfile(){
   const mediaBadge=p.mediaTeam?`<span class="pill" style="border-color:var(--interview-border);background:var(--interview-dim);color:var(--interview)">Media Team</span>`:'';
   const rehiredBadge=p.rehiredDate?`<span class="pill loa">Rehired: ${escapeHtml(fmtMDY(new Date(p.rehiredDate)))}</span>`:'';
 
-  // Profile header — gate actions by permissions
-  const _canEdit=canEditProfile(p);
-  const _canFire=canPromoteFire(p);
+  // Profile header
   $("#profilePanel").innerHTML=`
     <div class="profile-header">
-      <div style="flex:1">
+      <div>
         <div class="profile-name">${escapeHtml(p.character||"(no name)")}</div>
         <div class="profile-meta">${escapeHtml(p.callsign||"—")} · ${escapeHtml(p.steamName||"—")} · ${escapeHtml(p.rank||"No rank")}</div>
         <div class="profile-pills">
@@ -2347,13 +2043,13 @@ function renderProfile(){
           <span class="pill">Total: ${escapeHtml(durLabel(totalAll))}</span>
           <span class="pill">EOTM: ${escapeHtml(lastEotmLabel(p.id))}</span>
           ${strikeCount>0?`<span class="pill ${strikeCount>=3?'bad':'warn'}">Strikes: ${strikeCount}</span>`:''}
-          ${_canEdit?`<button class="${p.mediaTeam?'btn-accent':'btn-ghost'} btn-sm" id="toggleMediaBtn" style="margin-left:4px">${p.mediaTeam?'Media ✓':'Media'}</button>`:''}
         </div>
       </div>
       <div class="profile-actions">
-        ${_canEdit?`<button class="btn-ghost btn-sm" id="addLOABtn">+ LOA</button>`:''}
-        ${_canEdit&&activity.message?`<button class="btn-accent btn-sm" data-copy-msg="${escapeHtml(activityMsgTemplate(activity.message, p.character))}">Copy ${activity.message} msg</button>`:''}
-        ${_canFire?`<button class="btn-danger btn-sm" id="deletePersonBtn">Archive</button>`:''}
+        <button class="btn-ghost btn-sm" id="addLOABtn">+ LOA</button>
+        <button class="${p.mediaTeam?'btn-accent':'btn-ghost'} btn-sm" id="toggleMediaBtn">${p.mediaTeam?'Media ✓':'Media'}</button>
+        ${activity.message?`<button class="btn-accent btn-sm" data-copy-msg="${escapeHtml(activityMsgTemplate(activity.message, p.character))}">Copy ${activity.message} msg</button>`:''}
+        <button class="btn-danger btn-sm" id="deletePersonBtn">Archive</button>
       </div>
     </div>
   `;
@@ -2368,35 +2064,22 @@ function renderProfile(){
     btn.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();copyText(btn.getAttribute("data-copy-msg")||"");});
   });
 
-  // Gate panel-level edit buttons by permissions
-  const _editBtn=document.getElementById('editPersonBtn');
-  if(_editBtn) _editBtn.style.display=_canEdit?'':'none';
-  const _editTrainBtn=document.getElementById('editTrainingBtn');
-  if(_editTrainBtn){ _editTrainBtn.style.display=_canEdit?'':'none'; _editTrainBtn.addEventListener('click',()=>openTrainingModal(p.id)); }
-  const _calBtn=document.getElementById('addCalEventBtn');
-  if(_calBtn) _calBtn.style.display=_canEdit?'':'none';
-  const _discBtn=document.getElementById('addDisciplineBtn');
-  if(_discBtn) _discBtn.style.display=_canEdit?'':'none';
-  const _noteBtn=document.getElementById('addNoteBtn');
-  if(_noteBtn) _noteBtn.style.display=_canEdit?'':'none';
-
   // Basic Info
+  const copyIcon=`<svg viewBox="0 0 24 24" fill="none"><path d="M9 9h9v10a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V11a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.8"/><path d="M7 13H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="1.8"/></svg>`;
   const basicRows=[
-    {k:'Rank',v:p.rank||'—'},
-    {k:'Steam Name',v:p.steamName||'—',copy:p.steamName},
-    {k:'Discord',v:p.discord||'—',copy:p.discord},
-    {k:'Discord ID',v:p.discordId||'—',copy:p.discordId?`<@${p.discordId}>`:null},
-    {k:'Steam ID',v:p.steam||'—',copy:p.steam},
-    {k:'Timezone',v:p.timeZone||'—',copy:p.timeZone},
-    {k:'Bank ID',v:p.bankAccount||'—',copy:p.bankAccount},
+    {k:'Rank',v:p.rank||'—'},{k:'Discord',v:p.discord||'—'},
+    {k:'Discord ID',v:p.discordId||'—',copy:p.discordId},{k:'Steam ID',v:p.steam||'—',copy:p.steam},
+    {k:'Timezone',v:p.timeZone||'—'},{k:'Bank ID',v:p.bankAccount||'—',copy:p.bankAccount},
   ];
-  $("#basicInfo").innerHTML=basicRows.map(r=>{
-    const canCopy=r.copy&&r.k!=='Rank';
-    return `<div class="info-row${canCopy?' copyable':''}"${canCopy?` data-copy-row="${escapeHtml(r.copy)}"`:''}>
+  $("#basicInfo").innerHTML=basicRows.map(r=>`
+    <div class="info-row">
       <div class="info-key">${escapeHtml(r.k)}</div>
-      <div class="info-val"><span>${escapeHtml(r.v)}</span></div>
-    </div>`;
-  }).join('');
+      <div class="info-val">
+        <span>${escapeHtml(r.v)}</span>
+        ${r.copy?`<button class="btn-icon" data-copy-text="${escapeHtml(r.copy)}">${copyIcon}</button>`:''}
+      </div>
+    </div>
+  `).join('');
 
   // Training
   renderTraining(p.id);
@@ -2423,9 +2106,6 @@ function renderProfile(){
   // Wire copy buttons
   document.querySelectorAll('button[data-copy-text]').forEach(btn=>{
     btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();copyText(btn.getAttribute('data-copy-text')||'');});
-  });
-  document.querySelectorAll('[data-copy-row]').forEach(row=>{
-    row.addEventListener('click',()=>{copyText(row.getAttribute('data-copy-row')||'');});
   });
 }
 
@@ -2469,7 +2149,7 @@ function renderTraining(pid){
 
   // SOP row
   detailHtml+=`<div class="train-detail">`;
-  detailHtml+=`<div class="train-detail-row" style="padding-bottom:6px;margin-bottom:2px">
+  detailHtml+=`<div class="train-detail-row" style="border-bottom:1px solid var(--line2);padding-bottom:6px;margin-bottom:2px">
     <div class="muted" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Role</div>
     <div class="muted" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Status</div>
     <div class="muted" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Date</div>
@@ -2497,7 +2177,48 @@ function renderTraining(pid){
   }
   detailHtml+=`</div>`;
 
+  // Edit button
+  detailHtml+=`<div style="display:flex;justify-content:flex-end;gap:6px;margin-top:10px">
+    <button class="btn-ghost btn-sm" id="editTrainingBtn">Edit Training</button>
+  </div>`;
+
+  // Training notes
+  const tNotes=trainingNotesForPerson(pid);
+  detailHtml+=`<div class="divider"></div>`;
+  detailHtml+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <div class="muted small" style="font-weight:700;text-transform:uppercase;letter-spacing:.5px">Training Notes</div>
+    <button class="btn-ghost btn-sm" id="addTrainNoteBtn">+ Note</button>
+  </div>`;
+  detailHtml+=tNotes.map(n=>`
+    <div class="note-card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="note-date">${escapeHtml(fmtMDY(new Date(n.dateISO)))}</div>
+        <div style="display:flex;gap:4px">
+          <button class="btn-ghost btn-sm" data-edit-tnote="${escapeHtml(n.id)}">Edit</button>
+          <button class="btn-ghost btn-sm" data-del-tnote="${escapeHtml(n.id)}">Del</button>
+        </div>
+      </div>
+      <div class="note-text">${escapeHtml(n.note||'')}</div>
+    </div>
+  `).join('')||`<div class="muted small">No training notes yet.</div>`;
+
   host.innerHTML=detailHtml;
+
+  // Wire buttons
+  document.getElementById('editTrainingBtn')?.addEventListener('click',()=>openTrainingModal(pid));
+  document.getElementById('addTrainNoteBtn')?.addEventListener('click',()=>openTrainingNoteModal(pid,null));
+  document.querySelectorAll('[data-edit-tnote]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const n=(state.trainingNotes||[]).find(x=>x.id===btn.getAttribute('data-edit-tnote'));
+      if(n) openTrainingNoteModal(pid,n);
+    });
+  });
+  document.querySelectorAll('[data-del-tnote]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      state.trainingNotes=(state.trainingNotes||[]).filter(x=>x.id!==btn.getAttribute('data-del-tnote'));
+      save(); renderTraining(pid);
+    });
+  });
 }
 
 function openTrainingModal(pid){
@@ -2673,7 +2394,7 @@ function renderCalendar(pid){
       }
     }
 
-    html+=`<div class="${cls}" data-day="${key}" style="cursor:pointer">
+    html+=`<div class="${cls}" data-day="${key}" style="cursor:${clickable?'pointer':'default'}" ${clickable?'ondblclick="this.click()"':''}>
       <div class="day-num">${day}</div>
       <div class="day-tags">${tags}</div>
       <div><div class="day-label">${escapeHtml(label)}</div><div class="day-sub">${escapeHtml(sub)}</div></div>
@@ -2695,27 +2416,8 @@ function renderCalendar(pid){
       const info=monthly.byDay.get(dayKey);
       const loaInfo=loas.find(l=>{const d=new Date(dayKey+"T12:00:00"),s=new Date(l.startISO),e=new Date(l.endISO);return s<=d&&d<=e;});
       const dayEvts=(calEventDays.get(dayKey)||[]);
-      openModal("Day Details",buildDayDetailHtml(dayKey,info,loaInfo,dayEvts,pid));
-      // Wire cal event edit/delete
-      document.querySelectorAll('[data-ce-del]').forEach(btn=>{
-        btn.addEventListener('click',()=>{
-          if(!confirm('Delete this event?')) return;
-          state.calendarEvents=(state.calendarEvents||[]).filter(x=>x.id!==btn.getAttribute('data-ce-del'));
-          save();closeModal();renderProfile();
-        });
-      });
-      document.querySelectorAll('[data-ce-edit]').forEach(btn=>{
-        btn.addEventListener('click',()=>{
-          const ce=(state.calendarEvents||[]).find(x=>x.id===btn.getAttribute('data-ce-edit'));
-          if(ce){ closeModal(); openEditCalEventModal(ce); }
-        });
-      });
-      document.querySelectorAll('[data-ce-add]').forEach(btn=>{
-        btn.addEventListener('click',()=>{
-          const dk=btn.getAttribute('data-ce-add');
-          closeModal(); openCalEventModal(dk);
-        });
-      });
+      if(!info&&!loaInfo&&!dayEvts.length) return;
+      openModal("Day Details",buildDayDetailHtml(dayKey,info,loaInfo,dayEvts));
     });
     el.addEventListener("dblclick",(e)=>{
       e.preventDefault();
@@ -2727,7 +2429,7 @@ function renderCalendar(pid){
   return monthly;
 }
 
-function buildDayDetailHtml(dayKey,info,loa,calEvts=[],pid=null){
+function buildDayDetailHtml(dayKey,info,loa,calEvts=[]){
   const dateObj=new Date(dayKey+"T00:00:00");
   const pretty=new Intl.DateTimeFormat("en-US",{month:"long",day:"numeric",year:"numeric"}).format(dateObj);
   let html=`<div style="font-weight:900;font-size:16px;margin-bottom:10px">${escapeHtml(pretty)}</div>`;
@@ -2749,13 +2451,14 @@ function buildDayDetailHtml(dayKey,info,loa,calEvts=[],pid=null){
   }
 
   if(calEvts.length){
-    const _ceDay=pid?canEditProfile(getPerson(pid)):false;
     html+=`<div style="font-weight:700;font-size:12px;margin:10px 0 6px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">Events</div>`;
     for(const ce of calEvts){
       const typeColors={training:'var(--cyan)',interview:'var(--interview)',meeting:'var(--warn)',other:'var(--muted)'};
+      // For training events, try to find trainer from mgmt calendar or training records
       let trainerInfo='';
       if(ce.type==='training'&&ce.note){
         const roleName=ce.note.replace(' Training','');
+        // Check mgmt events for this date + role
         const mgmtMatch=(state.mgmtEvents||[]).find(me=>me.type==='training'&&me.role===roleName&&dateValueFromISO(me.dateISO)===dayKey);
         if(mgmtMatch&&mgmtMatch.ledBy){
           const trainer=getPerson(mgmtMatch.ledBy);
@@ -2763,13 +2466,7 @@ function buildDayDetailHtml(dayKey,info,loa,calEvts=[],pid=null){
         }
       }
       html+=`<div style="padding:8px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;font-size:12px">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <span class="pill" style="font-size:10px;border-color:${typeColors[ce.type]||typeColors.other}">${escapeHtml(ce.type)}</span>
-          ${_ceDay?`<div style="display:flex;gap:4px">
-            <button class="btn-ghost btn-sm" data-ce-edit="${escapeHtml(ce.id)}">Edit</button>
-            <button class="btn-ghost btn-sm" data-ce-del="${escapeHtml(ce.id)}">Del</button>
-          </div>`:''}
-        </div>
+        <span class="pill" style="font-size:10px;border-color:${typeColors[ce.type]||typeColors.other}">${escapeHtml(ce.type)}</span>
         <div style="margin-top:4px">${escapeHtml(ce.note||'')}</div>
         ${trainerInfo}
       </div>`;
@@ -2777,9 +2474,6 @@ function buildDayDetailHtml(dayKey,info,loa,calEvts=[],pid=null){
   }
 
   if(!info&&!loa&&!calEvts.length) html+=`<div class="muted">Nothing recorded for this day.</div>`;
-  if(pid&&canEditProfile(getPerson(pid))){
-    html+=`<div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn-accent btn-sm" data-ce-add="${escapeHtml(dayKey)}">+ Event</button></div>`;
-  }
   return html;
 }
 
@@ -2811,10 +2505,9 @@ function renderLOABanner(pid){
 function renderEntries(pid){
   const host=$("#discipline"); if(!host) return;
   const list=entriesForPerson(pid);
-  const _ce=canEditProfile(getPerson(pid));
   host.innerHTML=list.map(e=>{
     const kind=normalizeKind(e.kind);
-    const pillCls=kind==='Strike'?'bad':kind==='Correction'?'warn':kind==='Warning Sent'?'warn':kind==='Dismissal'?'bad':kind==='Fired'?'bad':kind==='Resigned'?'warn':kind==='Hired'?'good':'good';
+    const pillCls=kind==='Strike'?'bad':kind==='Correction'?'warn':kind==='Warning Sent'?'warn':kind==='Dismissal'?'bad':'good';
     const note=(e.note||'').trim();
     const preview=note.length>120?note.slice(0,120)+'…':note;
     return `<div class="entry-card">
@@ -2824,8 +2517,8 @@ function renderEntries(pid){
       </div>
       <div class="entry-actions">
         ${note.length>120?`<button class="btn-ghost btn-sm" data-view-entry="${escapeHtml(e.id)}">View</button>`:''}
-        ${_ce?`<button class="btn-ghost btn-sm" data-edit-entry="${escapeHtml(e.id)}">Edit</button>`:''}
-        ${_ce?`<button class="btn-ghost btn-sm" data-del-entry="${escapeHtml(e.id)}">Del</button>`:''}
+        <button class="btn-ghost btn-sm" data-edit-entry="${escapeHtml(e.id)}">Edit</button>
+        <button class="btn-ghost btn-sm" data-del-entry="${escapeHtml(e.id)}">Del</button>
       </div>
     </div>`;
   }).join('')||`<div class="muted small">No entries yet.</div>`;
@@ -2845,15 +2538,14 @@ function renderEntries(pid){
 function renderNotes(pid){
   const list=notesForPerson(pid);
   const host=$("#notesList"); if(!host) return;
-  const _ce=canEditProfile(getPerson(pid));
   host.innerHTML=list.map(n=>`
     <div class="note-card">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div class="note-date">${escapeHtml(fmtMDY(new Date(n.dateISO)))}</div>
-        ${_ce?`<div style="display:flex;gap:4px">
+        <div style="display:flex;gap:4px">
           <button class="btn-ghost btn-sm" data-edit-note="${escapeHtml(n.id)}">Edit</button>
           <button class="btn-ghost btn-sm" data-del-note="${escapeHtml(n.id)}">Del</button>
-        </div>`:''}
+        </div>
       </div>
       <div class="note-text">${escapeHtml(n.note||'')}</div>
     </div>
@@ -2879,10 +2571,9 @@ function renderReviewPage(){
   document.getElementById('templatesView').style.display="none";
   document.getElementById('auditLogView').style.display="none";
   document.getElementById('interviewView').style.display="none";
+  $("#backBtn").style.display="";
   document.getElementById('leadershipView').style.display="none";
-  document.getElementById('sopView').style.display="none";
   $("#searchBar").style.display="none";
-  updateSidebarActive('review');
 
   const monthDate=startOfMonth(new Date(state.monthCursor));
   const sub=document.getElementById('reviewSub');
@@ -2966,13 +2657,12 @@ function renderReviewPage(){
 // ACTIONS / MODALS
 // ═══════════════════════════════════════════
 function addPerson(){
-  const nextDC=nextAvailableDC();
   openModal("Add Person",`
-    <div class="hint" style="margin-bottom:10px"><b>Steam is the permanent ID.</b> DC numbers auto-assign from 21+. 1-20 are reserved for management.</div>
+    <div class="hint" style="margin-bottom:10px"><b>Steam is the permanent ID.</b> Callsigns recycle.</div>
     <div class="row"><div><div class="muted small">Steam ID</div><input id="f_steam" placeholder="steam:11000010abcd123"/></div>
     <div><div class="muted small">Steam Name</div><input id="f_steamName" placeholder="Display name"/></div></div>
     <div class="row" style="margin-top:8px"><div><div class="muted small">Character</div><input id="f_character" placeholder="Character name"/></div>
-    <div><div class="muted small">Callsign</div><input id="f_callsign" value="${escapeHtml(nextDC)}" placeholder="DC-21"/></div></div>
+    <div><div class="muted small">Callsign</div><input id="f_callsign" placeholder="DC-21"/></div></div>
     <div class="row" style="margin-top:8px"><div><div class="muted small">Rank</div><select id="f_rank"><option value="">—</option>${RANKS.map(r=>`<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`).join('')}</select></div><div></div></div>
     <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn-accent" id="f_save">Save</button></div>
   `);
@@ -2980,9 +2670,7 @@ function addPerson(){
     const steam=($("#f_steam").value||'').trim(),character=($("#f_character").value||'').trim();
     if(!steam&&!character) return alert("Need Steam ID or Character name.");
     if(steam&&state.people.some(p=>(p.steam||'').trim()===steam)) return alert("Steam ID exists.");
-    let callsign=($("#f_callsign").value||'').trim();
-    if(!callsign) callsign=nextAvailableDC();
-    const p={id:uid(),steam,steamName:($("#f_steamName").value||'').trim(),character,callsign,
+    const p={id:uid(),steam,steamName:($("#f_steamName").value||'').trim(),character,callsign:($("#f_callsign").value||'').trim(),
       rank:$("#f_rank").value||'',discord:'',discordId:'',timeZone:'',bankAccount:'',
       training:{sop:{done:false,trainerId:'',date:'',comment:''},roles:{}},priorityRole:'',crossTrain:[],notes:''};
     ensurePerson(p);state.people.push(p);save();closeModal();renderHub();
@@ -2991,30 +2679,28 @@ function addPerson(){
 
 function editBasics(){
   const p=getPerson(state.selectedId); if(!p) return;
-  const canEditRank=!currentUser||canPromoteFire(p);
+  const canEditRank=!currentUser||canManage(p);
   const rankSelect=canEditRank?`<select id="e_rank"><option value="">—</option>${RANKS.filter(r=>!currentUser||rankLevel(r)<=rankLevel(currentUser.rank)).map(r=>`<option value="${escapeHtml(r)}" ${p.rank===r?'selected':''}>${escapeHtml(r)}</option>`).join('')}</select>`:`<input value="${escapeHtml(p.rank||'—')}" disabled/>`;
   openModal("Edit Info",`
     <div class="row"><div><div class="muted small">Character</div><input id="e_character" value="${escapeHtml(p.character||'')}"></div>
     <div><div class="muted small">Callsign</div><input id="e_callsign" value="${escapeHtml(p.callsign||'')}"></div></div>
-    <div class="row" style="margin-top:8px"><div><div class="muted small">Steam ID</div><input id="e_steam" value="${escapeHtml(p.steam||'')}"></div>
-    <div><div class="muted small">Steam Name</div><input id="e_steamName" value="${escapeHtml(p.steamName||'')}"></div></div>
     <div class="row" style="margin-top:8px"><div><div class="muted small">Discord</div><input id="e_discord" value="${escapeHtml(p.discord||'')}" placeholder="@name"></div>
     <div><div class="muted small">Discord ID</div><input id="e_discordId" value="${escapeHtml(p.discordId||'')}"></div></div>
     <div class="row" style="margin-top:8px"><div><div class="muted small">Timezone</div><input id="e_tz" value="${escapeHtml(p.timeZone||'')}"></div>
     <div><div class="muted small">Bank ID</div><input id="e_bank" value="${escapeHtml(p.bankAccount||'')}"></div></div>
     <div class="row" style="margin-top:8px"><div><div class="muted small">Rank</div>${rankSelect}</div>
     <div><div class="muted small">Google Email</div><input id="e_google" value="${escapeHtml(p.googleEmail||'')}" placeholder="name@gmail.com"></div></div>
-    <div class="hint" style="margin-top:10px">Google Email is used for login. Steam ID also updates from CSV import.</div>
+    <div class="row" style="margin-top:8px"><div><div class="muted small" style="margin-bottom:6px">Media Team</div><label style="display:flex;gap:6px;align-items:center;font-size:12px"><input type="checkbox" id="e_media" ${p.mediaTeam?'checked':''}/> Member of Media & Promotions</label></div><div></div></div>
+    <div class="hint" style="margin-top:10px">Steam fields update from CSV import only. Google Email is used for login.</div>
     <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn-accent" id="e_save">Save</button></div>
   `);
   $("#e_save").addEventListener("click",()=>{
     const oldRank=p.rank||'';
     p.character=($("#e_character").value||'').trim(); p.callsign=($("#e_callsign").value||'').trim();
-    p.steam=(document.getElementById('e_steam')?.value||'').trim();
-    p.steamName=(document.getElementById('e_steamName')?.value||'').trim();
     p.discord=($("#e_discord").value||'').trim(); p.discordId=($("#e_discordId").value||'').trim();
     p.timeZone=($("#e_tz").value||'').trim(); p.bankAccount=($("#e_bank").value||'').trim();
     if(canEditRank) p.rank=$("#e_rank").value||'';
+    p.mediaTeam=!!document.getElementById('e_media')?.checked;
     p.googleEmail=(document.getElementById('e_google')?.value||'').trim();
     if(p.rank!==oldRank) logAction('Rank changed',p.id,`${oldRank||'None'} → ${p.rank||'None'}`);
     logAction('Profile edited',p.id,'Basic info updated');
@@ -3045,10 +2731,6 @@ function deletePerson(){
     p.archiveType=document.getElementById('arc_type').value;
     p.archiveDate=(document.getElementById('arc_date').value||'').trim();
     p.archiveReason=(document.getElementById('arc_reason').value||'').trim();
-    // Auto-log feedback entry
-    const arcKind=p.archiveType==='fired'?'Fired':p.archiveType==='resigned'?'Resigned':'Dismissal';
-    const arcDate=p.archiveDate?isoFromDateValue(p.archiveDate):new Date().toISOString();
-    state.entries.push({id:uid(),personId:p.id,dateISO:arcDate,kind:arcKind,note:p.archiveReason||'Archived'});
     logAction('Archived',p.id,`${p.archiveType}: ${p.archiveReason||'No reason'}`);
     state.selectedId=null; save(); closeModal(); renderHub(); toast("Archived");
   });
@@ -3142,29 +2824,6 @@ function openCalEventModal(prefillDate){
   });
 }
 
-function openEditCalEventModal(ce){
-  if(!ce) return;
-  const dateVal=dateValueFromISO(ce.dateISO);
-  openModal("Edit Calendar Event",`
-    <div class="row"><div><div class="muted small">Date</div><input type="date" id="ece_date" value="${escapeHtml(dateVal)}"/></div>
-    <div><div class="muted small">Type</div><select id="ece_type">
-      <option value="training" ${ce.type==='training'?'selected':''}>Training</option>
-      <option value="interview" ${ce.type==='interview'?'selected':''}>Interview</option>
-      <option value="meeting" ${ce.type==='meeting'?'selected':''}>Meeting</option>
-      <option value="other" ${ce.type==='other'?'selected':''}>Other</option>
-    </select></div></div>
-    <div style="margin-top:8px"><div class="muted small">Note</div><textarea id="ece_note" rows="3">${escapeHtml(ce.note||'')}</textarea></div>
-    <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn-accent" id="ece_save">Save</button></div>
-  `);
-  document.getElementById('ece_save').addEventListener('click',()=>{
-    const ds=(document.getElementById('ece_date').value||'').trim(); if(!ds) return alert('Pick a date.');
-    ce.dateISO=isoFromDateValue(ds);
-    ce.type=document.getElementById('ece_type').value;
-    ce.note=(document.getElementById('ece_note').value||'').trim();
-    save();closeModal();renderProfile();toast('Updated');
-  });
-}
-
 function resetAll(){
   if(!confirm("Reset EVERYTHING? This wipes the entire tracker for all users.")) return;
   if(!confirm("Are you SURE? This cannot be undone.")) return;
@@ -3188,14 +2847,13 @@ function hideAllViews(){
   document.getElementById('interviewView').style.display="none";
   document.getElementById('leadershipView').style.display="none";
   document.getElementById('auditLogView').style.display="none";
-  document.getElementById('sopView').style.display="none";
 }
 
 function renderMgmtCal(){
   hideAllViews();
   document.getElementById('mgmtCalView').style.display="";
+  $("#backBtn").style.display="";
   $("#searchBar").style.display="none";
-  updateSidebarActive('mgmtcal');
   state.ui.view="mgmtcal"; save();
 
   const md=startOfMonth(new Date(state.mgmtMonthCursor));
@@ -3227,29 +2885,23 @@ function renderMgmtCal(){
   for(let day=1;day<=daysInMonth;day++){
     const key=`${year}-${String(mIdx+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
     const dayEvents=mgmtByDay.get(key)||[];
+    const hasTraining=dayEvents.some(e=>e.type==='training');
+    const hasInterview=dayEvents.some(e=>e.type==='interview');
+    const hasEvent=dayEvents.some(e=>e.type==='event');
+    const clickable=dayEvents.length>0;
 
-    // Build compact pills with time baked in
-    let pills='';
-    for(const me of dayEvents){
-      const timeLabel=me.startISO?fmtTime(me.startISO):(me.time||'');
-      const timeSuffix=timeLabel?` · ${timeLabel}`:'';
-      if(me.type==='training'){
-        const label=(me.role||'Train')+timeSuffix;
-        pills+=`<div style="margin-top:3px"><span class="day-tag training">${escapeHtml(label)}</span></div>`;
-      } else if(me.type==='interview'){
-        pills+=`<div style="margin-top:3px"><span class="day-tag interview">Interview${timeSuffix}</span></div>`;
-      } else {
-        const label=(me.note||'Event')+timeSuffix;
-        pills+=`<div style="margin-top:3px"><span class="day-tag event">${escapeHtml(label)}</span></div>`;
-      }
-    }
+    let tags="";
+    if(hasTraining) tags+=`<span class="day-tag training">Train</span>`;
+    if(hasInterview) tags+=`<span class="day-tag interview">IV</span>`;
+    if(hasEvent) tags+=`<span class="day-tag event">Event</span>`;
 
     let cls="cal-day";
     if(dayEvents.length) cls+=" good";
 
-    html+=`<div class="${cls}" data-mday="${key}" style="cursor:pointer">
+    html+=`<div class="${cls}" data-mday="${key}" style="cursor:${clickable?'pointer':'default'}">
       <div class="day-num">${day}</div>
-      ${pills}
+      <div class="day-tags">${tags}</div>
+      <div><div class="day-label">${dayEvents.length?dayEvents.length+' entr'+(dayEvents.length===1?'y':'ies'):''}</div></div>
     </div>`;
   }
   html+=`</div>`;
@@ -3267,11 +2919,6 @@ function renderMgmtCal(){
       const evts=mgmtByDay.get(dk)||[];
       if(!evts.length) return;
       openMgmtDayDetail(dk,evts);
-    });
-    el.addEventListener('dblclick',(e)=>{
-      e.preventDefault();
-      const dk=el.getAttribute('data-mday');
-      openMgmtEventModal(null,dk);
     });
   });
 }
@@ -3291,24 +2938,20 @@ function openMgmtDayDetail(dayKey,evts){
     const typeColors={training:'var(--cyan)',interview:'var(--accent)',event:'var(--warn)'};
     const typeLabel=me.type.charAt(0).toUpperCase()+me.type.slice(1);
     const roleLabel=me.role?` — ${escapeHtml(me.role)}`:'';
-    const timeLabel=me.startISO?fmtTime(me.startISO):(me.time||'');
     const ledLabel=me.ledBy?personLabel(me.ledBy):'Not assigned';
     const ledId=me.ledBy||'';
     const attendeeItems=(me.attendees||[]).map(id=>({id,label:escapeHtml(personLabel(id))}));
 
     html+=`<div style="padding:10px;border:1px solid var(--line);border-radius:var(--r);margin-bottom:8px;background:var(--surface)">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
-        <div style="display:flex;gap:6px;align-items:center">
-          <span class="pill" style="font-size:10px;border-color:${typeColors[me.type]||'var(--muted)'}">${escapeHtml(typeLabel)}${roleLabel}</span>
-          ${timeLabel?`<span class="muted" style="font-size:11px;font-weight:700">${escapeHtml(timeLabel)}</span>`:''}
-        </div>
+        <div><span class="pill" style="font-size:10px;border-color:${typeColors[me.type]||'var(--muted)'}">${escapeHtml(typeLabel)}${roleLabel}</span></div>
         <div style="display:flex;gap:4px">
           <button class="btn-ghost btn-sm" data-edit-mgmt="${escapeHtml(me.id)}">Edit</button>
           <button class="btn-ghost btn-sm" data-del-mgmt="${escapeHtml(me.id)}">Del</button>
         </div>
       </div>
       <div style="margin-top:8px;font-size:12px">
-        <div><span class="muted">Led by:</span> <b style="cursor:pointer" data-goto-profile="${escapeHtml(ledId)}">${escapeHtml(ledLabel)}</b></div>
+        <div><span class="muted">Led by:</span> <b style="cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px" data-goto-profile="${escapeHtml(ledId)}">${escapeHtml(ledLabel)}</b></div>
         ${attendeeItems.length?`<div style="margin-top:6px"><span class="muted">Attended:</span><div style="display:flex;flex-direction:column;gap:3px;margin-top:4px">${attendeeItems.map(a=>`<div style="padding:4px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);font-size:11px;cursor:pointer" data-goto-profile="${escapeHtml(a.id)}">${a.label}</div>`).join('')}</div></div>`:''}
         ${me.note?`<div style="margin-top:4px;white-space:pre-wrap">${escapeHtml(me.note)}</div>`:''}
       </div>
@@ -3340,19 +2983,19 @@ function openMgmtDayDetail(dayKey,evts){
   });
 }
 
-function openMgmtEventModal(existing,prefillDate){
+function openMgmtEventModal(existing){
   const isEdit=!!existing;
   const title=isEdit?"Edit Entry":"Add Entry";
-  const dateVal=isEdit?dateValueFromISO(existing.dateISO):prefillDate||dateValueFromISO(new Date().toISOString());
+  const dateVal=isEdit?dateValueFromISO(existing.dateISO):dateValueFromISO(new Date().toISOString());
   const typeVal=isEdit?existing.type:'training';
   const roleVal=isEdit?existing.role||'':'';
-  const timeVal=isEdit?(existing.time||(existing.startISO?new Intl.DateTimeFormat("en-CA",{timeZone:TZ,hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date(existing.startISO)):'')):'';
   const ledVal=isEdit?existing.ledBy||'':'';
   const attendeesVal=isEdit?(existing.attendees||[]):[];
   const noteVal=isEdit?existing.note||'':'';
 
   // Build people options for led by (DC1-19 management)
   const mgmtOpts=managementTrainerOptions();
+  const ledOpts=[`<option value="">— Select —</option>`].concat(mgmtOpts.map(t=>`<option value="${escapeHtml(t.id)}" ${t.id===ledVal?'selected':''}>${escapeHtml(t.label)}</option>`)).join('');
 
   // Build people options for attendees (everyone active)
   const allPeople=state.people.filter(p=>!p.archived).map(p=>{ensurePerson(p);return p;}).sort((a,b)=>(a.character||'').localeCompare(b.character||''));
@@ -3362,14 +3005,13 @@ function openMgmtEventModal(existing,prefillDate){
 
   openModal(title,`
     <div class="row"><div><div class="muted small">Date</div><input type="date" id="me_date" value="${escapeHtml(dateVal)}"/></div>
-    <div><div class="muted small">Time</div><input type="time" id="me_time" value="${escapeHtml(timeVal)}"/></div>
     <div><div class="muted small">Type</div><select id="me_type">
       <option value="training" ${typeVal==='training'?'selected':''}>Training</option>
       <option value="interview" ${typeVal==='interview'?'selected':''}>Interview</option>
       <option value="event" ${typeVal==='event'?'selected':''}>Event</option>
     </select></div></div>
     <div class="row" style="margin-top:8px"><div><div class="muted small">Role (training only)</div><select id="me_role">${roleOpts}</select></div>
-    <div><div class="muted small">Led by</div><div id="me_led_picker"></div></div></div>
+    <div><div class="muted small">Led by</div><select id="me_led">${ledOpts}</select></div></div>
     <div style="margin-top:8px"><div class="muted small">Attended by</div>
       <div id="me_attendee_picker"></div>
     </div>
@@ -3377,7 +3019,6 @@ function openMgmtEventModal(existing,prefillDate){
     <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn-accent" id="me_save">Save</button></div>
   `);
 
-  const ledPicker=createTagPicker('me_led_picker',mgmtOpts,ledVal?[ledVal]:[]);
   const attendeePicker=createTagPicker('me_attendee_picker',allPeopleOpts,attendeesVal);
 
   document.getElementById('me_save').addEventListener('click',()=>{
@@ -3386,18 +3027,16 @@ function openMgmtEventModal(existing,prefillDate){
     const iso=isoFromDateValue(ds);
     const type=document.getElementById('me_type').value;
     const role=document.getElementById('me_role').value;
-    const time=(document.getElementById('me_time').value||'').trim();
-    const ledBy=ledPicker.getSelected()[0]||'';
+    const ledBy=document.getElementById('me_led').value;
     const attendees=attendeePicker.getSelected();
     const note=(document.getElementById('me_note').value||'').trim();
 
     if(existing){
-      existing.dateISO=iso; existing.type=type; existing.role=role; existing.time=time;
-      existing.startISO=makeStartISO(ds,time);
+      existing.dateISO=iso; existing.type=type; existing.role=role;
       existing.ledBy=ledBy; existing.attendees=attendees; existing.note=note;
     } else {
       state.mgmtEvents||=[];
-      state.mgmtEvents.push({id:uid(),dateISO:iso,type,role,time,startISO:makeStartISO(ds,time),ledBy,attendees,note});
+      state.mgmtEvents.push({id:uid(),dateISO:iso,type,role,ledBy,attendees,note});
     }
 
     // Auto-update training profiles for training events with a role
@@ -3442,8 +3081,8 @@ function openMgmtEventModal(existing,prefillDate){
 function renderAuditLog(){
   hideAllViews();
   document.getElementById('auditLogView').style.display="";
+  $("#backBtn").style.display="";
   $("#searchBar").style.display="none";
-  updateSidebarActive('auditlog');
   state.ui.view="auditlog"; save();
 
   const host=document.getElementById('auditLogBody');
@@ -3453,31 +3092,23 @@ function renderAuditLog(){
     return;
   }
 
-  host.innerHTML=`<div style="max-height:600px;overflow-y:auto"><table style="table-layout:fixed;width:100%">
-    <colgroup><col style="width:140px"><col style="width:120px"><col style="width:120px"><col><col style="width:100px"></colgroup>
-    <thead><tr>
-      <th style="position:sticky;top:0;background:var(--panel);z-index:1">Date</th>
-      <th style="position:sticky;top:0;background:var(--panel);z-index:1">Action</th>
-      <th style="position:sticky;top:0;background:var(--panel);z-index:1">Target</th>
-      <th style="position:sticky;top:0;background:var(--panel);z-index:1">Detail</th>
-      <th style="position:sticky;top:0;background:var(--panel);z-index:1;text-align:right">By</th>
-    </tr></thead><tbody>` + log.map(entry=>{
+  host.innerHTML=`<div style="max-height:600px;overflow-y:auto">` + log.map(entry=>{
     const time=formatLocal(entry.timestamp);
     const actionColors={
       'Promoted':'var(--good)','Archived':'var(--bad)','Dismissed':'var(--bad)',
       'Revived':'var(--loa)','Warning sent':'var(--warn)','Marked EOTM':'var(--accent)',
       'Rank changed':'var(--cyan)','Profile edited':'var(--muted)',
-      'Candidate converted':'var(--good)','Account linked':'var(--cyan)'
+      'Candidate converted':'var(--good)'
     };
     const color=actionColors[entry.action]||'var(--muted)';
-    return `<tr>
-      <td style="color:var(--muted);font-size:11px;white-space:nowrap">${escapeHtml(time)}</td>
-      <td style="font-weight:700;color:${color}">${escapeHtml(entry.action)}</td>
-      <td style="font-weight:700;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-al-profile="${escapeHtml(entry.targetId)}">${escapeHtml(entry.targetName||'—')}</td>
-      <td style="color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escapeHtml(entry.detail||'')}">${escapeHtml(entry.detail||'')}</td>
-      <td style="color:var(--muted);font-size:11px;text-align:right;white-space:nowrap">${escapeHtml(entry.userName||'System')}</td>
-    </tr>`;
-  }).join('') + `</tbody></table></div>`;
+    return `<div style="display:flex;gap:10px;padding:8px;border-bottom:1px solid var(--line);font-size:12px;align-items:flex-start">
+      <div style="min-width:130px;color:var(--muted);font-size:11px;flex-shrink:0">${escapeHtml(time)}</div>
+      <div style="min-width:100px;font-weight:700;color:${color};flex-shrink:0">${escapeHtml(entry.action)}</div>
+      <div style="min-width:100px;font-weight:700;flex-shrink:0;cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px" data-al-profile="${escapeHtml(entry.targetId)}">${escapeHtml(entry.targetName||'—')}</div>
+      <div style="color:var(--muted);flex:1">${escapeHtml(entry.detail||'')}</div>
+      <div style="min-width:80px;color:var(--muted);font-size:11px;text-align:right;flex-shrink:0">${escapeHtml(entry.userName||'System')}</div>
+    </div>`;
+  }).join('') + `</div>`;
 
   host.querySelectorAll('[data-al-profile]').forEach(el=>{
     el.addEventListener('click',()=>{
@@ -3496,8 +3127,8 @@ function renderAuditLog(){
 function renderLeadership(){
   hideAllViews();
   document.getElementById('leadershipView').style.display="";
+  $("#backBtn").style.display="";
   $("#searchBar").style.display="none";
-  updateSidebarActive('leadership');
   state.ui.view="leadership"; save();
 
   const fromEl=document.getElementById('laFrom');
@@ -3515,7 +3146,7 @@ function renderLeadership(){
   });
 
   // Get all Supervisor+ people
-  const leaders=state.people.filter(p=>{ensurePerson(p);return isMgmtRank(p)&&!p.archived;});
+  const leaders=state.people.filter(p=>{ensurePerson(p);return isMgmtRank(p)&&!p.archived;}).sort((a,b)=>(a.character||'').localeCompare(b.character||''));
 
   const host=document.getElementById('leadershipBody');
   if(!leaders.length){
@@ -3534,19 +3165,12 @@ function renderLeadership(){
     const interviewsAttended=attended.filter(me=>me.type==='interview').length;
     const totalLed=led.length;
     const totalAttended=attended.length;
-    const allPersonEvents=[...led,...attended];
-    const lastEventDate=allPersonEvents.length?Math.max(...allPersonEvents.map(e=>new Date(e.dateISO).getTime())):0;
-    const notes=notesForPerson(p.id).slice(0,5);
-    return {p,trainingsLed,interviewsLed,eventsLed,trainingsAttended,interviewsAttended,totalLed,totalAttended,led,attended,notes,lastEventDate};
-  });
 
-  // Sort
-  const sortVal=document.getElementById('laSort')?.value||'az';
-  if(sortVal==='az') stats.sort((a,b)=>(a.p.character||'').localeCompare(b.p.character||''));
-  else if(sortVal==='rank') stats.sort((a,b)=>rankLevel(b.p.rank)-rankLevel(a.p.rank)||(a.p.character||'').localeCompare(b.p.character||''));
-  else if(sortVal==='most') stats.sort((a,b)=>(b.totalLed+b.totalAttended)-(a.totalLed+a.totalAttended));
-  else if(sortVal==='least') stats.sort((a,b)=>(a.totalLed+a.totalAttended)-(b.totalLed+b.totalAttended));
-  else if(sortVal==='recent') stats.sort((a,b)=>b.lastEventDate-a.lastEventDate);
+    // Grab profile notes for eval context
+    const notes=notesForPerson(p.id).slice(0,5);
+
+    return {p,trainingsLed,interviewsLed,eventsLed,trainingsAttended,interviewsAttended,totalLed,totalAttended,led,attended,notes};
+  });
 
   const rangeLabel=(fromDate||toDate)?
     `${fromDate?fmtMDY(fromDate):'Start'} — ${toDate?fmtMDY(toDate):'Now'}`:'All Time';
@@ -3795,8 +3419,8 @@ Just wanted to let you know that you didn't hit your 4 hours last month. Make su
 function renderTemplates(){
   hideAllViews();
   document.getElementById('templatesView').style.display="";
+  $("#backBtn").style.display="";
   $("#searchBar").style.display="none";
-  updateSidebarActive('templates');
   state.ui.view="templates"; save();
 
   // Auto-populate defaults on first visit
@@ -3812,29 +3436,17 @@ function renderTemplates(){
   }
 
   host.innerHTML=state.templates.map(t=>{
-    return `<div class="sop-card" data-tpl-id="${escapeHtml(t.id)}">
-      <div class="sop-header">
-        <div class="sop-title">
-          <svg class="sop-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-          ${escapeHtml(t.title||'Untitled')}
-        </div>
-        <div style="display:flex;gap:4px">
-          <button class="btn-ghost btn-sm" data-tpl-copy="${escapeHtml(t.id)}">Copy</button>
-          <button class="btn-ghost btn-sm" data-tpl-edit="${escapeHtml(t.id)}">Edit</button>
-          <button class="btn-ghost btn-sm" data-tpl-del="${escapeHtml(t.id)}">Del</button>
-        </div>
+    const preview=(t.body||'').length>200?(t.body||'').slice(0,200)+'…':(t.body||'');
+    return `<div class="tpl-card">
+      <div class="tpl-title">${escapeHtml(t.title||'Untitled')}</div>
+      <div class="tpl-body">${escapeHtml(preview)}</div>
+      <div class="tpl-actions">
+        <button class="btn-ghost btn-sm" data-tpl-copy="${escapeHtml(t.id)}">Copy</button>
+        <button class="btn-ghost btn-sm" data-tpl-edit="${escapeHtml(t.id)}">Edit</button>
+        <button class="btn-ghost btn-sm" data-tpl-del="${escapeHtml(t.id)}">Del</button>
       </div>
-      <div class="sop-body">${escapeHtml(t.body||'')}</div>
     </div>`;
   }).join('');
-
-  // Toggle collapse
-  host.querySelectorAll('.sop-header').forEach(hdr=>{
-    hdr.addEventListener('click',e=>{
-      if(e.target.closest('button')) return;
-      hdr.closest('.sop-card')?.classList.toggle('open');
-    });
-  });
 
   host.querySelectorAll('[data-tpl-copy]').forEach(btn=>{
     btn.addEventListener('click',()=>{
@@ -3879,105 +3491,11 @@ function openTemplateModal(existing){
 // ═══════════════════════════════════════════
 // RENDER: INTERVIEWS
 // ═══════════════════════════════════════════
-// ═══════════════════════════════════════════
-// RENDER: SOPs & TRAINING GUIDES
-// ═══════════════════════════════════════════
-function renderSOPs(){
-  hideAllViews();
-  document.getElementById('sopView').style.display="";
-  $("#searchBar").style.display="none";
-  updateSidebarActive('sops');
-  state.ui.view="sops"; save();
-
-  const canEdit=!currentUser||rankLevel(currentUser.rank)>=3||DEV_MODE;
-  const addBtn=document.getElementById('addSopBtn');
-  if(addBtn) addBtn.style.display=canEdit?'':'none';
-
-  const host=document.getElementById('sopBody');
-  const sops=(state.sops||[]).slice();
-
-  if(!sops.length){
-    host.innerHTML=`<div class="muted small">No SOPs or training guides yet.${canEdit?' Click + Guide to add one.':''}</div>`;
-    return;
-  }
-
-  host.innerHTML=sops.map(s=>`
-    <div class="sop-card" data-sop-id="${escapeHtml(s.id)}">
-      <div class="sop-header">
-        <div class="sop-title">
-          <svg class="sop-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-          ${escapeHtml(s.title||'(untitled)')}
-        </div>
-        ${canEdit?`<div style="display:flex;gap:4px">
-          <button class="btn-ghost btn-sm" data-sop-edit="${escapeHtml(s.id)}">Edit</button>
-          <button class="btn-ghost btn-sm" data-sop-copy="${escapeHtml(s.id)}">Copy</button>
-          <button class="btn-ghost btn-sm" data-sop-del="${escapeHtml(s.id)}">Del</button>
-        </div>`:`<button class="btn-ghost btn-sm" data-sop-copy="${escapeHtml(s.id)}">Copy</button>`}
-      </div>
-      <div class="sop-body">${escapeHtml(s.body||'')}</div>
-    </div>
-  `).join('');
-
-  // Toggle collapse
-  host.querySelectorAll('.sop-header').forEach(hdr=>{
-    hdr.addEventListener('click',e=>{
-      if(e.target.closest('button')) return;
-      hdr.closest('.sop-card')?.classList.toggle('open');
-    });
-  });
-
-  // Copy
-  host.querySelectorAll('[data-sop-copy]').forEach(btn=>{
-    btn.addEventListener('click',e=>{
-      e.stopPropagation();
-      const s=sops.find(x=>x.id===btn.getAttribute('data-sop-copy'));
-      if(s) copyText(s.body||'');
-    });
-  });
-
-  // Edit
-  host.querySelectorAll('[data-sop-edit]').forEach(btn=>{
-    btn.addEventListener('click',e=>{
-      e.stopPropagation();
-      const s=sops.find(x=>x.id===btn.getAttribute('data-sop-edit'));
-      if(s) openSopModal(s);
-    });
-  });
-
-  // Delete
-  host.querySelectorAll('[data-sop-del]').forEach(btn=>{
-    btn.addEventListener('click',e=>{
-      e.stopPropagation();
-      const sid=btn.getAttribute('data-sop-del');
-      if(!confirm('Delete this SOP?')) return;
-      state.sops=(state.sops||[]).filter(x=>x.id!==sid);
-      save(); renderSOPs(); toast('Deleted');
-    });
-  });
-}
-
-function openSopModal(existing){
-  const isNew=!existing;
-  openModal(isNew?'Add SOP / Training Guide':'Edit SOP / Training Guide',`
-    <div><div class="muted small">Title</div><input id="sop_title" value="${escapeHtml(existing?.title||'')}" placeholder="e.g. SOP: Opening Procedures"/></div>
-    <div style="margin-top:8px"><div class="muted small">Content</div><textarea id="sop_body" rows="12" placeholder="Write or paste your SOP content here...">${escapeHtml(existing?.body||'')}</textarea></div>
-    <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn-accent" id="sop_save">Save</button></div>
-  `);
-  document.getElementById('sop_save').addEventListener('click',()=>{
-    const title=(document.getElementById('sop_title').value||'').trim();
-    const body=(document.getElementById('sop_body').value||'').trim();
-    if(!title) return alert('Title is required.');
-    if(existing){ existing.title=title; existing.body=body; }
-    else { state.sops||=[]; state.sops.push({id:uid(),title,body}); }
-    save(); closeModal(); renderSOPs(); toast('Saved');
-  });
-}
-
 function renderInterviews(){
   hideAllViews();
   document.getElementById('interviewView').style.display="";
+  $("#backBtn").style.display="";
   $("#searchBar").style.display="none";
-  updateSidebarActive('interviews');
   state.ui.view="interviews"; save();
 
   // Render question template
@@ -4101,7 +3619,7 @@ function renderCandidateCards(){
         <div class="cand-name">${escapeHtml(c.name||'(no name)')}</div>
         ${statusPill}
       </div>
-      <div class="cand-meta">${escapeHtml(c.discord||'—')}${c.discordId?' · <@'+escapeHtml(c.discordId)+'>':''} · ${escapeHtml(positions)}</div>
+      <div class="cand-meta">${escapeHtml(c.discord||'—')} · ${escapeHtml(positions)}</div>
       <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
         <div class="cand-meta">Accepted: ${escapeHtml(dateLabel)}</div>
         ${graceLabel}
@@ -4131,16 +3649,16 @@ function openAddCandidateModal(){
       <div><div class="muted small">Discord</div><input id="c_discord" placeholder="Discord name"/></div>
     </div>
     <div class="row" style="margin-top:8px">
-      <div><div class="muted small">Discord ID</div><input id="c_discordId" placeholder="e.g. 123456789012345678"/></div>
       <div><div class="muted small">Steam ID</div><input id="c_steam" placeholder="steam:..."/></div>
-    </div>
-    <div class="row" style="margin-top:8px">
       <div><div class="muted small">Accepted Date</div><input type="date" id="c_accepted" value="${dateValueFromISO(new Date().toISOString())}"/></div>
-      <div><div class="muted small">Age</div><input id="c_age" placeholder="Age"/></div>
     </div>
     <div class="row" style="margin-top:8px">
+      <div><div class="muted small">Age</div><input id="c_age" placeholder="Age"/></div>
       <div><div class="muted small">Timezone</div><input id="c_tz" placeholder="EST, CST, etc."/></div>
+    </div>
+    <div class="row" style="margin-top:8px">
       <div><div class="muted small">Bank ID</div><input id="c_bank" placeholder="Bank ID"/></div>
+      <div></div>
     </div>
     <div style="margin-top:8px"><div class="muted small">Chosen Positions</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">${roleChecks}</div>
@@ -4160,7 +3678,6 @@ function openAddCandidateModal(){
       id:uid(),
       name,
       discord:(document.getElementById('c_discord').value||'').trim(),
-      discordId:(document.getElementById('c_discordId').value||'').trim(),
       steam:(document.getElementById('c_steam').value||'').trim(),
       age:(document.getElementById('c_age').value||'').trim(),
       timezone:(document.getElementById('c_tz').value||'').trim(),
@@ -4188,7 +3705,7 @@ function openCandidateDetail(c){
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:12px">
       <div>
         <div style="font-weight:900;font-size:18px">${escapeHtml(c.name||'(no name)')}</div>
-        <div class="muted small" style="margin-top:2px">${escapeHtml(c.discord||'—')}${c.discordId?` · <span style="cursor:pointer;color:var(--cyan)" data-cd-copydiscord>&lt;@${escapeHtml(c.discordId)}&gt;</span>`:''} · ${escapeHtml(c.steam||'—')}</div>
+        <div class="muted small" style="margin-top:2px">${escapeHtml(c.discord||'—')} · ${escapeHtml(c.steam||'—')}</div>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn-accent btn-sm" data-cd-copyinfo>Copy Info</button>
@@ -4271,7 +3788,6 @@ function openCandidateDetail(c){
     const lines=[
       c.name||'',
       `Discord: ${c.discord||'—'}`,
-      c.discordId?`Discord ID: <@${c.discordId}>`:'',
       `Steam: ${c.steam||'—'}`,
       `Accepted: ${c.acceptedDate?fmtMDY(new Date(c.acceptedDate+'T00:00:00')):'—'}`,
       `Positions: ${(c.chosenPositions||[]).join(', ')||'—'}`,
@@ -4281,12 +3797,6 @@ function openCandidateDetail(c){
       `Bank ID: ${c.bankAccount||'—'}`,
     ].filter(Boolean).join('\n');
     copyText(lines);
-  });
-
-  // Copy discord <@id>
-  document.querySelector('[data-cd-copydiscord]')?.addEventListener('click',(e)=>{
-    e.stopPropagation();
-    copyText(`<@${c.discordId}>`);
   });
 
   // Edit info
@@ -4307,9 +3817,9 @@ function openCandidateDetail(c){
       steam: c.steam||'',
       steamName: '',
       character: c.name||'',
-      callsign: nextAvailableDC(),
+      callsign: '',
       discord: c.discord||'',
-      discordId: c.discordId||'',
+      discordId: '',
       timeZone: c.timezone||'',
       bankAccount: c.bankAccount||'',
       rank: 'Trainee',
@@ -4324,8 +3834,6 @@ function openCandidateDetail(c){
     ensurePerson(newP);
     state.people.push(newP);
     c.status = 'hired';
-    // Auto-log Hired feedback entry
-    state.entries.push({id:uid(),personId:newP.id,dateISO:new Date().toISOString(),kind:'Hired',note:`Converted from interview candidate`});
     save(); closeModal(); renderCandidateCards();
     logAction('Candidate converted',newP.id,`${c.name} converted from interview candidate to Trainee`);
     toast(`${c.name} added as Trainee`);
@@ -4369,16 +3877,16 @@ function openEditCandidateModal(c){
       <div><div class="muted small">Discord</div><input id="ec_discord" value="${escapeHtml(c.discord||'')}"/></div>
     </div>
     <div class="row" style="margin-top:8px">
-      <div><div class="muted small">Discord ID</div><input id="ec_discordId" value="${escapeHtml(c.discordId||'')}"/></div>
       <div><div class="muted small">Steam ID</div><input id="ec_steam" value="${escapeHtml(c.steam||'')}"/></div>
-    </div>
-    <div class="row" style="margin-top:8px">
       <div><div class="muted small">Accepted Date</div><input type="date" id="ec_accepted" value="${escapeHtml(c.acceptedDate||'')}"/></div>
-      <div><div class="muted small">Age</div><input id="ec_age" value="${escapeHtml(c.age||'')}"/></div>
     </div>
     <div class="row" style="margin-top:8px">
+      <div><div class="muted small">Age</div><input id="ec_age" value="${escapeHtml(c.age||'')}"/></div>
       <div><div class="muted small">Timezone</div><input id="ec_tz" value="${escapeHtml(c.timezone||'')}"/></div>
+    </div>
+    <div class="row" style="margin-top:8px">
       <div><div class="muted small">Bank ID</div><input id="ec_bank" value="${escapeHtml(c.bankAccount||'')}"/></div>
+      <div></div>
     </div>
     <div style="margin-top:8px"><div class="muted small">Chosen Positions</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">${roleChecks}</div>
@@ -4393,7 +3901,6 @@ function openEditCandidateModal(c){
   document.getElementById('ec_save').addEventListener('click',()=>{
     c.name=(document.getElementById('ec_name').value||'').trim();
     c.discord=(document.getElementById('ec_discord').value||'').trim();
-    c.discordId=(document.getElementById('ec_discordId').value||'').trim();
     c.steam=(document.getElementById('ec_steam').value||'').trim();
     c.acceptedDate=(document.getElementById('ec_accepted').value||'').trim();
     c.age=(document.getElementById('ec_age').value||'').trim();
@@ -4473,73 +3980,35 @@ function openVoteModal(c){
 }
 
 // ═══════════════════════════════════════════
-// SIDEBAR HELPERS
-// ═══════════════════════════════════════════
-function updateSidebarActive(page){
-  document.querySelectorAll('.nav-item[id]').forEach(el=>{
-    const map={navHub:'hub',sopBtn:'sops',overviewBtn:'overview',mgmtCalBtn:'mgmtcal',promoBtn:'review',
-      interviewBtn:'interviews',leadershipBtn:'leadership',auditLogBtn:'auditlog',templatesBtn:'templates'};
-    const p=map[el.id]||'';
-    el.classList.toggle('active',p===page);
-  });
-}
-function closeMobileSidebar(){
-  document.getElementById('sidebar')?.classList.remove('mobile-open');
-  document.getElementById('mobileOverlay')?.classList.remove('show');
-}
-
-// ═══════════════════════════════════════════
 // WIRES
 // ═══════════════════════════════════════════
-// Sidebar
-document.getElementById('collapseBtn')?.addEventListener('click',()=>{document.getElementById('sidebar')?.classList.toggle('collapsed');});
-document.getElementById('hamburger')?.addEventListener('click',()=>{
-  document.getElementById('sidebar')?.classList.toggle('mobile-open');
-  document.getElementById('mobileOverlay')?.classList.toggle('show');
-});
-document.getElementById('mobileOverlay')?.addEventListener('click',closeMobileSidebar);
-document.getElementById('sidebarHome')?.addEventListener('click',()=>{closeMobileSidebar();renderHub();});
-document.getElementById('navHub')?.addEventListener('click',()=>{closeMobileSidebar();renderHub();});
-document.getElementById('sopBtn')?.addEventListener('click',()=>{closeMobileSidebar();renderSOPs();});
-document.getElementById('addSopBtn')?.addEventListener('click',()=>openSopModal(null));
-document.getElementById('signOutBtn')?.addEventListener('click',()=>{ auth.signOut(); });
-
-$("#importCsvBtn").addEventListener("click",()=>{closeMobileSidebar();$("#csvFile").click();});
+$("#importCsvBtn").addEventListener("click",()=>$("#csvFile").click());
 $("#csvFile").addEventListener("change",e=>{const f=e.target.files?.[0];if(f) importCSVFile(f);e.target.value="";});
-$("#exportBtn").addEventListener("click",()=>{closeMobileSidebar();exportBackup();});
-$("#importBackupBtn").addEventListener("click",()=>{closeMobileSidebar();$("#backupFile").click();});
+$("#exportBtn").addEventListener("click",exportBackup);
+$("#importBackupBtn").addEventListener("click",()=>$("#backupFile").click());
 $("#backupFile").addEventListener("change",e=>{const f=e.target.files?.[0];if(f) importBackup(f);e.target.value="";});
-$("#addPersonBtn").addEventListener("click",()=>{closeMobileSidebar();addPerson();});
-document.getElementById('dcNumbersBtn')?.addEventListener('click',()=>{closeMobileSidebar();openDCNumbersModal();});
-$("#promoBtn").addEventListener("click",()=>{closeMobileSidebar();state.ui.reviewTab='eotm';renderReviewPage();});
-$("#overviewBtn").addEventListener("click",()=>{closeMobileSidebar();renderOverview();});
-$("#mgmtCalBtn").addEventListener("click",()=>{closeMobileSidebar();renderMgmtCal();});
-$("#templatesBtn").addEventListener("click",()=>{closeMobileSidebar();renderTemplates();});
-$("#leadershipBtn").addEventListener("click",()=>{closeMobileSidebar();renderLeadership();});
-$("#auditLogBtn")?.addEventListener("click",()=>{closeMobileSidebar();renderAuditLog();});
+$("#addPersonBtn").addEventListener("click",addPerson);
+$("#promoBtn").addEventListener("click",()=>{state.ui.reviewTab='eotm';renderReviewPage();});
+$("#overviewBtn").addEventListener("click",renderOverview);
+$("#mgmtCalBtn").addEventListener("click",renderMgmtCal);
+$("#templatesBtn").addEventListener("click",renderTemplates);
+$("#leadershipBtn").addEventListener("click",renderLeadership);
+$("#auditLogBtn")?.addEventListener("click",renderAuditLog);
 document.getElementById('laApply')?.addEventListener('click',renderLeadership);
-document.getElementById('laSort')?.addEventListener('change',renderLeadership);
 document.getElementById('laClear')?.addEventListener('click',()=>{
   const f=document.getElementById('laFrom'),t=document.getElementById('laTo');
   if(f)f.value='';if(t)t.value='';renderLeadership();
 });
-$("#interviewBtn").addEventListener("click",()=>{closeMobileSidebar();renderInterviews();});
+$("#interviewBtn").addEventListener("click",renderInterviews);
 document.getElementById('addTemplateBtn')?.addEventListener('click',()=>openTemplateModal(null));
-document.getElementById('editQuestionsBtn')?.addEventListener('click',(e)=>{e.stopPropagation();openEditQuestionsModal();});
-document.getElementById('ivQuestionsToggle')?.addEventListener('click',(e)=>{
-  if(e.target.closest('button')) return;
-  const body=document.getElementById('questionsBody');
-  const chev=document.getElementById('ivQChevron');
-  if(body){body.style.display=body.style.display==='none'?'':'none';}
-  if(chev){chev.style.transform=body.style.display==='none'?'':'rotate(90deg)';}
-});
+document.getElementById('editQuestionsBtn')?.addEventListener('click',openEditQuestionsModal);
 document.getElementById('addCandidateBtn')?.addEventListener('click',openAddCandidateModal);
 document.getElementById('ivFilterAwait')?.addEventListener('click',()=>{state.ui.ivFilter='awaiting';save();renderCandidateCards();});
 document.getElementById('ivFilterDone')?.addEventListener('click',()=>{state.ui.ivFilter='interviewed';save();renderCandidateCards();});
 document.getElementById('ivFilterHired')?.addEventListener('click',()=>{state.ui.ivFilter='hired';save();renderCandidateCards();});
 document.getElementById('ivFilterDenied')?.addEventListener('click',()=>{state.ui.ivFilter='denied';save();renderCandidateCards();});
 document.getElementById('ivFilterAll')?.addEventListener('click',()=>{state.ui.ivFilter='all';save();renderCandidateCards();});
-$("#resetBtn").addEventListener("click",()=>{closeMobileSidebar();resetAll();});
+$("#resetBtn").addEventListener("click",resetAll);
 
 document.getElementById('addMgmtEventBtn')?.addEventListener('click',()=>openMgmtEventModal(null));
 document.getElementById('mcPrev')?.addEventListener('click',()=>{
@@ -4555,6 +4024,7 @@ $("#inactiveBtn").addEventListener("click",()=>{state.ui.inactiveOnly=!state.ui.
 document.getElementById('needsTrainBtn')?.addEventListener("click",()=>{state.ui.needsTrainOnly=!state.ui.needsTrainOnly;if(state.ui.needsTrainOnly){state.ui.showArchived=false;state.ui.inactiveOnly=false;}save();renderHub();});
 $("#pastBtn").addEventListener("click",()=>{state.ui.showArchived=!state.ui.showArchived;if(state.ui.showArchived){state.ui.inactiveOnly=false;state.ui.needsTrainOnly=false;}save();renderHub();});
 
+$("#backBtn").addEventListener("click",renderHub);
 $("#editPersonBtn").addEventListener("click",editBasics);
 $("#addDisciplineBtn").addEventListener("click",()=>addEntry());
 $("#addNoteBtn").addEventListener("click",()=>openNoteModal(null));
@@ -4603,6 +4073,27 @@ document.getElementById('rankFilter')?.addEventListener("change",()=>{if(state.u
 
 document.getElementById('reviewTabEotm')?.addEventListener('click',()=>{state.ui.reviewTab='eotm';save();renderReviewPage();});
 document.getElementById('reviewTabPromo')?.addEventListener('click',()=>{state.ui.reviewTab='promo';save();renderReviewPage();});
+
+// Click status text to force reconnect when disconnected
+document.getElementById('saveState')?.addEventListener('click',()=>{
+  if(!fbConnected || pendingSave){
+    $("#saveState").textContent="reconnecting...";
+    $("#saveState").style.color="";
+    db.goOffline();
+    setTimeout(()=>db.goOnline(), 500);
+  }
+});
+
+// Periodic connection health check — every 60s, verify we can still write
+setInterval(()=>{
+  if(!fbConnected) return;
+  db.ref('.info/serverTimeOffset').once('value').catch(()=>{
+    console.warn("Connection health check failed");
+    fbConnected = false;
+    $("#saveState").textContent="⚠ connection lost — click to reconnect";
+    $("#saveState").style.color="#ff6b6b";
+  });
+}, 60000);
 
 // ═══════════════════════════════════════════
 // BOOT
