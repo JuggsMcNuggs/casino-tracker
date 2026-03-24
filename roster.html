@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Diamond Casino — Staff Roster</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap');
+    :root {
+      --bg: #070b12;
+      --panel: #0c1017;
+      --panel2: #11161f;
+      --surface: #172033;
+      --line: #1b2640;
+      --line2: #243050;
+      --text: #e8ecf4;
+      --muted: #6b7a96;
+      --accent: #8b6cff;
+      --accent-dim: rgba(139,108,255,.12);
+      --loa: #60a5fa;
+      --loa-dim: rgba(96,165,250,.1);
+      --loa-border: rgba(96,165,250,.45);
+      --r: 10px;
+
+      --sop: #a78bfa; --sop-bg: rgba(167,139,250,.15); --sop-tx: #c4b5fd;
+      --sec: #f59e0b; --sec-bg: rgba(245,158,11,.13); --sec-tx: #fbbf24;
+      --cro: #34d399; --cro-bg: rgba(52,211,153,.13); --cro-tx: #6ee7b7;
+      --bar: #fb7185; --bar-bg: rgba(251,113,133,.12); --bar-tx: #fda4af;
+      --val: #38bdf8; --val-bg: rgba(56,189,248,.12); --val-tx: #7dd3fc;
+      --med: #e879f9; --med-bg: rgba(232,121,249,.12); --med-tx: #f0abfc;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      padding: 20px 24px;
+      text-align: center;
+    }
+    .header-title { font-size: 18px; font-weight: 700; letter-spacing: .3px; }
+    .header-sub { font-size: 11px; color: var(--muted); letter-spacing: .4px; margin-top: 2px; }
+    .header-status { font-size: 10px; margin-top: 6px; color: var(--muted); transition: color .3s; }
+    .header-count {
+      display: inline-block; margin-top: 8px;
+      font-size: 10px; font-weight: 500; color: var(--accent);
+      background: var(--accent-dim); padding: 3px 10px;
+      border-radius: 20px; border: 1px solid rgba(139,108,255,.2);
+    }
+
+    .wrap { max-width: 780px; margin: 0 auto; padding: 12px 20px 40px; }
+
+    .search-bar { margin-bottom: 12px; }
+    .search-bar input {
+      width: 100%; padding: 9px 14px;
+      border-radius: var(--r); border: 1px solid var(--line);
+      background: var(--panel); color: var(--text);
+      font-family: inherit; font-size: 13px; outline: none;
+      transition: border-color .2s;
+    }
+    .search-bar input:focus { border-color: var(--accent); }
+    .search-bar input::placeholder { color: var(--muted); }
+
+    .group-label {
+      font-size: 11px; font-weight: 500; color: var(--muted);
+      margin: 16px 0 6px 12px; letter-spacing: .3px;
+    }
+    .divider { height: 1px; background: var(--line); margin: 1px 12px; }
+
+    .row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 12px;
+    }
+    .row-left {
+      display: flex; align-items: center; gap: 8px;
+      width: 200px; flex-shrink: 0;
+    }
+    .row-dc { font-size: 10px; font-weight: 500; color: var(--accent); min-width: 34px; }
+    .row-nm {
+      font-size: 13px; font-weight: 500; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .row-bar {
+      flex: 1; display: flex; align-items: center; gap: 3px;
+      height: 26px;
+    }
+    .seg {
+      height: 100%; flex: 1; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 500; letter-spacing: .2px;
+    }
+    .seg.off { background: var(--surface); }
+    .seg.s-sop { background: var(--sop-bg); color: var(--sop-tx); }
+    .seg.s-sec { background: var(--sec-bg); color: var(--sec-tx); }
+    .seg.s-cro { background: var(--cro-bg); color: var(--cro-tx); }
+    .seg.s-bar { background: var(--bar-bg); color: var(--bar-tx); }
+    .seg.s-val { background: var(--val-bg); color: var(--val-tx); }
+    .seg.s-med { background: var(--med-bg); color: var(--med-tx); }
+
+    .loa-card {
+      border: 1px solid var(--loa-border);
+      border-radius: var(--r);
+      background: var(--loa-dim);
+      margin: 3px 0;
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 12px;
+    }
+    .loa-card .row-nm { color: var(--loa); }
+    .loa-card .row-dc { color: var(--loa); }
+    .loa-card .seg { opacity: .3; }
+    .loa-card .seg.off { opacity: .1; }
+    .loa-label {
+      font-size: 10px; font-weight: 500; color: var(--loa);
+      white-space: nowrap; flex-shrink: 0; min-width: 100px; text-align: right;
+    }
+
+    .legend {
+      display: flex; gap: 14px; flex-wrap: wrap;
+      margin-top: 20px; padding: 12px 14px;
+      background: var(--panel); border-radius: var(--r);
+      border: 1px solid var(--line);
+    }
+    .legend-i { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); }
+    .legend-s { width: 14px; height: 10px; border-radius: 3px; }
+    .legend-s.l-sop { background: var(--sop-bg); border: 1px solid var(--sop); }
+    .legend-s.l-sec { background: var(--sec-bg); border: 1px solid var(--sec); }
+    .legend-s.l-cro { background: var(--cro-bg); border: 1px solid var(--cro); }
+    .legend-s.l-bar { background: var(--bar-bg); border: 1px solid var(--bar); }
+    .legend-s.l-val { background: var(--val-bg); border: 1px solid var(--val); }
+    .legend-s.l-med { background: var(--med-bg); border: 1px solid var(--med); }
+
+    .loading, .empty { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 13px; }
+    .loading::after {
+      content: ''; display: block; width: 22px; height: 22px;
+      margin: 12px auto 0; border: 2px solid var(--line);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .footer { text-align: center; padding: 20px; font-size: 10px; color: var(--muted); border-top: 1px solid var(--line); }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">Diamond Casino & Resort</div>
+  <div class="header-sub">STAFF ROSTER</div>
+  <div class="header-status" id="status">Loading...</div>
+  <div class="header-count" id="countBadge" style="display:none"></div>
+</div>
+
+<div class="wrap">
+  <div class="search-bar">
+    <input type="text" id="search" placeholder="Search by name or DC number..." />
+  </div>
+  <div id="roster"><div class="loading">Connecting to database</div></div>
+  <div class="legend" id="legend" style="display:none">
+    <div class="legend-i"><div class="legend-s l-sop"></div>SOPs</div>
+    <div class="legend-i"><div class="legend-s l-sec"></div>Security</div>
+    <div class="legend-i"><div class="legend-s l-cro"></div>Croupier</div>
+    <div class="legend-i"><div class="legend-s l-bar"></div>Bartender</div>
+    <div class="legend-i"><div class="legend-s l-val"></div>Valet</div>
+    <div class="legend-i"><div class="legend-s l-med"></div>Media</div>
+  </div>
+</div>
+
+<div class="footer">Read-only roster — updates live from the staff tracker</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDxBR0GsFpWEYOHkl26BSxp_tMlyOGiIcU",
+  authDomain: "diamond-casino-tracker.firebaseapp.com",
+  databaseURL: "https://diamond-casino-tracker-default-rtdb.firebaseio.com",
+  projectId: "diamond-casino-tracker",
+  storageBucket: "diamond-casino-tracker.firebasestorage.app",
+  messagingSenderId: "973952156488",
+  appId: "1:973952156488:web:a4729ae9f843ae941b297d"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const dbRef = db.ref('tracker');
+
+const RANK_ORDER = {Director:0, Manager:1, Supervisor:2, "Senior Employee":3, Employee:4, Trainee:5};
+const ROLES = ["Security","Croupier","Bartender","Valet"];
+const ROLE_CLS = {Security:"sec", Croupier:"cro", Bartender:"bar", Valet:"val"};
+
+let data = null;
+
+function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+function isOnLOA(pid, loas){
+  const now=Date.now();
+  return loas.some(l=>l.personId===pid && new Date(l.startISO).getTime()<=now && now<=new Date(l.endISO).getTime());
+}
+function getLOAEnd(pid, loas){
+  const now=Date.now();
+  const a=loas.find(l=>l.personId===pid && new Date(l.startISO).getTime()<=now && now<=new Date(l.endISO).getTime());
+  return a ? new Date(a.endISO) : null;
+}
+
+function buildBar(p){
+  let h='';
+  h += (p.training?.sop?.done) ? '<div class="seg s-sop">SOP</div>' : '<div class="seg off"></div>';
+  for(const role of ROLES){
+    const trained = !!(p.training?.roles?.[role]?.date);
+    h += trained ? '<div class="seg s-'+ROLE_CLS[role]+'">'+role.substring(0,3).toUpperCase()+'</div>' : '<div class="seg off"></div>';
+  }
+  h += p.mediaTeam ? '<div class="seg s-med">MED</div>' : '<div class="seg off"></div>';
+  return h;
+}
+
+function render(filter){
+  const host=document.getElementById('roster');
+  const badge=document.getElementById('countBadge');
+  const legend=document.getElementById('legend');
+
+  if(!data||!data.people){
+    host.innerHTML='<div class="empty">No roster data available</div>';
+    return;
+  }
+
+  const loas=data.loas||[];
+  const q=(filter||'').toLowerCase().trim();
+
+  let people=data.people.filter(p=>!p.archived);
+  if(q){
+    people=people.filter(p=>{
+      const name=(p.character||p.steamName||'').toLowerCase();
+      const dc=(p.callsign||'').toLowerCase();
+      return name.includes(q)||dc.includes(q);
+    });
+  }
+  people.sort((a,b)=>{
+    const ra=RANK_ORDER[a.rank]??99, rb=RANK_ORDER[b.rank]??99;
+    if(ra!==rb) return ra-rb;
+    return (a.character||'').localeCompare(b.character||'');
+  });
+
+  const totalActive=data.people.filter(p=>!p.archived).length;
+  badge.style.display='';
+  badge.textContent=totalActive+' Active Staff';
+  legend.style.display='';
+
+  if(!people.length){
+    host.innerHTML='<div class="empty">No results found</div>';
+    return;
+  }
+
+  let html='';
+  let currentRank=null;
+  let first=true;
+
+  for(const p of people){
+    const rank=p.rank||'Unranked';
+    if(rank!==currentRank){
+      currentRank=rank;
+      const label=rank==='Senior Employee'?'Senior Employees':rank+'s';
+      html+='<div class="group-label">'+esc(label)+'</div>';
+      first=true;
+    }
+
+    const onLOA=isOnLOA(p.id, loas);
+    const loaEnd=getLOAEnd(p.id, loas);
+    const loaLabel=loaEnd?'LOA til '+loaEnd.toLocaleDateString('en-US',{month:'short',day:'numeric'}):'LOA';
+    const bar=buildBar(p);
+
+    if(!first && !onLOA) html+='<div class="divider"></div>';
+    first=false;
+
+    if(onLOA){
+      html+='<div class="loa-card">'
+        +'<div class="row-left"><span class="row-dc">'+esc(p.callsign||'—')+'</span><span class="row-nm">'+esc(p.character||p.steamName||'Unknown')+'</span></div>'
+        +'<div class="row-bar">'+bar+'</div>'
+        +'<div class="loa-label">'+esc(loaLabel)+'</div>'
+        +'</div>';
+    } else {
+      html+='<div class="row">'
+        +'<div class="row-left"><span class="row-dc">'+esc(p.callsign||'—')+'</span><span class="row-nm">'+esc(p.character||p.steamName||'Unknown')+'</span></div>'
+        +'<div class="row-bar">'+bar+'</div>'
+        +'</div>';
+    }
+  }
+
+  host.innerHTML=html;
+}
+
+dbRef.on('value', snap=>{
+  data=snap.val();
+  document.getElementById('status').textContent='● Live';
+  document.getElementById('status').style.color='#4ade80';
+  render(document.getElementById('search').value);
+}, err=>{
+  console.error("Firebase error:",err);
+  document.getElementById('status').textContent='⚠ Offline';
+  document.getElementById('status').style.color='#fb7185';
+  document.getElementById('roster').innerHTML='<div class="empty">Could not connect. Try refreshing.</div>';
+});
+
+document.getElementById('search').addEventListener('input', e=>render(e.target.value));
+</script>
+</body>
+</html>
