@@ -1456,6 +1456,7 @@ function ensureState(data){
 
 let state = seed();
 let firebaseReady = false;
+let justSaved = 0; // timestamp of last save, used to ignore our own echoes
 
 // Save to Firebase (debounced)
 function save(){
@@ -1486,6 +1487,7 @@ function save(){
       }
     }, 8000);
 
+    justSaved = Date.now();
     dbRef.set(state).then(()=>{
       confirmed = true;
       clearTimeout(saveTimeout);
@@ -1508,6 +1510,42 @@ function save(){
     });
   }, 400);
 }
+
+// ═══════════════════════════════════════════
+// REALTIME SYNC — picks up other users' saves
+// ═══════════════════════════════════════════
+const UI_KEYS = ['selectedId','ui','monthCursor','profileMonthCursor','overviewMonthCursor','mgmtMonthCursor'];
+
+dbRef.on('value', snap => {
+  // Skip during boot — boot handles its own load
+  if(!firebaseReady) return;
+
+  // Skip our own echo (within 3 seconds of our save)
+  if(Date.now() - justSaved < 3000) return;
+
+  const incoming = snap.val();
+  if(!incoming || !Array.isArray(incoming.people)) return;
+
+  // Preserve our local UI state, take everything else from remote
+  const myUI = {};
+  for(const k of UI_KEYS) myUI[k] = state[k];
+
+  state = ensureState(incoming);
+
+  // Restore our UI state so we don't jump views
+  for(const k of UI_KEYS) if(myUI[k] !== undefined) state[k] = myUI[k];
+
+  // Re-link currentUser to the updated people array
+  if(currentUser){
+    const updated = state.people.find(p => p.id === currentUser.id);
+    if(updated) currentUser = updated;
+  }
+
+  // Re-render whatever view is currently showing
+  try{ startApp(); }catch(e){ console.warn("Re-render after sync:", e); }
+  toast("Synced from another user");
+  console.log("Realtime sync: merged remote changes");
+});
 
 // Boot: load from Firebase, fall back to localStorage, then start
 const DEV_MODE = new URLSearchParams(window.location.search).has('dev');
