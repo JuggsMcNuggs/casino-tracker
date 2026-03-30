@@ -784,8 +784,37 @@
     <section id="auditLogView" style="display:none;">
       <div class="panel">
         <div class="panel-head">
-          <div class="h">Audit Log</div>
-          <div class="muted small">Last 500 actions</div>
+          <div>
+            <div class="h">Audit Log</div>
+            <div class="muted small" id="auditLogSub">Last 500 actions</div>
+          </div>
+          <div class="row tight" style="gap:6px;flex-wrap:wrap;">
+            <input type="text" id="alSearch" placeholder="Search..." style="width:140px;font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);color:var(--text);" />
+            <select id="alFilter" style="font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);color:var(--text);">
+              <option value="all">All actions</option>
+              <option value="Profile edited">Profile edits</option>
+              <option value="Rank changed">Rank changes</option>
+              <option value="Promoted">Promotions</option>
+              <option value="Training updated">Training</option>
+              <option value="LOA">LOAs</option>
+              <option value="Feedback">Feedback</option>
+              <option value="Note">Notes</option>
+              <option value="Calendar">Calendar</option>
+              <option value="Candidate">Candidates</option>
+              <option value="Interview">Interviews</option>
+              <option value="Rental">Rentals</option>
+              <option value="Appeal">Appeals</option>
+              <option value="Archived">Archives</option>
+              <option value="Media">Media</option>
+              <option value="Account">Account</option>
+              <option value="Warning">Warnings</option>
+              <option value="Dismissed">Dismissals</option>
+            </select>
+            <select id="alSort" style="font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);color:var(--text);">
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+            </select>
+          </div>
         </div>
         <div class="panel-body" id="auditLogBody"></div>
       </div>
@@ -2533,7 +2562,7 @@ function renderProfile(){
   document.getElementById("addLOABtn")?.addEventListener("click",()=>openLOAModal(null));
   document.getElementById("deletePersonBtn")?.addEventListener("click",deletePerson);
   document.getElementById("toggleMediaBtn")?.addEventListener("click",()=>{
-    p.mediaTeam=!p.mediaTeam; save(); renderProfile(); toast(p.mediaTeam?'Media Team ON':'Media Team OFF');
+    p.mediaTeam=!p.mediaTeam; logAction('Media team toggled',p.id,p.mediaTeam?'Added to media team':'Removed from media team'); save(); renderProfile(); toast(p.mediaTeam?'Media Team ON':'Media Team OFF');
   });
   document.querySelectorAll("button[data-copy-msg]").forEach(btn=>{
     btn.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();copyText(btn.getAttribute("data-copy-msg")||"");});
@@ -2753,6 +2782,7 @@ function openTrainingModal(pid){
       }
     }
 
+    logAction('Training updated',p.id,'Training records modified');
     save();closeModal();renderProfile();toast("Training saved");
   });
 }
@@ -2971,7 +3001,7 @@ function renderLOABanner(pid){
         <button class="btn-ghost btn-sm" data-edit-loa="${escapeHtml(l.id)}">Edit</button>
         <button class="btn-ghost btn-sm" data-del-loa="${escapeHtml(l.id)}">Del</button></td></tr>`).join('')}</tbody></table>
     `;
-    loaBanner.querySelectorAll('[data-del-loa]').forEach(btn=>{btn.addEventListener('click',()=>{state.loas=state.loas.filter(x=>x.id!==btn.getAttribute('data-del-loa'));save();renderProfile();});});
+    loaBanner.querySelectorAll('[data-del-loa]').forEach(btn=>{btn.addEventListener('click',()=>{logAction('LOA removed',pid,'LOA deleted');state.loas=state.loas.filter(x=>x.id!==btn.getAttribute('data-del-loa'));save();renderProfile();});});
     loaBanner.querySelectorAll('[data-edit-loa]').forEach(btn=>{btn.addEventListener('click',()=>{openLOAModal(btn.getAttribute('data-edit-loa'));});});
   } else { loaBanner.style.display="none"; }
 }
@@ -3001,7 +3031,7 @@ function renderEntries(pid){
     </div>`;
   }).join('')||`<div class="muted small">No entries yet.</div>`;
 
-  host.querySelectorAll('[data-del-entry]').forEach(btn=>{btn.addEventListener('click',()=>{state.entries=state.entries.filter(x=>x.id!==btn.getAttribute('data-del-entry'));save();renderProfile();});});
+  host.querySelectorAll('[data-del-entry]').forEach(btn=>{btn.addEventListener('click',()=>{logAction('Feedback removed',state.selectedId,'Entry deleted');state.entries=state.entries.filter(x=>x.id!==btn.getAttribute('data-del-entry'));save();renderProfile();});});
   host.querySelectorAll('[data-edit-entry]').forEach(btn=>{btn.addEventListener('click',()=>{addEntry(btn.getAttribute('data-edit-entry'));});});
   host.querySelectorAll('[data-view-entry]').forEach(btn=>{btn.addEventListener('click',()=>{
     const e=state.entries.find(x=>x.id===btn.getAttribute('data-view-entry'));
@@ -3030,7 +3060,7 @@ function renderNotes(pid){
     </div>
   `).join('')||`<div class="muted small">No notes yet.</div>`;
 
-  host.querySelectorAll('[data-del-note]').forEach(btn=>{btn.addEventListener('click',()=>{state.notesEntries=state.notesEntries.filter(x=>x.id!==btn.getAttribute('data-del-note'));save();renderNotes(pid);});});
+  host.querySelectorAll('[data-del-note]').forEach(btn=>{btn.addEventListener('click',()=>{logAction('Note removed',pid,'Note deleted');state.notesEntries=state.notesEntries.filter(x=>x.id!==btn.getAttribute('data-del-note'));save();renderNotes(pid);});});
   host.querySelectorAll('[data-edit-note]').forEach(btn=>{btn.addEventListener('click',()=>{
     const n=state.notesEntries.find(x=>x.id===btn.getAttribute('data-edit-note'));
     if(n) openNoteModal(n);
@@ -3246,6 +3276,7 @@ function addEntry(existingId=null){
     const note=(document.getElementById('en_note').value||'').trim();
     if(existing){existing.dateISO=iso;existing.kind=kind;existing.note=note;}
     else{state.entries.push({id:uid(),personId:p.id,dateISO:iso,kind,note});}
+    logAction(existing?'Feedback edited':'Feedback added',p.id,kind+(note?' — '+note.substring(0,60):''));
     save();closeModal();renderProfile();
   });
 }
@@ -3270,6 +3301,7 @@ function openLOAModal(existingId=null){
     const reason=(document.getElementById('loa_reason').value||'').trim();
     if(existing){existing.startISO=sISO;existing.endISO=eISO;existing.reason=reason;}
     else{state.loas.push({id:uid(),personId:p.id,startISO:sISO,endISO:eISO,reason});}
+    logAction(existing?'LOA edited':'LOA added',p.id,reason||'No reason given');
     save();closeModal();renderProfile();
   });
 }
@@ -3287,6 +3319,7 @@ function openNoteModal(existing){
     const text=(document.getElementById('note_text').value||'').trim(); if(!text) return alert('Cannot be empty.');
     if(existing){existing.dateISO=isoFromDateValue(ds);existing.note=text;}
     else{state.notesEntries.push({id:uid(),personId:state.selectedId,dateISO:isoFromDateValue(ds),note:text});}
+    logAction(existing?'Note edited':'Note added',state.selectedId,text.substring(0,60));
     save();closeModal();renderProfile();
   });
 }
@@ -3498,6 +3531,8 @@ function openMgmtDayDetail(dayKey,evts){
   });
   document.querySelectorAll('[data-del-mgmt]').forEach(btn=>{
     btn.addEventListener('click',()=>{
+      const delMe=(state.mgmtEvents||[]).find(x=>x.id===btn.getAttribute('data-del-mgmt'));
+      logAction('Calendar event deleted','',delMe?(delMe.type+' — '+(delMe.note||'').substring(0,40)):'Event removed');
       state.mgmtEvents=(state.mgmtEvents||[]).filter(x=>x.id!==btn.getAttribute('data-del-mgmt'));
       save();closeModal();renderMgmtCal();
     });
@@ -3605,6 +3640,7 @@ function openMgmtEventModal(existing,prefillDate){
       else toast("Saved");
     } else { toast("Saved"); }
 
+    logAction(isEdit?'Calendar event edited':'Calendar event added','',type+' — '+(note||role||'').substring(0,40));
     save();closeModal();renderMgmtCal();
   });
 }
@@ -3612,45 +3648,76 @@ function openMgmtEventModal(existing,prefillDate){
 // ═══════════════════════════════════════════
 // RENDER: AUDIT LOG
 // ═══════════════════════════════════════════
-function renderAuditLog(){
-  hideAllViews();
-  document.getElementById('auditLogView').style.display="";
-  $("#searchBar").style.display="none";
-  updateSidebarActive('auditlog');
-  state.ui.view="auditlog"; save();
+function renderAuditLog(skipNav){
+  if(!skipNav){
+    hideAllViews();
+    document.getElementById('auditLogView').style.display="";
+    $("#searchBar").style.display="none";
+    updateSidebarActive('auditlog');
+    state.ui.view="auditlog"; save();
+  }
 
   const host=document.getElementById('auditLogBody');
-  const log=(state.auditLog||[]).slice().reverse();
+  const filterVal=(document.getElementById('alFilter')?.value||'all');
+  const sortVal=(document.getElementById('alSort')?.value||'newest');
+  const searchVal=(document.getElementById('alSearch')?.value||'').toLowerCase().trim();
+
+  let log=(state.auditLog||[]).slice();
+
+  if(filterVal!=='all'){
+    log=log.filter(e=>(e.action||'').includes(filterVal));
+  }
+  if(searchVal){
+    log=log.filter(e=>{
+      const hay=((e.action||'')+(e.targetName||'')+(e.detail||'')+(e.userName||'')).toLowerCase();
+      return hay.includes(searchVal);
+    });
+  }
+
+  if(sortVal==='newest') log.reverse();
+
+  document.getElementById('auditLogSub').textContent=log.length+' of '+(state.auditLog||[]).length+' entries';
+
   if(!log.length){
-    host.innerHTML=`<div class="muted small">No actions logged yet.</div>`;
+    host.innerHTML='<div class="muted small" style="padding:20px;text-align:center;">No matching entries.</div>';
     return;
   }
 
-  host.innerHTML=`<div style="max-height:600px;overflow-y:auto"><table style="table-layout:fixed;width:100%">
-    <colgroup><col style="width:140px"><col style="width:120px"><col style="width:120px"><col><col style="width:100px"></colgroup>
-    <thead><tr>
-      <th style="position:sticky;top:0;background:var(--panel);z-index:1">Date</th>
-      <th style="position:sticky;top:0;background:var(--panel);z-index:1">Action</th>
-      <th style="position:sticky;top:0;background:var(--panel);z-index:1">Target</th>
-      <th style="position:sticky;top:0;background:var(--panel);z-index:1">Detail</th>
-      <th style="position:sticky;top:0;background:var(--panel);z-index:1;text-align:right">By</th>
-    </tr></thead><tbody>` + log.map(entry=>{
+  const actionColors={
+    'Promoted':'var(--good)','Archived':'var(--bad)','Dismissed':'var(--bad)',
+    'Revived':'var(--loa)','Warning sent':'var(--warn)','Marked EOTM':'var(--accent)',
+    'Rank changed':'var(--cyan)','Profile edited':'var(--muted)',
+    'Candidate converted':'var(--good)','Account linked':'var(--cyan)',
+    'Training updated':'var(--cyan)','Media team toggled':'var(--interview)',
+    'LOA added':'var(--loa)','LOA edited':'var(--loa)','LOA removed':'var(--loa)',
+    'Feedback added':'var(--warn)','Feedback edited':'var(--warn)','Feedback removed':'var(--warn)',
+    'Note added':'var(--muted)','Note edited':'var(--muted)','Note removed':'var(--muted)',
+    'Calendar event added':'var(--event)','Calendar event edited':'var(--event)','Calendar event deleted':'var(--bad)',
+    'Interview questions updated':'var(--accent)','Interview recorded':'var(--good)',
+    'Candidate status changed':'var(--accent)','Candidate vote':'var(--accent)',
+    'Rental approved':'var(--good)','Rental denied':'var(--bad)','Rental pending':'var(--warn)',
+    'Appeal approved':'var(--good)','Appeal denied':'var(--bad)','Appeal pending':'var(--warn)'
+  };
+
+  host.innerHTML='<div style="max-height:600px;overflow-y:auto"><table style="table-layout:fixed;width:100%">'
+    +'<colgroup><col style="width:140px"><col style="width:130px"><col style="width:120px"><col><col style="width:100px"></colgroup>'
+    +'<thead><tr>'
+    +'<th style="position:sticky;top:0;background:var(--panel);z-index:1">Date</th>'
+    +'<th style="position:sticky;top:0;background:var(--panel);z-index:1">Action</th>'
+    +'<th style="position:sticky;top:0;background:var(--panel);z-index:1">Target</th>'
+    +'<th style="position:sticky;top:0;background:var(--panel);z-index:1">Detail</th>'
+    +'<th style="position:sticky;top:0;background:var(--panel);z-index:1;text-align:right">By</th>'
+    +'</tr></thead><tbody>' + log.map(entry=>{
     const time=formatLocal(entry.timestamp);
-    const actionColors={
-      'Promoted':'var(--good)','Archived':'var(--bad)','Dismissed':'var(--bad)',
-      'Revived':'var(--loa)','Warning sent':'var(--warn)','Marked EOTM':'var(--accent)',
-      'Rank changed':'var(--cyan)','Profile edited':'var(--muted)',
-      'Candidate converted':'var(--good)','Account linked':'var(--cyan)'
-    };
     const color=actionColors[entry.action]||'var(--muted)';
-    return `<tr>
-      <td style="color:var(--muted);font-size:11px;white-space:nowrap">${escapeHtml(time)}</td>
-      <td style="font-weight:700;color:${color}">${escapeHtml(entry.action)}</td>
-      <td style="font-weight:700;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-al-profile="${escapeHtml(entry.targetId)}">${escapeHtml(entry.targetName||'—')}</td>
-      <td style="color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escapeHtml(entry.detail||'')}">${escapeHtml(entry.detail||'')}</td>
-      <td style="color:var(--muted);font-size:11px;text-align:right;white-space:nowrap">${escapeHtml(entry.userName||'System')}</td>
-    </tr>`;
-  }).join('') + `</tbody></table></div>`;
+    return '<tr>'
+      +'<td style="color:var(--muted);font-size:11px;white-space:nowrap">'+escapeHtml(time)+'</td>'
+      +'<td style="font-weight:700;color:'+color+'">'+escapeHtml(entry.action)+'</td>'
+      +'<td style="font-weight:700;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-al-profile="'+escapeHtml(entry.targetId)+'">'+escapeHtml(entry.targetName||'—')+'</td>'
+      +'<td style="color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+escapeHtml(entry.detail||'')+'">'+escapeHtml(entry.detail||'')+'</td>'
+      +'<td style="color:var(--muted);font-size:11px;text-align:right;white-space:nowrap">'+escapeHtml(entry.userName||'System')+'</td>'
+      +'</tr>';
+  }).join('') + '</tbody></table></div>';
 
   host.querySelectorAll('[data-al-profile]').forEach(el=>{
     el.addEventListener('click',()=>{
@@ -4220,6 +4287,7 @@ function openEditQuestionsModal(){
 
   document.getElementById('iq_save').addEventListener('click',()=>{
     state.interviewQuestions=collectQs();
+    logAction('Interview questions updated','','Questions list modified');
     save();closeModal();renderInterviews();toast("Questions saved");
   });
 }
@@ -4436,6 +4504,7 @@ function openCandidateDetail(c){
   // Status change
   document.getElementById('cd_status')?.addEventListener('change',e=>{
     c.status=e.target.value;
+    logAction('Candidate status changed','',c.name+' — '+e.target.value);
     save();renderCandidateCards();
   });
 
@@ -4603,6 +4672,7 @@ function openInterviewRecordModal(c){
     c.qa=qs.map((q,i)=>({q, a:(ansEls[i]?.value||'').trim()}));
     c.interviewDate=(document.getElementById('ir_date').value||'').trim();
     if(c.status==='awaiting') c.status='interviewed';
+    logAction('Interview recorded','',c.name+' — interview completed');
     save();closeModal();openCandidateDetail(c);renderCandidateCards();toast("Interview saved");
   });
 }
@@ -4641,6 +4711,7 @@ function openVoteModal(c){
       c.votes||=[];
       c.votes.push({id:uid(),voterId,voterName:voter?.label||'Unknown',vote:voteEl.value,comment:(document.getElementById('v_comment').value||'').trim()});
     }
+    logAction('Candidate vote','',c.name+' — '+voteEl.value);
     save();closeModal();openCandidateDetail(c);renderCandidateCards();toast("Vote recorded");
   });
 }
@@ -4769,7 +4840,9 @@ function renderRentals(skipNav){
 }
 
 function updateRentalStatus(id, newStatus){
+  const r = portalRentals.find(x=>x.id===id);
   rentalRef.child(id).update({status:newStatus}).then(()=>{
+    logAction('Rental '+newStatus,'',r?(r.venue+' — '+r.name):'');
     toast('Rental '+newStatus);
   }).catch(err=>{ console.error(err); toast('Update failed'); });
 }
@@ -4779,6 +4852,7 @@ function approveRental(id){
   if(!r) return;
   rentalRef.child(id).update({status:'approved'}).then(()=>{
     toast('Rental approved — added to calendar');
+    logAction('Rental approved','',r.venue+' — '+r.name);
     // Auto-add to management calendar
     if(r.date){
       const iso = isoFromDateValue(r.date);
@@ -4863,7 +4937,9 @@ function renderAppeals(skipNav){
 }
 
 function updateAppealStatus(id, newStatus){
+  const a = portalAppeals.find(x=>x.id===id);
   appealRef.child(id).update({status:newStatus}).then(()=>{
+    logAction('Appeal '+newStatus,'',a?(a.type+' — '+a.name):'');
     toast(newStatus==='approved'?'Approved':'Status updated');
   }).catch(err=>{ console.error(err); toast('Update failed'); });
 }
@@ -4897,6 +4973,9 @@ $("#mgmtCalBtn").addEventListener("click",()=>{closeMobileSidebar();renderMgmtCa
 $("#templatesBtn").addEventListener("click",()=>{closeMobileSidebar();renderTemplates();});
 $("#leadershipBtn").addEventListener("click",()=>{closeMobileSidebar();renderLeadership();});
 $("#auditLogBtn")?.addEventListener("click",()=>{closeMobileSidebar();renderAuditLog();});
+document.getElementById('alFilter')?.addEventListener('change',()=>renderAuditLog(true));
+document.getElementById('alSort')?.addEventListener('change',()=>renderAuditLog(true));
+document.getElementById('alSearch')?.addEventListener('input',()=>renderAuditLog(true));
 document.getElementById('laApply')?.addEventListener('click',renderLeadership);
 document.getElementById('laSort')?.addEventListener('change',renderLeadership);
 document.getElementById('laClear')?.addEventListener('click',()=>{
