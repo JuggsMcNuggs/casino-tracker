@@ -4737,7 +4737,7 @@ function closeMobileSidebar(){
 // PORTAL: RENTALS & APPEALS
 // ═══════════════════════════════════════════
 let rentalFilter = 'all';
-let appealFilter = 'all';
+let appealFilter = 'pending';
 
 rentalRef.on('value', snap => {
   const data = snap.val();
@@ -4870,6 +4870,7 @@ function approveRental(id){
 
 function renderAppeals(skipNav){
   if(!skipNav){
+    appealFilter = 'pending';
     hideAllViews();
     document.getElementById('appealsView').style.display = '';
     $("#searchBar").style.display = "none";
@@ -4925,12 +4926,15 @@ function renderAppeals(skipNav){
       ${a.reason?`<div style="font-size:12px;margin-bottom:6px;padding:8px 10px;background:var(--panel2);border-radius:6px;line-height:1.5;"><span class="muted">Their statement:</span><br>${escapeHtml(a.reason)}</div>`:''}
       ${a.vseReason?`<div style="font-size:12px;margin-bottom:6px;padding:8px 10px;background:var(--panel2);border-radius:6px;line-height:1.5;"><span class="muted">Reason:</span><br>${escapeHtml(a.vseReason)}</div>`:''}
       <div class="muted small" style="margin-bottom:8px;">Submitted ${submitted}</div>
-      ${a.status==='pending'?`<div style="display:flex;gap:6px;">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        ${a.status==='pending'?`
         <button class="btn-accent btn-sm" onclick="updateAppealStatus('${escapeHtml(a.id)}','approved')">Approve</button>
         <button class="btn-ghost btn-sm" style="color:var(--bad);border-color:var(--bad)" onclick="updateAppealStatus('${escapeHtml(a.id)}','denied')">Deny</button>
-      </div>`:`<div style="display:flex;gap:6px;">
+        `:`
         <button class="btn-ghost btn-sm" onclick="updateAppealStatus('${escapeHtml(a.id)}','pending')">Back to pending</button>
-      </div>`}
+        `}
+        <button class="btn-danger btn-sm" onclick="deleteAppeal('${escapeHtml(a.id)}')">Delete</button>
+      </div>
     </div>`;
   }
   document.getElementById('appealsBody').innerHTML = html;
@@ -4942,6 +4946,15 @@ function updateAppealStatus(id, newStatus){
     logAction('Appeal '+newStatus,'',a?(a.type+' — '+a.name):'');
     toast(newStatus==='approved'?'Approved':'Status updated');
   }).catch(err=>{ console.error(err); toast('Update failed'); });
+}
+
+function deleteAppeal(id){
+  const a = portalAppeals.find(x=>x.id===id);
+  if(!confirm(`Delete this ${a?.type||'appeal'} from ${a?.name||'Unknown'}? This cannot be undone.`)) return;
+  appealRef.child(id).remove().then(()=>{
+    logAction('Appeal deleted','',a?(a.type+' — '+a.name):'');
+    toast('Deleted');
+  }).catch(err=>{ console.error(err); toast('Delete failed'); });
 }
 
 // ═══════════════════════════════════════════
