@@ -4556,9 +4556,9 @@ function openCandidateDetail(c){
       bankAccount: c.bankAccount||'',
       rank: 'Trainee',
       priorityRole: c.firstChoice||'',
-      crossTrain: [],
+      crossTrain: (c.chosenPositions||[]).filter(r => r !== (c.firstChoice||'')),
       training: {sop:{done:false,trainerId:'',date:'',comment:''},roles:{}},
-      notes: '',
+      notes: c.notes||'',
       archived: false,
       archiveType: '', archiveReason: '', archiveDate: '',
       rehiredDate: '', mediaTeam: false
@@ -4736,7 +4736,7 @@ function closeMobileSidebar(){
 // ═══════════════════════════════════════════
 // PORTAL: RENTALS & APPEALS
 // ═══════════════════════════════════════════
-let rentalFilter = 'all';
+let rentalFilter = 'pending';
 let appealFilter = 'pending';
 
 rentalRef.on('value', snap => {
@@ -4764,6 +4764,7 @@ function updatePortalBadges(){
 
 function renderRentals(skipNav){
   if(!skipNav){
+    rentalFilter = 'pending';
     hideAllViews();
     document.getElementById('rentalsView').style.display = '';
     $("#searchBar").style.display = "none";
@@ -4828,12 +4829,15 @@ function renderRentals(skipNav){
       ${r.dressCode?`<div style="font-size:12px;margin-bottom:6px;"><span class="muted">Dress code:</span> ${escapeHtml(r.dressCode)}</div>`:''}
       ${r.notes?`<div style="font-size:12px;margin-bottom:6px;"><span class="muted">Notes:</span> ${escapeHtml(r.notes)}</div>`:''}
       <div class="muted small" style="margin-bottom:8px;">Submitted ${submitted}</div>
-      ${r.status==='pending'?`<div style="display:flex;gap:6px;">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        ${r.status==='pending'?`
         <button class="btn-accent btn-sm" onclick="approveRental('${escapeHtml(r.id)}')">Approve</button>
         <button class="btn-ghost btn-sm" style="color:var(--bad);border-color:var(--bad)" onclick="updateRentalStatus('${escapeHtml(r.id)}','denied')">Deny</button>
-      </div>`:`<div style="display:flex;gap:6px;">
+        `:`
         <button class="btn-ghost btn-sm" onclick="updateRentalStatus('${escapeHtml(r.id)}','pending')">Back to pending</button>
-      </div>`}
+        `}
+        <button class="btn-danger btn-sm" onclick="deleteRental('${escapeHtml(r.id)}')">Delete</button>
+      </div>
     </div>`;
   }
   document.getElementById('rentalsBody').innerHTML = html;
@@ -4845,6 +4849,15 @@ function updateRentalStatus(id, newStatus){
     logAction('Rental '+newStatus,'',r?(r.venue+' — '+r.name):'');
     toast('Rental '+newStatus);
   }).catch(err=>{ console.error(err); toast('Update failed'); });
+}
+
+function deleteRental(id){
+  const r = portalRentals.find(x=>x.id===id);
+  if(!confirm(`Delete rental request from ${r?.name||'Unknown'}? This cannot be undone.`)) return;
+  rentalRef.child(id).remove().then(()=>{
+    logAction('Rental deleted','',r?(r.venue+' — '+r.name):'');
+    toast('Deleted');
+  }).catch(err=>{ console.error(err); toast('Delete failed'); });
 }
 
 function approveRental(id){
