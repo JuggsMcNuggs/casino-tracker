@@ -324,6 +324,8 @@
       min-height: calc(100vh - 155px);
     }
     #mgmtCalendar .cal-grid {
+      /* Row 1 (day-name headers) stays auto-height; rows 2+ (day cells) get the tall treatment */
+      grid-template-rows: auto;
       grid-auto-rows: minmax(130px, auto);
     }
     .cal-head { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); text-align: center; padding: 4px; font-weight: 700; }
@@ -4679,12 +4681,12 @@ function openInterviewRecordModal(c){
 
   // Two-column layout for questions when there are multiple
   const useCols=qs.length>2;
-  if(useCols) html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">`;
+  if(useCols) html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;grid-auto-rows:1fr;">`;
 
   qs.forEach((q,i)=>{
-    html+=`<div style="margin-bottom:${useCols?'0':'16px'};padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r2);">
-      <div style="font-weight:800;font-size:13px;margin-bottom:8px;line-height:1.4;color:var(--text);">Q${i+1}: ${escapeHtml(q)}</div>
-      <textarea class="ir-answer" rows="5" placeholder="Their answer..." style="font-size:13px;line-height:1.6;resize:vertical;width:100%;">${escapeHtml(answers[i]||'')}</textarea>
+    html+=`<div style="display:flex;flex-direction:column;margin-bottom:${useCols?'0':'16px'};padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r2);">
+      <div style="font-weight:800;font-size:13px;margin-bottom:8px;line-height:1.4;color:var(--text);min-height:36px;">Q${i+1}: ${escapeHtml(q)}</div>
+      <textarea class="ir-answer" placeholder="Their answer..." style="flex:1;min-height:120px;font-size:13px;line-height:1.6;resize:vertical;width:100%;">${escapeHtml(answers[i]||'')}</textarea>
     </div>`;
   });
 
