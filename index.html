@@ -317,18 +317,14 @@
     .cal-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      grid-auto-rows: 1fr;
       gap: 6px;
     }
-    /* Manager calendar stretches to fill available viewport */
-    #mgmtCalendar {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
+    /* Manager calendar — fills viewport without flex chain issues */
+    #mgmtCalView .panel-body {
+      min-height: calc(100vh - 155px);
     }
     #mgmtCalendar .cal-grid {
-      flex: 1;
-      grid-auto-rows: minmax(110px, 1fr);
+      grid-auto-rows: minmax(130px, auto);
     }
     .cal-head { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); text-align: center; padding: 4px; font-weight: 700; }
     .cal-day {
@@ -470,8 +466,8 @@
     /* ── INTERVIEW CANDIDATES ── */
     .cand-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 12px;
     }
     .cand-card {
       padding: 12px;
@@ -775,8 +771,8 @@
     </section>
 
     <!-- MANAGEMENT CALENDAR -->
-    <section id="mgmtCalView" style="display:none;min-height:calc(100vh - 80px);flex-direction:column;">
-      <div class="panel" style="flex:1;display:flex;flex-direction:column;min-height:calc(100vh - 80px);">
+    <section id="mgmtCalView" style="display:none;">
+      <div class="panel">
         <div class="panel-head">
           <div class="h">Calendar</div>
           <div class="row tight" style="gap:6px">
@@ -786,8 +782,8 @@
             <button class="btn-accent btn-sm" id="addMgmtEventBtn">+ Entry</button>
           </div>
         </div>
-        <div class="panel-body" style="flex:1;display:flex;flex-direction:column;">
-          <div id="mgmtCalendar" style="flex:1;display:flex;flex-direction:column;"></div>
+        <div class="panel-body">
+          <div id="mgmtCalendar"></div>
         </div>
       </div>
     </section>
@@ -3421,7 +3417,7 @@ function hideAllViews(){
 
 function renderMgmtCal(){
   hideAllViews();
-  document.getElementById('mgmtCalView').style.display="flex";
+  document.getElementById('mgmtCalView').style.display="";
   $("#searchBar").style.display="none";
   updateSidebarActive('mgmtcal');
   state.ui.view="mgmtcal"; save();
@@ -4279,7 +4275,7 @@ function openEditQuestionsModal(){
     <button class="btn-accent" id="iq_save">Save</button>
   </div>`;
 
-  openModal("Edit Interview Questions",html);
+  openModal("Edit Interview Questions",html,{wide:true});
 
   function collectQs(){
     return Array.from(document.querySelectorAll('.iq-input')).map(ta=>ta.value.trim()).filter(Boolean);
@@ -4389,31 +4385,27 @@ function openAddCandidateModal(){
   const roleChecks=FIXED_ROLES.map(r=>`<label style="display:flex;gap:6px;align-items:center;font-size:12px"><input type="checkbox" data-cpos="${escapeHtml(r)}"/>${escapeHtml(r)}</label>`).join('');
 
   openModal("Add Candidate",`
-    <div class="row">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
       <div><div class="muted small">Name</div><input id="c_name" placeholder="Character name"/></div>
       <div><div class="muted small">Discord</div><input id="c_discord" placeholder="Discord name"/></div>
-    </div>
-    <div class="row" style="margin-top:8px">
       <div><div class="muted small">Discord ID</div><input id="c_discordId" placeholder="e.g. 123456789012345678"/></div>
       <div><div class="muted small">Steam ID</div><input id="c_steam" placeholder="steam:..."/></div>
-    </div>
-    <div class="row" style="margin-top:8px">
       <div><div class="muted small">Accepted Date</div><input type="date" id="c_accepted" value="${dateValueFromISO(new Date().toISOString())}"/></div>
       <div><div class="muted small">Age</div><input id="c_age" placeholder="Age"/></div>
-    </div>
-    <div class="row" style="margin-top:8px">
       <div><div class="muted small">Timezone</div><input id="c_tz" placeholder="EST, CST, etc."/></div>
       <div><div class="muted small">Bank ID</div><input id="c_bank" placeholder="Bank ID"/></div>
     </div>
-    <div style="margin-top:8px"><div class="muted small">Chosen Positions</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">${roleChecks}</div>
+    <div style="margin-top:14px"><div class="muted small">Chosen Positions</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">${roleChecks}</div>
     </div>
-    <div style="margin-top:8px"><div class="muted small">First Choice</div>
-      <select id="c_first"><option value="">—</option>${FIXED_ROLES.map(r=>`<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`).join('')}</select>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">
+      <div><div class="muted small">First Choice</div>
+        <select id="c_first"><option value="">—</option>${FIXED_ROLES.map(r=>`<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`).join('')}</select>
+      </div>
     </div>
-    <div style="margin-top:8px"><div class="muted small">Notes</div><textarea id="c_notes" rows="2" placeholder="Optional..."></textarea></div>
-    <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn-accent" id="c_save">Add</button></div>
-  `);
+    <div style="margin-top:14px"><div class="muted small">Notes</div><textarea id="c_notes" rows="3" placeholder="Optional..."></textarea></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:14px"><button class="btn-accent" id="c_save">Add Candidate</button></div>
+  `,{wide:true});
 
   document.getElementById('c_save').addEventListener('click',()=>{
     const name=(document.getElementById('c_name').value||'').trim();
@@ -4628,31 +4620,27 @@ function openEditCandidateModal(c){
   }).join('');
 
   openModal("Edit Candidate",`
-    <div class="row">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
       <div><div class="muted small">Name</div><input id="ec_name" value="${escapeHtml(c.name||'')}"/></div>
       <div><div class="muted small">Discord</div><input id="ec_discord" value="${escapeHtml(c.discord||'')}"/></div>
-    </div>
-    <div class="row" style="margin-top:8px">
       <div><div class="muted small">Discord ID</div><input id="ec_discordId" value="${escapeHtml(c.discordId||'')}"/></div>
       <div><div class="muted small">Steam ID</div><input id="ec_steam" value="${escapeHtml(c.steam||'')}"/></div>
-    </div>
-    <div class="row" style="margin-top:8px">
       <div><div class="muted small">Accepted Date</div><input type="date" id="ec_accepted" value="${escapeHtml(c.acceptedDate||'')}"/></div>
       <div><div class="muted small">Age</div><input id="ec_age" value="${escapeHtml(c.age||'')}"/></div>
-    </div>
-    <div class="row" style="margin-top:8px">
       <div><div class="muted small">Timezone</div><input id="ec_tz" value="${escapeHtml(c.timezone||'')}"/></div>
       <div><div class="muted small">Bank ID</div><input id="ec_bank" value="${escapeHtml(c.bankAccount||'')}"/></div>
     </div>
-    <div style="margin-top:8px"><div class="muted small">Chosen Positions</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">${roleChecks}</div>
+    <div style="margin-top:14px"><div class="muted small">Chosen Positions</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">${roleChecks}</div>
     </div>
-    <div style="margin-top:8px"><div class="muted small">First Choice</div>
-      <select id="ec_first"><option value="">—</option>${FIXED_ROLES.map(r=>`<option value="${escapeHtml(r)}" ${c.firstChoice===r?'selected':''}>${escapeHtml(r)}</option>`).join('')}</select>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">
+      <div><div class="muted small">First Choice</div>
+        <select id="ec_first"><option value="">—</option>${FIXED_ROLES.map(r=>`<option value="${escapeHtml(r)}" ${c.firstChoice===r?'selected':''}>${escapeHtml(r)}</option>`).join('')}</select>
+      </div>
     </div>
-    <div style="margin-top:8px"><div class="muted small">Notes</div><textarea id="ec_notes" rows="2">${escapeHtml(c.notes||'')}</textarea></div>
-    <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn-accent" id="ec_save">Save</button></div>
-  `);
+    <div style="margin-top:14px"><div class="muted small">Notes</div><textarea id="ec_notes" rows="3">${escapeHtml(c.notes||'')}</textarea></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:14px"><button class="btn-accent" id="ec_save">Save Changes</button></div>
+  `,{wide:true});
 
   document.getElementById('ec_save').addEventListener('click',()=>{
     c.name=(document.getElementById('ec_name').value||'').trim();
