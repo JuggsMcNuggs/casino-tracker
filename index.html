@@ -207,7 +207,7 @@
     .search-bar select { min-width: 180px; }
 
     /* ── MAIN ── */
-    main { margin-left: 220px; padding: 16px 28px; transition: margin-left .2s ease; }
+    main { margin-left: 220px; padding: 16px 28px 48px; transition: margin-left .2s ease; }
     .sidebar.collapsed ~ main { margin-left: 56px; }
 
     /* ── PANELS ── */
@@ -1031,9 +1031,6 @@
         <div class="panel-body" id="reviewBody"></div>
       </div>
     </section>
-  <footer style="margin-left:0;padding:18px 28px 12px;text-align:center;font-size:11px;color:rgba(107,122,150,.5);letter-spacing:.4px;border-top:1px solid var(--line);margin-top:24px;">
-    Created by JuggsMcNuggs. Built with her A.I. Levi.
-  </footer>
   </main>
 
   <!-- Modal -->
@@ -1280,7 +1277,7 @@ function nextAvailableDC(){
     if(n!==Infinity) used.add(n);
   }
   for(let i=21;i<=999;i++){
-    if(!used.has(i)) return `DC-${i}`;
+    if(!used.has(i)) return `DC${i}`;
   }
   return '';
 }
@@ -1331,7 +1328,7 @@ function openDCNumbersModal(){
     const name=filled?escapeHtml(s.owner.character||s.owner.steamName||'Unknown'):'<span style="color:var(--muted)">Open</span>';
     const rank=filled?`<span style="font-size:10px;color:var(--muted)">${escapeHtml(s.owner.rank||'')}</span>`:'';
     html+=`<div style="padding:8px 10px;border:1px solid ${border};border-radius:8px;background:${bg};font-size:12px;display:flex;justify-content:space-between;align-items:center">
-      <div><span style="font-weight:900;color:var(--accent);margin-right:6px">DC-${s.n}</span>${name}</div>
+      <div><span style="font-weight:900;color:var(--accent);margin-right:6px">DC${s.n}</span>${name}</div>
       ${rank}
     </div>`;
   }
@@ -1342,7 +1339,7 @@ function openDCNumbersModal(){
   html+=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px;margin-bottom:16px">`;
   for(const s of staffSlots){
     html+=`<div style="padding:8px 10px;border:1px solid var(--good-border);border-radius:8px;background:var(--good-dim);font-size:12px;display:flex;justify-content:space-between;align-items:center">
-      <div><span style="font-weight:900;color:var(--good);margin-right:6px">DC-${s.n}</span>${escapeHtml(s.p.character||s.p.steamName||'Unknown')}</div>
+      <div><span style="font-weight:900;color:var(--good);margin-right:6px">DC${s.n}</span>${escapeHtml(s.p.character||s.p.steamName||'Unknown')}</div>
       <span style="font-size:10px;color:var(--muted)">${escapeHtml(s.p.rank||'')}</span>
     </div>`;
   }
@@ -1352,7 +1349,7 @@ function openDCNumbersModal(){
   html+=`<div style="font-weight:700;font-size:12px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">Available (DC 21+)</div>`;
   html+=`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:16px">`;
   for(const n of available.slice(0,30)){
-    html+=`<span class="pill" style="font-size:11px;font-weight:700">DC-${n}</span>`;
+    html+=`<span class="pill" style="font-size:11px;font-weight:700">DC${n}</span>`;
   }
   if(available.length>30) html+=`<span class="pill" style="font-size:11px">+${available.length-30} more</span>`;
   html+=`</div>`;
@@ -1362,7 +1359,7 @@ function openDCNumbersModal(){
     html+=`<div style="font-weight:700;font-size:12px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)">Archived (numbers recycled)</div>`;
     html+=`<div style="display:flex;flex-wrap:wrap;gap:4px">`;
     for(const s of archivedDCs){
-      html+=`<span class="pill bad" style="font-size:10px">DC-${s.n} ${escapeHtml(s.p.character||'')}</span>`;
+      html+=`<span class="pill bad" style="font-size:10px">DC${s.n} ${escapeHtml(s.p.character||'')}</span>`;
     }
     html+=`</div>`;
   }
@@ -3196,7 +3193,7 @@ function addPerson(){
     <div class="row"><div><div class="muted small">Steam ID</div><input id="f_steam" placeholder="steam:11000010abcd123"/></div>
     <div><div class="muted small">Steam Name</div><input id="f_steamName" placeholder="Display name"/></div></div>
     <div class="row" style="margin-top:8px"><div><div class="muted small">Character</div><input id="f_character" placeholder="Character name"/></div>
-    <div><div class="muted small">Callsign</div><input id="f_callsign" value="${escapeHtml(nextDC)}" placeholder="DC-21"/></div></div>
+    <div><div class="muted small">Callsign</div><input id="f_callsign" value="${escapeHtml(nextDC)}" placeholder="DC21"/></div></div>
     <div class="row" style="margin-top:8px"><div><div class="muted small">Rank</div><select id="f_rank"><option value="">—</option>${RANKS.map(r=>`<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`).join('')}</select></div><div></div></div>
     <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn-accent" id="f_save">Save</button></div>
   `);
@@ -5185,5 +5182,8 @@ setInterval(()=>{
 // ═══════════════════════════════════════════
 boot();
 </script>
+<footer style="position:fixed;bottom:0;left:0;right:0;z-index:29;padding:9px 20px;text-align:center;font-size:11px;color:rgba(107,122,150,.45);letter-spacing:.4px;background:var(--bg);border-top:1px solid var(--line);pointer-events:none;">
+  Created by JuggsMcNuggs. Built with her A.I. Levi.
+</footer>
 </body>
 </html>
