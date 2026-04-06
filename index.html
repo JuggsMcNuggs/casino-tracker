@@ -317,7 +317,18 @@
     .cal-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
+      grid-auto-rows: 1fr;
       gap: 6px;
+    }
+    /* Manager calendar stretches to fill available viewport */
+    #mgmtCalendar {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    #mgmtCalendar .cal-grid {
+      flex: 1;
+      grid-auto-rows: minmax(110px, 1fr);
     }
     .cal-head { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); text-align: center; padding: 4px; font-weight: 700; }
     .cal-day {
@@ -403,6 +414,7 @@
       box-shadow: var(--shadow);
     }
     .modal.modal-wide { width: min(820px, 100%); }
+    .modal.modal-interview { width: min(1100px, 96vw); max-height: 94vh; }
     .modal-head {
       padding: 12px 16px;
       border-bottom: 1px solid var(--line);
@@ -763,8 +775,8 @@
     </section>
 
     <!-- MANAGEMENT CALENDAR -->
-    <section id="mgmtCalView" style="display:none;">
-      <div class="panel">
+    <section id="mgmtCalView" style="display:none;min-height:calc(100vh - 80px);flex-direction:column;">
+      <div class="panel" style="flex:1;display:flex;flex-direction:column;min-height:calc(100vh - 80px);">
         <div class="panel-head">
           <div class="h">Calendar</div>
           <div class="row tight" style="gap:6px">
@@ -774,8 +786,8 @@
             <button class="btn-accent btn-sm" id="addMgmtEventBtn">+ Entry</button>
           </div>
         </div>
-        <div class="panel-body">
-          <div id="mgmtCalendar"></div>
+        <div class="panel-body" style="flex:1;display:flex;flex-direction:column;">
+          <div id="mgmtCalendar" style="flex:1;display:flex;flex-direction:column;"></div>
         </div>
       </div>
     </section>
@@ -1857,7 +1869,9 @@ function startApp(){
 // ═══════════════════════════════════════════
 function openModal(title,html,opts={}){
   const modal=document.querySelector('.modal');
-  if(opts.wide) modal.classList.add('modal-wide'); else modal.classList.remove('modal-wide');
+  modal.classList.remove('modal-wide','modal-interview');
+  if(opts.wide) modal.classList.add('modal-wide');
+  if(opts.interview) modal.classList.add('modal-interview');
   $("#modalTitle").textContent=title; $("#modalBody").innerHTML=html; $("#modalBackdrop").style.display="flex";
 }
 function closeModal(){ $("#modalBackdrop").style.display="none"; }
@@ -2189,6 +2203,8 @@ function renderHub(){
   document.getElementById('leadershipView').style.display="none";
   document.getElementById('auditLogView').style.display="none";
   document.getElementById('sopView').style.display="none";
+  document.getElementById('rentalsView').style.display="none";
+  document.getElementById('appealsView').style.display="none";
   $("#searchBar").style.display="";
   updateSidebarActive('hub');
   state.ui.view="hub"; state.selectedId=null;
@@ -2322,6 +2338,8 @@ function renderOverview(){
   document.getElementById('auditLogView').style.display="none";
   document.getElementById('leadershipView').style.display="none";
   document.getElementById('sopView').style.display="none";
+  document.getElementById('rentalsView').style.display="none";
+  document.getElementById('appealsView').style.display="none";
   $("#searchBar").style.display="none";
   updateSidebarActive('overview');
   state.ui.view="overview"; save();
@@ -2510,6 +2528,8 @@ function renderProfile(){
   document.getElementById('auditLogView').style.display="none";
   document.getElementById('leadershipView').style.display="none";
   document.getElementById('sopView').style.display="none";
+  document.getElementById('rentalsView').style.display="none";
+  document.getElementById('appealsView').style.display="none";
   $("#searchBar").style.display="none";
   updateSidebarActive('');
 
@@ -3082,6 +3102,8 @@ function renderReviewPage(){
   document.getElementById('interviewView').style.display="none";
   document.getElementById('leadershipView').style.display="none";
   document.getElementById('sopView').style.display="none";
+  document.getElementById('rentalsView').style.display="none";
+  document.getElementById('appealsView').style.display="none";
   $("#searchBar").style.display="none";
   updateSidebarActive('review');
 
@@ -3399,7 +3421,7 @@ function hideAllViews(){
 
 function renderMgmtCal(){
   hideAllViews();
-  document.getElementById('mgmtCalView').style.display="";
+  document.getElementById('mgmtCalView').style.display="flex";
   $("#searchBar").style.display="none";
   updateSidebarActive('mgmtcal');
   state.ui.view="mgmtcal"; save();
@@ -4649,31 +4671,76 @@ function openEditCandidateModal(c){
 }
 
 function openInterviewRecordModal(c){
+  const DRAFT_KEY='iv_draft_'+c.id;
+
+  // Restore any auto-saved draft
+  let savedDraft=null;
+  try{ savedDraft=JSON.parse(localStorage.getItem(DRAFT_KEY)); }catch(e){}
+
   // If they already have Q&A, use those questions. Otherwise copy from template.
   const qs=(c.qa&&c.qa.length)?c.qa.map(p=>p.q):(state.interviewQuestions||[]).slice();
-  const answers=(c.qa&&c.qa.length)?c.qa.map(p=>p.a||''):qs.map(()=>'');
+  const answers=savedDraft?.answers||((c.qa&&c.qa.length)?c.qa.map(p=>p.a||''):qs.map(()=>''));
+  const dateVal=savedDraft?.date||(c.interviewDate?dateValueFromStored(c.interviewDate):dateValueFromISO(new Date().toISOString()));
 
-  let html=`<div class="muted small" style="margin-bottom:10px">Record answers for <b>${escapeHtml(c.name)}</b>. Questions are from your template.</div>`;
-  html+=`<div style="margin-bottom:10px"><div class="muted small">Interview Date</div><input type="date" id="ir_date" value="${escapeHtml(c.interviewDate?dateValueFromStored(c.interviewDate):dateValueFromISO(new Date().toISOString()))}"/></div>`;
+  let html=`<div style="margin-bottom:16px;padding:12px 14px;background:var(--accent-dim);border:1px solid var(--accent-mid);border-radius:var(--r);font-size:13px;">
+    Recording answers for <b>${escapeHtml(c.name)}</b>. Answers auto-save as you type — you won't lose your work if you navigate away.
+    ${savedDraft?`<span style="color:var(--good);font-weight:700;margin-left:10px">&#10003; Draft restored</span>`:''}
+  </div>`;
+
+  html+=`<div style="margin-bottom:20px;max-width:260px"><div class="muted small" style="margin-bottom:5px;font-weight:700;">Interview Date</div><input type="date" id="ir_date" value="${escapeHtml(dateVal)}" style="font-size:13px;padding:7px 10px;width:100%;"/></div>`;
+
+  // Two-column layout for questions when there are multiple
+  const useCols=qs.length>2;
+  if(useCols) html+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">`;
 
   qs.forEach((q,i)=>{
-    html+=`<div style="margin-bottom:10px">
-      <div style="font-weight:700;font-size:12px;margin-bottom:4px">Q${i+1}: ${escapeHtml(q)}</div>
-      <textarea class="ir-answer" rows="3" placeholder="Their answer...">${escapeHtml(answers[i]||'')}</textarea>
+    html+=`<div style="margin-bottom:${useCols?'0':'16px'};padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r2);">
+      <div style="font-weight:800;font-size:13px;margin-bottom:8px;line-height:1.4;color:var(--text);">Q${i+1}: ${escapeHtml(q)}</div>
+      <textarea class="ir-answer" rows="5" placeholder="Their answer..." style="font-size:13px;line-height:1.6;resize:vertical;width:100%;">${escapeHtml(answers[i]||'')}</textarea>
     </div>`;
   });
 
-  html+=`<div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn-accent" id="ir_save">Save</button></div>`;
+  if(useCols) html+=`</div>`;
 
-  openModal("Record Interview — "+c.name,html,{wide:true});
+  html+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:14px;border-top:1px solid var(--line);">
+    <span style="font-size:11px;color:var(--good);font-weight:700;" id="ir_autosave_status"></span>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-ghost btn-sm" id="ir_discard">Discard Draft</button>
+      <button class="btn-accent" id="ir_save" style="padding:8px 20px;font-size:13px;">Save Interview</button>
+    </div>
+  </div>`;
+
+  openModal("Record Interview — "+c.name,html,{interview:true});
+
+  // Auto-save to localStorage on every keystroke (debounced 500ms)
+  let saveTimer;
+  function autosave(){
+    clearTimeout(saveTimer);
+    saveTimer=setTimeout(()=>{
+      const ansEls=document.querySelectorAll('.ir-answer');
+      const draft={date:(document.getElementById('ir_date')?.value||'').trim(),answers:Array.from(ansEls).map(el=>el.value)};
+      localStorage.setItem(DRAFT_KEY,JSON.stringify(draft));
+      const status=document.getElementById('ir_autosave_status');
+      if(status){ status.textContent='Draft saved'; setTimeout(()=>{ if(status) status.textContent=''; },2000); }
+    },500);
+  }
+  document.querySelectorAll('.ir-answer').forEach(el=>el.addEventListener('input',autosave));
+  document.getElementById('ir_date')?.addEventListener('change',autosave);
 
   document.getElementById('ir_save').addEventListener('click',()=>{
     const ansEls=document.querySelectorAll('.ir-answer');
-    c.qa=qs.map((q,i)=>({q, a:(ansEls[i]?.value||'').trim()}));
+    c.qa=qs.map((q,i)=>({q,a:(ansEls[i]?.value||'').trim()}));
     c.interviewDate=(document.getElementById('ir_date').value||'').trim();
     if(c.status==='awaiting') c.status='interviewed';
+    localStorage.removeItem(DRAFT_KEY);
     logAction('Interview recorded','',c.name+' — interview completed');
     save();closeModal();openCandidateDetail(c);renderCandidateCards();toast("Interview saved");
+  });
+
+  document.getElementById('ir_discard')?.addEventListener('click',()=>{
+    if(!confirm('Discard draft and close?')) return;
+    localStorage.removeItem(DRAFT_KEY);
+    closeModal();
   });
 }
 
