@@ -4948,13 +4948,17 @@ function renderAppeals(skipNav){
     state.ui.view = 'appeals'; save();
   }
 
-  const filtered = appealFilter === 'all' ? portalAppeals : portalAppeals.filter(a => a.status === appealFilter);
+  let filtered = appealFilter === 'all' ? portalAppeals.slice() : portalAppeals.filter(a => a.status === appealFilter);
+  // Priority items always float to the top
+  filtered.sort((a,b) => (b.priority?1:0) - (a.priority?1:0));
+
   const total = portalAppeals.length;
   const pending = portalAppeals.filter(a => a.status === 'pending').length;
-  document.getElementById('appealsSub').textContent = `${total} total, ${pending} pending`;
+  const priority = portalAppeals.filter(a => a.priority).length;
+  document.getElementById('appealsSub').textContent = `${total} total · ${pending} pending${priority?' · '+priority+' priority':''}`;
 
   document.querySelectorAll('#appealsView .btn-ghost').forEach(b => {
-    const f = b.textContent.toLowerCase();
+    const f = b.getAttribute('data-iv-filter')||b.textContent.toLowerCase();
     b.style.borderColor = f === appealFilter ? 'var(--accent)' : '';
     b.style.color = f === appealFilter ? 'var(--accent)' : '';
   });
@@ -4973,48 +4977,94 @@ function renderAppeals(skipNav){
     const typeLabel = isVSE ? 'VSE Request' : 'Blacklist Appeal';
     const typeColor = isVSE ? 'var(--cyan)' : 'var(--warn)';
     const sc = statusColors[a.status] || 'var(--muted)';
+    const noteCount = (a.staffNotes||[]).length;
+    const assignedName = a.assignedTo?.name ? a.assignedTo.name.split('—').pop().trim() : null;
 
-    html += `<div style="border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;border-left:3px solid ${sc};">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
-        <div>
-          <div style="font-size:14px;font-weight:600;">${escapeHtml(a.name||'Unknown')}</div>
-          <div class="muted small">${escapeHtml(a.discord||'')} · ${escapeHtml(a.phone||'')}</div>
+    html += `<div data-appeal-id="${escapeHtml(a.id)}" style="border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;border-left:3px solid ${sc};cursor:pointer;transition:background .12s;" onmouseenter="this.style.background='rgba(139,108,255,.04)'" onmouseleave="this.style.background=''">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px;">
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
+            ${a.priority?`<span style="font-size:11px;color:var(--warn);font-weight:800;">⚑</span>`:''}
+            <span style="font-size:15px;font-weight:700;">${escapeHtml(a.name||'Unknown')}</span>
+          </div>
+          <div class="muted small">${escapeHtml(a.discord||'')}${a.phone?' · '+escapeHtml(a.phone):''}</div>
+          ${assignedName?`<div style="font-size:11px;margin-top:3px;color:var(--muted);">Assigned: <b style="color:var(--text)">${escapeHtml(assignedName)}</b></div>`:''}
         </div>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <span style="font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid ${typeColor};color:${typeColor};font-weight:500;">${typeLabel}</span>
-          <span style="font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid ${sc};color:${sc};text-transform:uppercase;font-weight:500;">${escapeHtml(a.status||'pending')}</span>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;">
+          <div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;">
+            <span style="font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid ${typeColor};color:${typeColor};font-weight:600;">${typeLabel}</span>
+            <span style="font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid ${sc};color:${sc};text-transform:uppercase;font-weight:600;">${escapeHtml(a.status||'pending')}</span>
+            ${noteCount?`<span style="font-size:10px;padding:2px 8px;border-radius:10px;border:1px solid var(--line2);color:var(--muted);font-weight:600;">📝 ${noteCount}</span>`:''}
+          </div>
+          <div class="muted small">Submitted ${submitted}</div>
         </div>
       </div>
-      <div style="font-size:12px;display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
-        <div><span class="muted">DOB:</span> ${escapeHtml(a.dob||'—')}</div>
-        ${!isVSE?`<div><span class="muted">When:</span> ${escapeHtml(a.whenBlacklisted||'—')}</div>`:''}
-        ${!isVSE?`<div><span class="muted">Who:</span> ${escapeHtml(a.whoBlacklisted||'—')}</div>`:''}
-        ${!isVSE&&a.slotsRelated?`<div><span class="muted">Slots related:</span> ${escapeHtml(a.slotsRelated)}</div>`:''}
-        ${isVSE?`<div><span class="muted">Duration:</span> ${escapeHtml(a.duration||a.vseDuration||'—')}</div>`:''}
-      </div>
-      ${a.detail?`<div style="font-size:12px;margin-bottom:6px;padding:8px 10px;background:var(--panel2);border-radius:6px;line-height:1.5;"><span class="muted">Their statement:</span><br>${escapeHtml(a.detail)}</div>`:''}
-      ${a.reason?`<div style="font-size:12px;margin-bottom:6px;padding:8px 10px;background:var(--panel2);border-radius:6px;line-height:1.5;"><span class="muted">Their statement:</span><br>${escapeHtml(a.reason)}</div>`:''}
-      ${a.vseReason?`<div style="font-size:12px;margin-bottom:6px;padding:8px 10px;background:var(--panel2);border-radius:6px;line-height:1.5;"><span class="muted">Reason:</span><br>${escapeHtml(a.vseReason)}</div>`:''}
-      <div class="muted small" style="margin-bottom:8px;">Submitted ${submitted}</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      ${a.decisionReason?`<div style="font-size:11px;padding:5px 8px;background:var(--panel2);border-radius:6px;margin-bottom:8px;color:var(--muted);"><b>Decision:</b> ${escapeHtml(a.decisionReason.substring(0,120))}${a.decisionReason.length>120?'…':''}</div>`:''}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+        <button class="btn-ghost btn-sm" data-appeal-view="${escapeHtml(a.id)}" style="font-weight:700;">View Details</button>
         ${a.status==='pending'?`
-        <button class="btn-accent btn-sm" onclick="updateAppealStatus('${escapeHtml(a.id)}','approved')">Approve</button>
-        <button class="btn-ghost btn-sm" style="color:var(--bad);border-color:var(--bad)" onclick="updateAppealStatus('${escapeHtml(a.id)}','denied')">Deny</button>
+        <button class="btn-accent btn-sm" data-appeal-approve="${escapeHtml(a.id)}">Approve</button>
+        <button class="btn-ghost btn-sm" style="color:var(--bad);border-color:var(--bad)" data-appeal-deny="${escapeHtml(a.id)}">Deny</button>
         `:`
-        <button class="btn-ghost btn-sm" onclick="updateAppealStatus('${escapeHtml(a.id)}','pending')">Back to pending</button>
+        <button class="btn-ghost btn-sm" data-appeal-reopen="${escapeHtml(a.id)}">Back to Pending</button>
         `}
-        <button class="btn-danger btn-sm" onclick="deleteAppeal('${escapeHtml(a.id)}')">Delete</button>
+        <button class="btn-danger btn-sm" data-appeal-del="${escapeHtml(a.id)}">Delete</button>
       </div>
     </div>`;
   }
-  document.getElementById('appealsBody').innerHTML = html;
+
+  const body = document.getElementById('appealsBody');
+  body.innerHTML = html;
+
+  // Wire all card interactions
+  body.querySelectorAll('[data-appeal-id]').forEach(card => {
+    card.addEventListener('click', e => {
+      if(e.target.closest('button')) return; // buttons handle their own clicks
+      const a = portalAppeals.find(x=>x.id===card.getAttribute('data-appeal-id'));
+      if(a) openAppealDetailModal(a);
+    });
+  });
+  body.querySelectorAll('[data-appeal-view]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const a = portalAppeals.find(x=>x.id===btn.getAttribute('data-appeal-view'));
+      if(a) openAppealDetailModal(a);
+    });
+  });
+  body.querySelectorAll('[data-appeal-approve]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      updateAppealStatus(btn.getAttribute('data-appeal-approve'),'approved');
+    });
+  });
+  body.querySelectorAll('[data-appeal-deny]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      updateAppealStatus(btn.getAttribute('data-appeal-deny'),'denied');
+    });
+  });
+  body.querySelectorAll('[data-appeal-reopen]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      updateAppealStatus(btn.getAttribute('data-appeal-reopen'),'pending');
+    });
+  });
+  body.querySelectorAll('[data-appeal-del]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      deleteAppeal(btn.getAttribute('data-appeal-del'));
+    });
+  });
 }
 
-function updateAppealStatus(id, newStatus){
+function updateAppealStatus(id, newStatus, decisionReason){
   const a = portalAppeals.find(x=>x.id===id);
-  appealRef.child(id).update({status:newStatus}).then(()=>{
-    logAction('Appeal '+newStatus,'',a?(a.type+' — '+a.name):'');
-    toast(newStatus==='approved'?'Approved':'Status updated');
+  const update = {status:newStatus};
+  if(decisionReason!==undefined) update.decisionReason = decisionReason;
+  appealRef.child(id).update(update).then(()=>{
+    if(a){ a.status=newStatus; if(decisionReason!==undefined) a.decisionReason=decisionReason; }
+    logAction('Appeal '+newStatus,'',a?(a.type+' — '+a.name+(decisionReason?' — '+decisionReason.substring(0,60):'')):'');
+    toast(newStatus==='approved'?'Approved':newStatus==='denied'?'Denied':'Status updated');
   }).catch(err=>{ console.error(err); toast('Update failed'); });
 }
 
@@ -5025,6 +5075,223 @@ function deleteAppeal(id){
     logAction('Appeal deleted','',a?(a.type+' — '+a.name):'');
     toast('Deleted');
   }).catch(err=>{ console.error(err); toast('Delete failed'); });
+}
+
+// ═══════════════════════════════════════════
+// APPEALS — DETAIL MODAL & NOTES
+// ═══════════════════════════════════════════
+function openAppealDetailModal(a){
+  const isVSE = a.type === 'VSE';
+  const typeLabel = isVSE ? 'VSE Request' : 'Blacklist Appeal';
+  const typeColor = isVSE ? 'var(--cyan)' : 'var(--warn)';
+  const statusColors = {pending:'var(--warn)',approved:'var(--good)',denied:'var(--bad)'};
+  const sc = statusColors[a.status] || 'var(--muted)';
+  const submitted = a.submittedAt ? new Date(a.submittedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+
+  const mgmt = managementTrainerOptions();
+  const assignOpts = `<option value="">— Unassigned —</option>` + mgmt.map(m=>`<option value="${escapeHtml(m.id)}" ${a.assignedTo?.id===m.id?'selected':''}>${escapeHtml(m.label)}</option>`).join('');
+  const statusOpts = ['pending','approved','denied'].map(s=>`<option value="${s}" ${a.status===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('');
+
+  const notes = (a.staffNotes||[]).slice().sort((x,y)=>new Date(x.timestamp)-new Date(y.timestamp));
+  const notesHtml = notes.length ? notes.map(n=>{
+    const ts = new Date(n.timestamp).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' · '+new Date(n.timestamp).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    return `<div style="padding:10px 12px;border:1px solid var(--line);border-radius:var(--r);margin-bottom:6px;background:var(--surface);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+        <span style="font-weight:700;font-size:12px;">${escapeHtml(n.userName||'Unknown')}</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="muted" style="font-size:10px;">${escapeHtml(ts)}</span>
+          <button class="btn-ghost btn-sm" style="font-size:10px;padding:2px 6px;" data-del-anote="${escapeHtml(n.id)}">✕</button>
+        </div>
+      </div>
+      <div style="font-size:13px;line-height:1.5;white-space:pre-wrap;word-break:break-word;">${escapeHtml(n.text||'')}</div>
+    </div>`;
+  }).join('') : `<div class="muted small" style="padding:8px 0;">No staff notes yet.</div>`;
+
+  const html = `
+    <!-- Header -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+      <div>
+        <div style="font-weight:900;font-size:20px;margin-bottom:6px;">${escapeHtml(a.name||'Unknown')}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+          <span style="font-size:11px;padding:3px 10px;border-radius:10px;border:1px solid ${typeColor};color:${typeColor};font-weight:600;">${typeLabel}</span>
+          <span style="font-size:11px;padding:3px 10px;border-radius:10px;border:1px solid ${sc};color:${sc};text-transform:uppercase;font-weight:600;">${escapeHtml(a.status||'pending')}</span>
+          ${a.priority?`<span style="font-size:11px;padding:3px 10px;border-radius:10px;border:1px solid var(--warn);color:var(--warn);font-weight:700;">⚑ Priority</span>`:''}
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        ${a.status==='pending'?`
+          <button class="btn-accent btn-sm" id="ad_approve">Approve</button>
+          <button class="btn-ghost btn-sm" style="color:var(--bad);border-color:var(--bad)" id="ad_deny">Deny</button>
+        `:`
+          <button class="btn-ghost btn-sm" id="ad_reopen">Back to Pending</button>
+        `}
+        <button class="btn-danger btn-sm" id="ad_delete">Delete</button>
+      </div>
+    </div>
+
+    <!-- Two-column: submission info + handling -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+      <div style="padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r2);">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px;">Submission Info</div>
+        <div style="font-size:12px;display:flex;flex-direction:column;gap:5px;">
+          <div><span class="muted">Discord:</span> ${escapeHtml(a.discord||'—')}</div>
+          <div><span class="muted">Phone:</span> ${escapeHtml(a.phone||'—')}</div>
+          <div><span class="muted">DOB:</span> ${escapeHtml(a.dob||'—')}</div>
+          ${!isVSE?`<div><span class="muted">When blacklisted:</span> ${escapeHtml(a.whenBlacklisted||'—')}</div>`:''}
+          ${!isVSE?`<div><span class="muted">Blacklisted by:</span> ${escapeHtml(a.whoBlacklisted||'—')}</div>`:''}
+          ${!isVSE&&a.slotsRelated?`<div><span class="muted">Slots related:</span> ${escapeHtml(a.slotsRelated)}</div>`:''}
+          ${isVSE?`<div><span class="muted">Duration:</span> ${escapeHtml(a.duration||a.vseDuration||'—')}</div>`:''}
+          <div><span class="muted">Submitted:</span> ${submitted}</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r2);">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px;">Handling</div>
+          <div style="margin-bottom:10px;">
+            <div class="muted small" style="margin-bottom:4px;">Assigned To</div>
+            <select id="ad_assignedTo" style="width:100%;font-size:12px;">${assignOpts}</select>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;">
+            <input type="checkbox" id="ad_priority" ${a.priority?'checked':''} style="width:14px;height:14px;accent-color:var(--warn);">
+            <span style="font-weight:600;color:var(--warn);">⚑ Mark as Priority</span>
+          </label>
+        </div>
+        <div style="padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r2);">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px;">Decision Reason <span style="font-weight:400;text-transform:none;letter-spacing:0;">(internal)</span></div>
+          <textarea id="ad_reason" rows="3" placeholder="Why approved or denied? Who made the call?" style="font-size:12px;resize:vertical;width:100%;">${escapeHtml(a.decisionReason||'')}</textarea>
+          <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+            <button class="btn-ghost btn-sm" id="ad_saveReason" style="font-size:11px;">Save Reason</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Their statement -->
+    ${(a.detail||a.reason)?`<div style="margin-bottom:14px;padding:12px 14px;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r2);">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px;">Their Statement</div>
+      <div style="font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word;">${escapeHtml(a.detail||a.reason||'')}</div>
+    </div>`:''}
+    ${a.vseReason?`<div style="margin-bottom:14px;padding:12px 14px;background:var(--panel2);border:1px solid var(--line);border-radius:var(--r2);">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px;">Reason</div>
+      <div style="font-size:13px;line-height:1.6;white-space:pre-wrap;word-break:break-word;">${escapeHtml(a.vseReason||'')}</div>
+    </div>`:''}
+
+    <!-- Staff Notes -->
+    <div style="border-top:1px solid var(--line);padding-top:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);">Staff Notes (${notes.length})</div>
+        <button class="btn-ghost btn-sm" id="ad_addNote">+ Add Note</button>
+      </div>
+      <div id="ad_notesList">${notesHtml}</div>
+    </div>`;
+
+  openModal(typeLabel+' — '+escapeHtml(a.name||'Unknown'), html, {wide:true});
+
+  // Status action buttons
+  document.getElementById('ad_approve')?.addEventListener('click',()=>{
+    const reason = (document.getElementById('ad_reason')?.value||'').trim();
+    updateAppealStatus(a.id,'approved',reason||undefined);
+    closeModal();
+  });
+  document.getElementById('ad_deny')?.addEventListener('click',()=>{
+    const reason = (document.getElementById('ad_reason')?.value||'').trim();
+    updateAppealStatus(a.id,'denied',reason||undefined);
+    closeModal();
+  });
+  document.getElementById('ad_reopen')?.addEventListener('click',()=>{
+    updateAppealStatus(a.id,'pending');
+    closeModal();
+  });
+  document.getElementById('ad_delete')?.addEventListener('click',()=>{
+    closeModal();
+    deleteAppeal(a.id);
+  });
+
+  // Assigned To
+  document.getElementById('ad_assignedTo')?.addEventListener('change', e=>{
+    const val = e.target.value;
+    const m = val ? mgmt.find(x=>x.id===val) : null;
+    const assignedTo = m ? {id:m.id, name:m.label} : null;
+    appealRef.child(a.id).update({assignedTo}).then(()=>{
+      a.assignedTo = assignedTo;
+      logAction('Appeal assigned','',a.name+' — '+(m?m.label:'Unassigned'));
+      toast(m?'Assigned to '+m.label.split('—').pop().trim():'Unassigned');
+    }).catch(()=>toast('Save failed'));
+  });
+
+  // Priority toggle
+  document.getElementById('ad_priority')?.addEventListener('change', e=>{
+    const priority = e.target.checked;
+    appealRef.child(a.id).update({priority}).then(()=>{
+      a.priority = priority;
+      logAction('Appeal priority '+(priority?'flagged':'cleared'),'',a.name);
+      toast(priority?'Marked as priority':'Priority cleared');
+    }).catch(()=>toast('Save failed'));
+  });
+
+  // Decision reason save
+  document.getElementById('ad_saveReason')?.addEventListener('click',()=>{
+    const reason = (document.getElementById('ad_reason')?.value||'').trim();
+    appealRef.child(a.id).update({decisionReason:reason}).then(()=>{
+      a.decisionReason = reason;
+      logAction('Appeal decision reason updated','',a.name+(reason?' — '+reason.substring(0,60):''));
+      toast('Reason saved');
+    }).catch(()=>toast('Save failed'));
+  });
+
+  // Add note
+  document.getElementById('ad_addNote')?.addEventListener('click',()=>{
+    closeModal();
+    openAppealNoteModal(a, null);
+  });
+
+  // Delete note
+  document.querySelectorAll('[data-del-anote]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const nid = btn.getAttribute('data-del-anote');
+      if(!confirm('Delete this note?')) return;
+      a.staffNotes = (a.staffNotes||[]).filter(n=>n.id!==nid);
+      appealRef.child(a.id).update({staffNotes: a.staffNotes.length ? a.staffNotes : null}).then(()=>{
+        logAction('Appeal note deleted','',a.name);
+        toast('Note deleted');
+        closeModal();
+        openAppealDetailModal(a);
+      }).catch(()=>toast('Delete failed'));
+    });
+  });
+}
+
+function openAppealNoteModal(a, existing){
+  openModal(existing?'Edit Staff Note':'Add Staff Note', `
+    <div style="margin-bottom:12px;font-size:13px;">Note for <b>${escapeHtml(a.name||'Unknown')}</b> — visible to all managers only.</div>
+    <textarea id="an_text" rows="6" placeholder="Write your note..." style="font-size:13px;line-height:1.6;resize:vertical;width:100%;">${escapeHtml(existing?.text||'')}</textarea>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
+      <button class="btn-ghost btn-sm" id="an_back">← Back</button>
+      <button class="btn-accent" id="an_save">Save Note</button>
+    </div>
+  `);
+
+  document.getElementById('an_back')?.addEventListener('click',()=>{ closeModal(); openAppealDetailModal(a); });
+
+  document.getElementById('an_save')?.addEventListener('click',()=>{
+    const text = (document.getElementById('an_text')?.value||'').trim();
+    if(!text) return alert('Note cannot be empty.');
+    const who = currentUser ? (currentUser.character||currentUser.steamName||'Unknown') : 'Unknown';
+    const whoId = currentUser?.id||'';
+    a.staffNotes||=[];
+    if(existing){
+      const n = a.staffNotes.find(x=>x.id===existing.id);
+      if(n){ n.text=text; n.editedAt=new Date().toISOString(); }
+    } else {
+      a.staffNotes.push({id:uid(), timestamp:new Date().toISOString(), userName:who, userId:whoId, text});
+    }
+    appealRef.child(a.id).update({staffNotes: a.staffNotes}).then(()=>{
+      logAction(existing?'Appeal note edited':'Appeal note added','',a.name+' — '+text.substring(0,60));
+      toast(existing?'Note updated':'Note added');
+      closeModal();
+      openAppealDetailModal(a);
+    }).catch(()=>toast('Save failed'));
+  });
 }
 
 // ═══════════════════════════════════════════
