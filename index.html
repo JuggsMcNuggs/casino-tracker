@@ -1429,6 +1429,13 @@ function createTagPicker(containerId, options, selected=[]){
     });
 
     input.addEventListener('blur',()=>{setTimeout(()=>dropdown.classList.remove('open'),150);});
+    input.addEventListener('keydown',e=>{
+      if((e.key==='Tab'||e.key==='Enter')&&dropdown.classList.contains('open')){
+        const first=dropdown.querySelector('[data-tag-add]');
+        if(first){ e.preventDefault(); sel.add(first.getAttribute('data-tag-add')); input.value=''; render(); }
+      }
+      if(e.key==='Escape') dropdown.classList.remove('open');
+    });
     input.addEventListener('focus',()=>{if(input.value.trim()) input.dispatchEvent(new Event('input'));});
 
     container.querySelectorAll('[data-tag-rm]').forEach(el=>{
@@ -4519,6 +4526,9 @@ function openCandidateDetail(c){
 
   // Status change
   document.getElementById('cd_status')?.addEventListener('change',e=>{
+    if(e.target.value==='hired'&&!confirm('Mark as Hired? If you meant to convert them to a staff profile, cancel and use the → Employee button instead. Their interview notes will be preserved either way.')){
+      e.target.value=c.status; return;
+    }
     c.status=e.target.value;
     logAction('Candidate status changed','',c.name+' — '+e.target.value);
     save();renderCandidateCards();
@@ -4719,6 +4729,10 @@ function openInterviewRecordModal(c){
 
   document.getElementById('ir_save').addEventListener('click',()=>{
     const ansEls=document.querySelectorAll('.ir-answer');
+    const currentAnswers=Array.from(ansEls).map(el=>el.value.trim());
+    if(currentAnswers.every(a=>!a)&&c.qa&&c.qa.some(p=>p.a)){
+      if(!confirm('All answers are blank but this candidate already has interview notes. Save anyway and overwrite?')) return;
+    }
     c.qa=qs.map((q,i)=>({q,a:(ansEls[i]?.value||'').trim()}));
     c.interviewDate=(document.getElementById('ir_date').value||'').trim();
     if(c.status==='awaiting') c.status='interviewed';
